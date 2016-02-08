@@ -9,7 +9,7 @@ Les principales caractéristiques à respecter sont :
  - **hétérogénéité** : résolue par la mise en place du protocole de niveau application.
  - **accès concurrents** : mise en place d'un mécanisme de type MUTEX au niveau du serveur. (_pas prioritaire_)
  - **chiffrement** : mise en place du chiffrement des communications (SSL par exemple mais c'est _pas prioritaire non plus_)
- - **tolérance aux pannes** : partiellement résolue par l'archi. clients-serveur (sauf dans le cas ou c'est le serveur qui meurt) mais sinon on mais en place au niveau du protocole applicatif un système de transactions entretenues par le serveur.
+ - **tolérance aux pannes** : partiellement résolue par l'archi. clients-serveur (sauf dans le cas ou c'est le serveur qui meurt) mais sinon on met en place au niveau du protocole applicatif un système de transactionnel.
 
 ### Protocole de communication (niveau applicatif)
 
