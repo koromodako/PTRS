@@ -188,5 +188,5 @@ Le serveur sera chargé de fragmenter le calcul initial et de le distribuer de m
 
 ## Client
 
-Les clients peuvent être implémentés dans n'importe quel langage (**hétérogénéité**). Il doivent également implémenter les algorithmes nécessaires à l'exécution du calcul demandé.
+Les clients peuvent être implémentés dans n'importe quel langage (**hétérogénéité**). Ils doivent également implémenter les algorithmes nécessaires à l'exécution du calcul demandé.
 
