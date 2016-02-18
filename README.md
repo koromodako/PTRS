@@ -190,3 +190,8 @@ Le serveur sera chargé de fragmenter le calcul initial et de le distribuer de m
 
 Les clients peuvent être implémentés dans n'importe quel langage (**hétérogénéité**). Ils doivent également implémenter les algorithmes nécessaires à l'exécution du calcul demandé.
 
+## Mise en place de l'environnement de développement
+
+Vous n'avez rien à configurer si vous utiliser l'IDE QtCreator.
+Vous pouvez télécharger et installer Qt en suivant ce [lien](http://www.qt.io/download-open-source/).
+
