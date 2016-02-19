@@ -2,6 +2,7 @@
 #define LOGGER_H
 
 #include <QString>
+#include "src/const.h"
 
 // -- definition de quelques format de log
 #define LOG_FORMAT_LIGHT       "[%c] - %m"
@@ -37,15 +38,6 @@ struct LoggerConfiguration {
 class Logger
 {
 public:    
-    enum Level {
-        LVL_NO_LVL      = 0x00,
-        LVL_DEBUG       = 0x01,
-        LVL_INFO        = 0x02,
-        LVL_ERROR       = 0x04,
-        LVL_CRITICAL    = 0x08,
-        LVL_FATAL       = 0x10
-    };
-
     ~Logger(){}
     static Logger & GetInstance() { return _instance;  }
 
@@ -60,8 +52,6 @@ private: // singleton
 
 private:
     LoggerConfiguration _config;
-
-    QString levelToString(Level lvl) const;
 };
 
 // -- macros pour logger facilement
@@ -74,10 +64,10 @@ private:
 // --- logging
 #define __QFILE__ QString(__FILE__)
 #define __QLINE__ QString::number(__LINE__)
-#define LOG_DEBUG(msg) Logger::GetInstance().Log(Logger::LVL_DEBUG, msg, __QLINE__, __QFILE__)
-#define LOG_INFO(msg) Logger::GetInstance().Log(Logger::LVL_DEBUG, msg, __QLINE__, __QFILE__)
-#define LOG_ERROR(msg) Logger::GetInstance().Log(Logger::LVL_DEBUG, msg, __QLINE__, __QFILE__)
-#define LOG_CRITICAL(msg) Logger::GetInstance().Log(Logger::LVL_DEBUG, msg, __QLINE__, __QFILE__)
-#define LOG_FATAL(msg) Logger::GetInstance().Log(Logger::LVL_DEBUG, msg, __QLINE__, __QFILE__)
+#define LOG_DEBUG(msg) Logger::GetInstance().Log(LVL_DEBUG, msg, __QLINE__, __QFILE__)
+#define LOG_INFO(msg) Logger::GetInstance().Log(LVL_INFO, msg, __QLINE__, __QFILE__)
+#define LOG_ERROR(msg) Logger::GetInstance().Log(LVL_ERROR, msg, __QLINE__, __QFILE__)
+#define LOG_CRITICAL(msg) Logger::GetInstance().Log(LVL_CRITICAL, msg, __QLINE__, __QFILE__)
+#define LOG_FATAL(msg) Logger::GetInstance().Log(LVL_FATAL, msg, __QLINE__, __QFILE__)
 
 #endif // LOGGER_H

@@ -5,7 +5,7 @@
 
 Logger Logger::_instance;
 
-void Logger::Log(Logger::Level lvl, QString message, QString line, QString file, bool endl) const
+void Logger::Log(Level lvl, QString message, QString line, QString file, bool endl) const
 {
     QString log;
     if(lvl == LVL_NO_LVL)
@@ -14,11 +14,20 @@ void Logger::Log(Logger::Level lvl, QString message, QString line, QString file,
     else
     {   // retrieve format
         log = _config.format;
+        QString level("unhandled_log_lvl");
+        switch (lvl) {
+                case LVL_NO_LVL:    level = "NO_LVL"; break;
+                case LVL_DEBUG:     level = "DEBUG"; break;
+                case LVL_INFO:      level = "INFO"; break;
+                case LVL_ERROR:     level = "ERROR"; break;
+                case LVL_CRITICAL:  level = "CRITICAL"; break;
+                case LVL_FATAL:     level = "FATAL"; break;
+            }
         // substitute
-        log.replace("%c", levelToString(lvl))
+        log.replace("%c", level)
            .replace("%t", QDateTime::currentDateTime().toString(Qt::ISODate))
            .replace("%m", message)
-           .replace("%f", file)
+           .replace("%f", file.split('/').last())
            .replace("%l", line);
     }
     // print log
@@ -28,16 +37,3 @@ void Logger::Log(Logger::Level lvl, QString message, QString line, QString file,
 }
 
 Logger::Logger() : _config() {}
-
-QString Logger::levelToString(Logger::Level lvl) const
-{
-    switch (lvl) {
-        case LVL_NO_LVL:    return "NO_LVL";
-        case LVL_DEBUG:     return "DEBUG";
-        case LVL_INFO:      return "INFO";
-        case LVL_ERROR:     return "ERROR";
-        case LVL_CRITICAL:  return "CRITICAL";
-        case LVL_FATAL:     return "FATAL";
-    }
-    return "unhandled_log_lvl";
-}

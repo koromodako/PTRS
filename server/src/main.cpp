@@ -9,6 +9,8 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
+    LOGGER_CONFIGURE(LVL_NO_LVL, LOG_FORMAT_DETAILED);
+
     LOG_INFO("Initialisation des connexions SIG/SLOTS...");
     // -- initialisation des connexions pour la communication inter-threads
     // --- console_handler --> calculation_manager
@@ -21,8 +23,8 @@ int main(int argc, char *argv[])
     QObject::connect(&(ConsoleHandler::GetInstance()), SIGNAL(SIG_CANCEL(uint)),
                      &(CalculationManager::GetInstance()), SLOT(SLOT_CANCEL(uint)));
     // --- calculation_mgr --> console_handler
-    QObject::connect(&(CalculationManager::GetInstance()), SIGNAL(SIG_RESPONSE(Command,bool,QList<Calculation>&)),
-                     &(ConsoleHandler::GetInstance()), SLOT(SLOT_RESPONSE(Command,bool,QList<Calculation>&)));
+    QObject::connect(&(CalculationManager::GetInstance()), SIGNAL(SIG_RESPONSE(Command,bool,QString)),
+                     &(ConsoleHandler::GetInstance()), SLOT(SLOT_RESPONSE(Command,bool,QString)));
     // --- console_handler --> qApp
     QObject::connect(&(ConsoleHandler::GetInstance()), SIGNAL(SIG_SHUTDOWN()), qApp, SLOT(quit()));
 
