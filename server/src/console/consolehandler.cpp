@@ -7,7 +7,7 @@ void ConsoleHandler::run()
     /// \todo implement here
 }
 
-void ConsoleHandler::SLOT_RESPONSE(Command command, bool ok, QList<Calculation> &calculations)
+void ConsoleHandler::SLOT_RESPONSE(Command command, bool ok, QString message)
 {
     /// \todo implement here
 }

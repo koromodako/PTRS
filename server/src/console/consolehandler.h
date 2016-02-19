@@ -35,7 +35,7 @@ public slots:
      * @param ok
      * @param calculations
      */
-    void SLOT_RESPONSE(Command command, bool ok, QList<Calculation> & calculations);
+    void SLOT_RESPONSE(Command command, bool ok, QString message);
 
 signals:
     /**
