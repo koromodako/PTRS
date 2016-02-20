@@ -12,16 +12,19 @@ class NetworkManager : public QObject
     Q_OBJECT
 public:
     ~NetworkManager(){}
-    /**
-     * @brief Récupère l'instance unique correspondant à cette classe
-     * @return
-     */
-    NetworkManager & GetInstance() { return _instance; }
 
 public slots:
 
 signals:
 
+protected:
+    /**
+     * @brief Récupère l'instance unique correspondant à cette classe
+     * @return
+     */
+    NetworkManager & getInstance() { return _instance; }
+    // only application manager class can access this instance
+    friend class ApplicationManager;
 
 private: // singleton
     NetworkManager();                // interdiction d'instancier en dehors de cette classe
