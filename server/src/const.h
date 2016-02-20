@@ -12,7 +12,8 @@ enum Command {
     CMD_STATUS,
     CMD_RESULT,
     CMD_CANCEL,
-    CMD_SHUTDOWN
+    CMD_SHUTDOWN,
+    CMD_STATE
 };
 
 /**
