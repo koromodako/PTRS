@@ -2,6 +2,7 @@
 
 #include "utils/logger.h"
 #include "console/consolehandler.h"
+#include "utils/calculationfactory.h"
 
 ApplicationManager ApplicationManager::_instance;
 
@@ -36,32 +37,37 @@ void ApplicationManager::SLOT_STATE()
     emit SIG_RESPONSE(CMD_STATE, true, "STATE command received !");
 }
 
-void ApplicationManager::SLOT_EXEC(QByteArray calculationOrderJSON)
+void ApplicationManager::SLOT_EXEC(QByteArray json)
 {
-    LOG_DEBUG("SLOT_EXEC called");
-    /// \todo implement here
-    emit SIG_RESPONSE(CMD_EXEC, true, "EXEC command received !");
+    Calculation * calculation = CalculationFactory::MakeCalculation(&_instance, json);
+    if(CalculationManager::getInstance().Execute(calculation))
+    {   emit SIG_RESPONSE(CMD_EXEC, true, QString("Calculation accepted id=%1. %2 fragments scheduled.").arg(
+                              calculation->GetId().toString(),
+                              calculation->GetFragmentCount()));
+    }
+    else
+    {   emit SIG_RESPONSE(CMD_EXEC, false, "Missing binary for this calculation.");
+    }
 }
 
 void ApplicationManager::SLOT_STATUS()
 {
-    LOG_DEBUG("SLOT_STATUS called");
-    /// \todo implement here
-    emit SIG_RESPONSE(CMD_STATUS, true, "STATUS command received !");
+    emit SIG_RESPONSE(CMD_STATUS, true, CalculationManager::getInstance().Status());
 }
 
 void ApplicationManager::SLOT_RESULT(QUuid id, QString filename)
 {
-    LOG_DEBUG("SLOT_RESULT called");
-    /// \todo implement here
-    emit SIG_RESPONSE(CMD_RESULT, true, "RESULT command received !");
+    emit SIG_RESPONSE(CMD_RESULT, true, CalculationManager::getInstance().Result(id, filename));
 }
 
 void ApplicationManager::SLOT_CANCEL(QUuid id)
 {
-    LOG_DEBUG("SLOT_CANCEL called");
-    /// \todo implement here
-    emit SIG_RESPONSE(CMD_CANCEL, true, "CANCEL command received !");
+    if(CalculationManager::getInstance().Cancel(id))
+    {   emit SIG_RESPONSE(CMD_CANCEL, true, QString("Calculation id=%1 scheduled for cancelation.").arg(id.toString()));
+    }
+    else
+    {   emit SIG_RESPONSE(CMD_CANCEL, false, QString("Unknown calculation id=%1").arg(id.toString()));
+    }
 }
 
 void ApplicationManager::SLOT_SHUTDOWN()

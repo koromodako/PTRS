@@ -18,7 +18,6 @@ SOURCES += \
     src/calculation/calculationmanager.cpp \
     src/network/networkmanager.cpp \
     src/utils/calculationfactory.cpp \
-    src/calculation/calculationorder.cpp \
     src/calculation/calculation.cpp \
     src/calculation/calculationfragment.cpp \
     src/network/clientsession.cpp \
@@ -31,7 +30,6 @@ HEADERS  += \
     src/calculation/calculationmanager.h \
     src/network/networkmanager.h \
     src/utils/calculationfactory.h \
-    src/calculation/calculationorder.h \
     src/calculation/calculation.h \
     src/calculation/calculationfragment.h \
     src/network/clientsession.h \

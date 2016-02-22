@@ -1,7 +1,8 @@
 #include "calculation.h"
 
-Calculation::Calculation(QObject * parent) :
-    AbstractIdentifiable(parent)
+Calculation::Calculation(const QString & bin, QObject * parent) :
+    AbstractIdentifiable(parent),
+    _bin(bin),
+    _fragments()
 {
-
 }
