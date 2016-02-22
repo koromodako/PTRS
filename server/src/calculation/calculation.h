@@ -1,6 +1,7 @@
 #ifndef CALCULATION_H
 #define CALCULATION_H
 
+#include "src/const.h"
 #include "src/utils/abstractidentifiable.h"
 #include "calculationfragment.h"
 #include <QHash>
@@ -17,6 +18,7 @@ public:
     void AddFragment(QList<CalculationFragment*> fragments);
 
     inline int GetFragmentCount() const { return _fragments.count(); }
+    inline CalculationStatus GetStatus() const { return _status; }
 
 protected:
     Calculation(const QString &bin, QObject * parent = NULL);
@@ -24,6 +26,7 @@ protected:
 
 private:
     Q_DISABLE_COPY(Calculation)
+    CalculationStatus _status;
     QString _bin;
     QHash<QUuid,CalculationFragment*> _fragments;
 };

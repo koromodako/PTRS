@@ -30,8 +30,7 @@ void ConsoleHandler::run()
 }
 
 void ConsoleHandler::SLOT_RESPONSE(Command command, bool ok, QString message)
-{   LOG_DEBUG("SLOT_RESPONSE called");
-
+{   //LOG_DEBUG("SLOT_RESPONSE called");
     if(command == CMD_SHUTDOWN) {
         // say goodbye
         goodbye();

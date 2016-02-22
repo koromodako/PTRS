@@ -17,7 +17,7 @@ public:
      *      QObject parent de l'instance qui sera créée
      * @return
      */
-    static Calculation * MakeCalculation(QObject * parent, const QByteArray & json);
+    static Calculation * MakeCalculation(QObject * parent, const QByteArray & json, QString &error_str);
     /**
      * @brief Crée une nouvelle instance de fragment de calcul en lui attachant le parent passé en paramètre
      * @param parent

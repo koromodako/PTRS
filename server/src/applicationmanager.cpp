@@ -13,6 +13,7 @@ void ApplicationManager::Init()
     // --- console_handler --> application_manager
     QObject::connect(&(ConsoleHandler::GetInstance()), SIGNAL(SIG_EXEC(QByteArray)),        SLOT(SLOT_EXEC(QByteArray)));
     QObject::connect(&(ConsoleHandler::GetInstance()), SIGNAL(SIG_STATUS()),                SLOT(SLOT_STATUS()));
+    QObject::connect(&(ConsoleHandler::GetInstance()), SIGNAL(SIG_STATE()),                 SLOT(SLOT_STATE()));
     QObject::connect(&(ConsoleHandler::GetInstance()), SIGNAL(SIG_RESULT(QUuid,QString)),   SLOT(SLOT_RESULT(QUuid,QString)));
     QObject::connect(&(ConsoleHandler::GetInstance()), SIGNAL(SIG_CANCEL(QUuid)),           SLOT(SLOT_CANCEL(QUuid)));
     QObject::connect(&(ConsoleHandler::GetInstance()), SIGNAL(SIG_SHUTDOWN()),              SLOT(SLOT_SHUTDOWN()));
@@ -32,21 +33,53 @@ void ApplicationManager::Init()
 
 void ApplicationManager::SLOT_STATE()
 {
-    LOG_DEBUG("SLOT_STATE called");
-    /// \todo implement here
-    emit SIG_RESPONSE(CMD_STATE, true, "STATE command received !");
+    QString report = "\n"
+                     "----------------- SERVER STATE REPORT -----------------\n"
+                     "\n"
+                     "Calculation stats :\n"
+                     "  + scheduled : %1\n"
+                     "  + canceled  : %2\n"
+                     "  + completed : %3\n"
+                     "  + total     : %4\n"
+                     "\n"
+                     "Clients stats :\n"
+                     "  + available : %5\n"
+                     "  + working   : %6\n"
+                     "  + total     : %7\n"
+                     "\n"
+                     "Timing stats :\n"
+                     "  + calculation average lifetime : %8\n"
+                     "  + calculation average fragment count : %9\n"
+                     "\n"
+                     "-------------------------------------------------------";
+    report = report.arg(QString::number(CalculationManager::getInstance().ScheduledCount()),
+                        QString::number(CalculationManager::getInstance().CompletedCount()),
+                        QString::number(CalculationManager::getInstance().CanceledCount()),
+                        QString::number(CalculationManager::getInstance().Count()),
+                        QString::number(-1), /// \todo complete here with NetworkManager stats
+                        QString::number(-1), /// \todo complete here with NetworkManager stats
+                        QString::number(-1), /// \todo complete here with NetworkManager stats
+                        QString::number(CalculationManager::getInstance().AverageLifetime()),
+                        QString::number(CalculationManager::getInstance().AverageFragmentCount()));
+    emit SIG_RESPONSE(CMD_STATE, true, report);
 }
 
 void ApplicationManager::SLOT_EXEC(QByteArray json)
 {
-    Calculation * calculation = CalculationFactory::MakeCalculation(&_instance, json);
-    if(CalculationManager::getInstance().Execute(calculation))
-    {   emit SIG_RESPONSE(CMD_EXEC, true, QString("Calculation accepted id=%1. %2 fragments scheduled.").arg(
-                              calculation->GetId().toString(),
-                              calculation->GetFragmentCount()));
+    QString error;
+    Calculation * calculation = CalculationFactory::MakeCalculation(&_instance, json, error);
+    if(calculation == NULL)
+    {   emit SIG_RESPONSE(CMD_EXEC, false, error);
     }
     else
-    {   emit SIG_RESPONSE(CMD_EXEC, false, "Missing binary for this calculation.");
+    {   if(CalculationManager::getInstance().Execute(calculation))
+        {   emit SIG_RESPONSE(CMD_EXEC, true, QString("Calculation accepted id=%1. %2 fragments scheduled.").arg(
+                                  calculation->GetId().toString(),
+                                  calculation->GetFragmentCount()));
+        }
+        else
+        {   emit SIG_RESPONSE(CMD_EXEC, false, "Missing binary for this calculation.");
+        }
     }
 }
 
@@ -74,14 +107,21 @@ void ApplicationManager::SLOT_SHUTDOWN()
 {
     LOG_DEBUG("SLOT_SHUTDOWN called");
     /// \todo implement here
-    emit SIG_RESPONSE(CMD_SHUTDOWN, true, "STATUS command received !");
+    if(TERMINATED_EXPECTED_TOTAL - _terminated_ctr == 1)
+    {   emit SIG_RESPONSE(CMD_SHUTDOWN, true, "STATUS command received !");
+    }
 }
 
 void ApplicationManager::SLOT_TERMINATED()
 {   _terminated_ctr++;
     if(_terminated_ctr >= TERMINATED_EXPECTED_TOTAL)
+    {   emit SIG_TERMINATE();
+    }
+    else if(TERMINATED_EXPECTED_TOTAL - _terminated_ctr == 1)
+    {   emit SIG_RESPONSE(CMD_SHUTDOWN, true, "STATUS command received !");
+    }
     // emission du signal de terminaison quand tous les composants attendus ont notofié l'app manager de leur terminaison
-    emit SIG_TERMINATE();
+
 }
 
 ApplicationManager::ApplicationManager() :
