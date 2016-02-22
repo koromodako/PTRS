@@ -3,6 +3,8 @@
 
 #include "calculation.h"
 
+typedef QHash<QUuid, Calculation*> CalculationHash;
+
 /**
  * @brief Cette classe représente l'entité qui gère les calculs distribués commandés au serveur
  */
@@ -46,12 +48,23 @@ protected:
      */
     QString Status() const;
 
+    // stats functions
+
+    int ScheduledCount() const;
+    int CompletedCount() const;
+    int CanceledCount() const;
+    inline int Count() const { return _calculations.count(); }
+
+    int AverageLifetime() const;
+    int AverageFragmentCount() const;
+
+
 private: // singleton
     CalculationManager();                // interdiction d'instancier en dehors de cette classe
     Q_DISABLE_COPY(CalculationManager)   // interdiction de réaliser une copie de l'instance
     static CalculationManager _instance; // instance unique de la classe
 
-    QHash<QUuid, Calculation*> _calculations;
+    CalculationHash _calculations;
 
 };
 

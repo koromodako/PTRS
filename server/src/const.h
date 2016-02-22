@@ -28,5 +28,14 @@ enum Level {
     LVL_FATAL       = 0x10
 };
 
+/**
+ * @brief Cette énumération décrit les différents états que peut prendre un calcul
+ */
+enum CalculationStatus {
+    CALCS_SCHEDULED,
+    CALCS_COMPLETED,
+    CALCS_CANCELED
+};
+
 
 #endif // CONST_H
