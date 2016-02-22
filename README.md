@@ -72,8 +72,8 @@ Ces structures seraient spécifiées comme suit :
 Spécification de la structure *\<calculation\_order\_block>* :
   ```json
 {
-  "calculation_type":"<type>",
-  "calculation_params":{
+  "bin":"<binary_basename>",
+  "params":{
     <list_of_param_value_pairs>
   }
 }
@@ -82,9 +82,9 @@ Spécification de la structure *\<calculation\_order\_block>* :
 Spécification de la structure *\<calculation\_block>* :
   ```json
 {
-  "calculation_type":"<type>",
-  "calculation_fragment_id":"<fragment_id>",
-  "calculation_params":{
+  "bin":"<binary_basename>",
+  "fragment_id":"<fragment_id>",
+  "params":{
     <list_of_param_value_pairs>
   }
 }
@@ -93,9 +93,8 @@ Spécification de la structure *\<calculation\_block>* :
 Spécification de la structure *\<calculation\_result\_block>* :
   ```json
 {
-  "calculation_type":"<type>",
-  "calculation_fragment_id":"<fragment_id>",
-  "calculation_result":{
+  "fragment_id":"<fragment_id>",
+  "result":{
     <serialized_data_structure>
   }
 }
@@ -106,8 +105,8 @@ Exemple pour un calcul de bruteforce :
 *\<calculation\_order\_block>*
   ```json
 {
-  "calculation_type":"bruteforce",
-  "calculation_params":{
+  "bin":"bruteforce",
+  "params":{
     "charset":"+-!?&=[a-zA-Z0-9]",
     "min_len":2,
     "max_len":15,
@@ -133,9 +132,8 @@ Exemple pour un calcul de bruteforce :
 *\<calculation\_result\_block>* :
   ```json
 {
-  "calculation_type":"bruteforce",
-  "calculation_fragment_id":"1",
-  "calculation_result":{
+  "fragment_id":"1",
+  "result":{
     "has_match":true,
     "match_string":"password"
   }
