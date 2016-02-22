@@ -5,7 +5,6 @@
 #include <QTextStream>
 #include "src/const.h"
 #include "src/calculation/calculation.h"
-#include "src/calculation/calculationorder.h"
 
 /**
  * @brief Cette classe gère les interactions avec l'utilisateur en console.

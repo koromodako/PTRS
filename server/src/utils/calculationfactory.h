@@ -2,7 +2,6 @@
 #define CALCULATIONFACTORY_H
 
 #include "src/calculation/calculation.h"
-#include "src/calculation/calculationorder.h"
 #include "src/calculation/calculationfragment.h"
 
 /**
@@ -18,21 +17,15 @@ public:
      *      QObject parent de l'instance qui sera créée
      * @return
      */
-    static Calculation * MakeCalculation(QObject * parent);
-    /**
-     * @brief Crée une nouvelle instance de requete de calcul en lui attachant le parent passé en paramètre
-     * @param parent
-     *      QObject parent de l'instance qui sera créée
-     * @return
-     */
-    static CalculationOrder * MakeCalculationOrder(QObject * parent);
+    static Calculation * MakeCalculation(QObject * parent, const QByteArray & json);
     /**
      * @brief Crée une nouvelle instance de fragment de calcul en lui attachant le parent passé en paramètre
      * @param parent
      *      QObject parent de l'instance qui sera créée
      * @return
      */
-    static CalculationFragment * MakeCalculationFragment(QObject * parent);
+    static CalculationFragment * MakeCalculationFragment(QObject * parent, const QByteArray & json);
+
 
 private: // classe de type fabrique
     CalculationFactory(){} // non instanciable
