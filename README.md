@@ -118,9 +118,9 @@ Exemple pour un calcul de bruteforce :
 *\<calculation\_block>* :
   ```json
 {
-  "calculation_type":"bruteforce",
-  "calculation_fragment_id":"1",
-  "calculation_params":{
+  "bin":"bruteforce",
+  "fragment_id":"1",
+  "params":{
     "charset":"+-!?&=[a-zA-Z0-9]",
     "min_len":6,
     "max_len":10,
@@ -151,7 +151,7 @@ Les commandes permettant d'agir sur le serveur :
 Exemple de sorties pour les commandes :
 
   ```bash
-server < EXEC {"calculation_type":"bruteforce","calculation_params":{"charset":"+-!?&=[a-zA-Z0-9]","min_len":2,"max_len":15,"hash_func":"sha256","target":"5E884898DA28047151D0E56F8DC6292773603D0D6AABBDD62A11EF721D1542D8"}}
+server < EXEC {"bin":"bruteforce","params":{"charset":"+-!?&=[a-zA-Z0-9]","min_len":2,"max_len":15,"hash_func":"sha256","target":"5E884898DA28047151D0E56F8DC6292773603D0D6AABBDD62A11EF721D1542D8"}}
 server > OK, calculation scheduled (calculation_id=1)
 server < STATUS
 server > 
