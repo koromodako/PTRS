@@ -30,7 +30,7 @@ public slots:
      * @param calculationOrder
      *      Objet contenant les spécification du calcul à effectuer
      */
-    void SLOT_EXEC(QByteArray calculationOrderJSON);
+    void SLOT_EXEC(QByteArray json);
     /**
      * @brief Ce slot reçoit les demandes de status des calculs en cours
      */
