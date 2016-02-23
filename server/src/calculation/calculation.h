@@ -5,6 +5,7 @@
 #include "src/utils/abstractidentifiable.h"
 #include "calculationfragment.h"
 #include <QHash>
+#include <QVariantMap>
 
 /**
  * @brief Cette classe représente un calcul distribuable
@@ -19,15 +20,18 @@ public:
 
     inline int GetFragmentCount() const { return _fragments.count(); }
     inline CalculationStatus GetStatus() const { return _status; }
+    inline QString GetBin() const { return _bin; }
+    inline QVariantMap GetParams() const { return _params; }
 
 protected:
-    Calculation(const QString &bin, QObject * parent = NULL);
+    Calculation(const QString &bin, const QVariantMap &params, QObject * parent = NULL);
     friend class CalculationFactory; // seule la CalculationFactory est autorisée à créer des instances de cette classe
 
 private:
     Q_DISABLE_COPY(Calculation)
     CalculationStatus _status;
     QString _bin;
+    QVariantMap _params;
     QHash<QUuid,CalculationFragment*> _fragments;
 };
 

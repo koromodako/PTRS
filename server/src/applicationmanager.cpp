@@ -3,6 +3,7 @@
 #include "utils/logger.h"
 #include "console/consolehandler.h"
 #include "utils/calculationfactory.h"
+#include "plugins/pluginmanager.h"
 
 ApplicationManager ApplicationManager::_instance;
 
@@ -24,7 +25,9 @@ void ApplicationManager::Init()
 
     LOG_INFO("Initialisation des composants...");
     // -- initialisation des composants
-    // rien à faire ici pour l'instant
+    if(!PluginManager::CheckPlugins())
+    {   LOG_CRITICAL("Plugins integrity check failed !");
+    }
 
     LOG_INFO("Démarrage du console handler...");
     // -- demarrage du thread d'interaction avec la console
@@ -36,22 +39,33 @@ void ApplicationManager::SLOT_STATE()
     QString report = "\n"
                      "----------------- SERVER STATE REPORT -----------------\n"
                      "\n"
-                     "Calculation stats :\n"
-                     "  + scheduled : %1\n"
-                     "  + canceled  : %2\n"
-                     "  + completed : %3\n"
-                     "  + total     : %4\n"
-                     "\n"
-                     "Clients stats :\n"
-                     "  + available : %5\n"
-                     "  + working   : %6\n"
-                     "  + total     : %7\n"
-                     "\n"
-                     "Timing stats :\n"
-                     "  + calculation average lifetime : %8\n"
-                     "  + calculation average fragment count : %9\n"
-                     "\n"
-                     "-------------------------------------------------------";
+                     "Available plugins :\n";
+    QStringList plugins = PluginManager::GetPluginsList();
+    if(plugins.size() > 0)
+    {   foreach (QString plugin, plugins)
+        {   report += QString("  + %1\n").arg(plugin);
+        }
+    }
+    else
+    {   report += "  - no plugin available, sever is useless.\n";
+    }
+    report += "\n"
+              "Calculation stats :\n"
+              "  + scheduled : %1\n"
+              "  + canceled  : %2\n"
+              "  + completed : %3\n"
+              "  + total     : %4\n"
+              "\n"
+              "Clients stats :\n"
+              "  + available : %5\n"
+              "  + working   : %6\n"
+              "  + total     : %7\n"
+              "\n"
+              "Timing stats :\n"
+              "  + calculation average lifetime : %8\n"
+              "  + calculation average fragment count : %9\n"
+              "\n"
+              "-------------------------------------------------------";
     report = report.arg(QString::number(CalculationManager::getInstance().ScheduledCount()),
                         QString::number(CalculationManager::getInstance().CompletedCount()),
                         QString::number(CalculationManager::getInstance().CanceledCount()),

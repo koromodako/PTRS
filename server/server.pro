@@ -23,7 +23,8 @@ SOURCES += \
     src/network/clientsession.cpp \
     src/utils/abstractidentifiable.cpp \
     src/utils/logger.cpp \
-    src/applicationmanager.cpp
+    src/applicationmanager.cpp \
+    src/plugins/pluginmanager.cpp
 
 HEADERS  += \
     src/console/consolehandler.h \
@@ -36,6 +37,7 @@ HEADERS  += \
     src/const.h \
     src/utils/abstractidentifiable.h \
     src/utils/logger.h \
-    src/applicationmanager.h
+    src/applicationmanager.h \
+    src/plugins/pluginmanager.h
 
 FORMS    +=
