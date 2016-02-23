@@ -24,7 +24,7 @@ public:
      *      QObject parent de l'instance qui sera créée
      * @return
      */
-    static CalculationFragment * MakeCalculationFragment(QObject * parent, const QByteArray & json);
+    static CalculationFragment * MakeCalculationFragment(QObject * parent, const QByteArray & json, QString & error_str);
 
 
 private: // classe de type fabrique

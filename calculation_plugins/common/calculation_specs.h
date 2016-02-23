@@ -9,4 +9,6 @@
 #define CS_OP_SPLIT "-split"
 #define CS_OP_JOIN  "-join"
 
+#define CS_FRAGMENT_SEP ';'
+
 #endif // CALCULATION_SPECS_H

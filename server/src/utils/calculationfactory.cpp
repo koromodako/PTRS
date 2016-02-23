@@ -12,11 +12,19 @@ Calculation *CalculationFactory::MakeCalculation(QObject *parent, const QByteArr
     QJsonDocument doc = QJsonDocument::fromJson(json, &error);
     if(!error.error)
     {   if(doc.isObject())
-        {   if(doc.object().contains(CS_JSON_KEY_CALC_BIN))
-            {   calculation = new Calculation(doc.object().value(CS_JSON_KEY_CALC_BIN).toString(), parent);
+        {   bool ok = true;
+            if(!doc.object().contains(CS_JSON_KEY_CALC_BIN))
+            {   error_str = QString("Missing '%1' key in JSON structure.").arg(CS_JSON_KEY_CALC_BIN);
+                ok = false;
             }
-            else
-            {   error_str = QString("Missing %1 key in JSON structure.").arg(CS_JSON_KEY_CALC_BIN);
+            else if(!doc.object().contains(CS_JSON_KEY_CALC_PARAMS) || !doc.object().value(CS_JSON_KEY_CALC_PARAMS).isObject())
+            {   error_str = QString("Missing '%1' key in JSON structure or value is not an object.").arg(CS_JSON_KEY_CALC_PARAMS);
+                ok = false;
+            }
+            if(ok)
+            {   calculation = new Calculation(doc.object().value(CS_JSON_KEY_CALC_BIN).toString(),
+                                              doc.object().value(CS_JSON_KEY_CALC_PARAMS).toObject().toVariantMap(),
+                                              parent);
             }
         }
         else
@@ -29,7 +37,7 @@ Calculation *CalculationFactory::MakeCalculation(QObject *parent, const QByteArr
     return calculation;
 }
 
-CalculationFragment *CalculationFactory::MakeCalculationFragment(QObject *parent, const QByteArray & json)
+CalculationFragment *CalculationFactory::MakeCalculationFragment(QObject *parent, const QByteArray & json, QString & error_str)
 {
     return new CalculationFragment(parent);
 }

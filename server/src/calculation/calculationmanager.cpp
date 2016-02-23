@@ -1,12 +1,52 @@
 #include "calculationmanager.h"
+#include "../calculation_plugins/common/calculation_specs.h"
+#include "src/plugins/pluginmanager.h"
+#include "src/utils/logger.h"
+#include "src/utils/calculationfactory.h"
+#include <QJsonObject>
+#include <QJsonDocument>
 
 CalculationManager CalculationManager::_instance;
 
 bool CalculationManager::Execute(Calculation *calculation)
 {
-    /// \todo implement CalculationManager::Execute(Calculation *calculation)
-    ///         Utiliser QProcess pour faire appel aux plugins
-    return false;
+    bool ok = false;
+    if(PluginManager::PluginExists(calculation->GetBin()))
+    {   // - construction des paramètres
+        // -- recuperation du nom du binaire
+        QString bin = calculation->GetBin();
+        // -- construction des arguments a passer au binaire
+        QStringList args; args << CS_OP_SPLIT; // ajout de l'operation split
+        // -- ajout des parametres en json
+        QJsonDocument json;
+        json.setObject(QJsonObject::fromVariantMap(calculation->GetParams()));
+        // -- construction des objet string pour récupération des sorties du plugin
+        QString out, err;
+        if(PluginManager::RunPlugin(bin, args, out, err))
+        {   LOG_INFO("Plugin exited normally.");
+            // treat plugin output
+            QString parsing_err;
+            foreach (QString json_fragment, out.split(CS_FRAGMENT_SEP))
+            {   CalculationFragment * fragment = CalculationFactory::MakeCalculationFragment(calculation, json_fragment.toUtf8(), parsing_err);
+                if(fragment == NULL)
+                {   LOG_ERROR("Calculation factory failed to parse fragment.");
+                    LOG_ERROR(parsing_err);
+                }
+                else
+                {   calculation->AddFragment(fragment);
+                }
+            }
+            ok = true;
+        }
+        else
+        {   LOG_ERROR("Plugin exited abnormally.");
+            LOG_ERROR(err);
+        }
+    }
+    else
+    {   LOG_ERROR("Call Execute on a missing plugin !");
+    }
+    return ok;
 }
 
 bool CalculationManager::Cancel(QUuid id)
