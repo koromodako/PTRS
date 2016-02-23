@@ -9,6 +9,6 @@ LEN=${#SRC_DIR}
 if [[ "${SRC_DIR}" != "" ]] && [[ "${DEST_DIR}" != "" ]]; then
 	for folder in ${SRC_DIR}*; do
 		echo -n "Exporting ${DEST_DIR}${folder:${LEN}}..."
-		ln -s ${DEPTH}${folder}/${BUILD_TYPE}/${folder:${LEN}} ${DEST_DIR}${folder:${LEN}} && echo "done !"
+		cp ${folder}/${BUILD_TYPE}/${folder:${LEN}} ${DEST_DIR}${folder:${LEN}} && echo "done !"
 	done
 fi
