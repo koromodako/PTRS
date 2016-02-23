@@ -2,7 +2,6 @@
 
 #include "utils/logger.h"
 #include "console/consolehandler.h"
-#include "utils/calculationfactory.h"
 #include "plugins/pluginmanager.h"
 
 ApplicationManager ApplicationManager::_instance;
@@ -82,7 +81,7 @@ void ApplicationManager::SLOT_STATE()
 void ApplicationManager::SLOT_EXEC(QByteArray json)
 {
     QString error;
-    Calculation * calculation = CalculationFactory::MakeCalculation(&_instance, json, error);
+    Calculation * calculation = Calculation::FromJson(&_instance, json, error);
     if(calculation == NULL)
     {   emit SIG_RESPONSE(CMD_EXEC, false, error);
     }

@@ -1,5 +1,5 @@
-#ifndef CALCULATION_SPECS_H
-#define CALCULATION_SPECS_H
+#ifndef SPECS_H
+#define SPECS_H
 
 #define CS_JSON_KEY_CALC_BIN    "bin"
 #define CS_JSON_KEY_CALC_PARAMS "params"
@@ -11,4 +11,5 @@
 
 #define CS_FRAGMENT_SEP ';'
 
-#endif // CALCULATION_SPECS_H
+
+#endif // SPECS_H

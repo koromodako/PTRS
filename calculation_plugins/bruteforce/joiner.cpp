@@ -1,8 +1,9 @@
 #include "joiner.h"
+#include "../../server/src/calculation/specs.h"
 
 Joiner::Joiner() {}
 
-bool Joiner::join(const QStringList &fragments)
+bool Joiner::join(const QString &json)
 {
     bool ok = false;
     /// \todo implement join

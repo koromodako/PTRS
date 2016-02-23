@@ -8,7 +8,7 @@ class Splitter
 public:
     Splitter();
 
-    bool split(const QStringList & fragments);
+    bool split(const QString & json);
     inline QString error() const { return _error; }
     inline QString result() const { return _result; }
 

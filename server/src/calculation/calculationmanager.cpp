@@ -1,8 +1,7 @@
 #include "calculationmanager.h"
-#include "../calculation_plugins/common/calculation_specs.h"
+#include "specs.h"
 #include "src/plugins/pluginmanager.h"
 #include "src/utils/logger.h"
-#include "src/utils/calculationfactory.h"
 #include <QJsonObject>
 #include <QJsonDocument>
 
@@ -16,10 +15,8 @@ bool CalculationManager::Execute(Calculation *calculation)
         // -- recuperation du nom du binaire
         QString bin = calculation->GetBin();
         // -- construction des arguments a passer au binaire
-        QStringList args; args << CS_OP_SPLIT; // ajout de l'operation split
-        // -- ajout des parametres en json
-        QJsonDocument json;
-        json.setObject(QJsonObject::fromVariantMap(calculation->GetParams()));
+        QStringList args;
+        args << CS_OP_SPLIT << calculation->ToJson();
         // -- construction des objet string pour récupération des sorties du plugin
         QString out, err;
         if(PluginManager::getInstance().RunPlugin(bin, args, out, err))
@@ -27,24 +24,29 @@ bool CalculationManager::Execute(Calculation *calculation)
             // treat plugin output
             QString parsing_err;
             foreach (QString json_fragment, out.split(CS_FRAGMENT_SEP))
-            {   CalculationFragment * fragment = CalculationFactory::MakeCalculationFragment(calculation, json_fragment.toUtf8(), parsing_err);
+            {   Calculation * fragment = Calculation::FromJson(calculation, json_fragment.toUtf8(), parsing_err);
                 if(fragment == NULL)
                 {   LOG_ERROR("Calculation factory failed to parse fragment.");
                     LOG_ERROR(parsing_err);
+                    ok = false;
+                    break; // interrupt here
                 }
                 else
                 {   calculation->AddFragment(fragment);
                 }
+                ok = true;
             }
-            ok = true;
         }
         else
         {   LOG_ERROR("Plugin exited abnormally.");
-            LOG_ERROR(err);
+            LOG_ERROR(calculation->dump());
+            LOG_ERROR(QString("Output is : ").append(out));
+            LOG_ERROR(QString("Errput is : ").append(err));
         }
     }
     else
     {   LOG_ERROR("Call Execute on a missing plugin !");
+        LOG_ERROR(calculation->dump());
     }
     return ok;
 }

@@ -8,7 +8,7 @@ class Joiner
 public:
     Joiner();
 
-    bool join(const QStringList & fragments);
+    bool join(const QString &json);
     inline QString error() const { return _error; }
     inline QString result() const { return _result; }
 

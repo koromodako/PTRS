@@ -15,4 +15,5 @@ SOURCES += main.cpp \
 
 HEADERS += \
     splitter.h \
-    joiner.h
+    joiner.h \
+    bruteforce_specs.h

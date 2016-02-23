@@ -1,4 +1,4 @@
-#include "../common/calculation_specs.h"
+#include "../../server/src/calculation/specs.h"
 #include "splitter.h"
 #include "joiner.h"
 
@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
     {   QString action = args.takeFirst();
         if(action == CS_OP_JOIN)
         {   Joiner joiner;
-            if(joiner.join(args))
+            if(joiner.join(args.join(' ')))
             {   success(joiner.result().toStdString());
             }
             else
@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
         }
         else if(action == CS_OP_SPLIT)
         {   Splitter splitter;
-            if(splitter.split(args))
+            if(splitter.split(args.join(' ')))
             {   success(splitter.result().toStdString());
             }
             else
