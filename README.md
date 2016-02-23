@@ -38,30 +38,7 @@ Un scénario de communication dans le cas nominal serait :
  - C > S : ( **DONE** *\<id>* *\<calculation\_result\_block>* | **ABORT** *\<id>* )
  - S > C : **OK**
 
-Concernant le client un graphe d'états lui aussi provisoire :
-
-<pre>
-                      +--------+
-                      |        | KO
-                  +---v---+    |
-                  | HELLO +----+
-                  +---+---+
-           OK         |
-    +---------------+ |OK
- +------+          +v-v--+     STOP
- |UNABLE|          |READY<------------+
- +------+          +--^--+        +-------+
-    ^---------------+ | +--------->WORKING+----+
-           DO         |    DO     +---+----    |
-                      |               |        |
-                      |               |OK      |OK
-                      |               |        |
-                      |     OK     +--v--+   +-v--+
-                      <------------+ABORT|   |DONE|
-                      |            +-----+   +-+--+
-                      |     OK                 |
-                      ^------------------------+
-</pre>
+Concernant le client un graphe d'états lui aussi provisoire : cf graphes_etats.pdf
 
 ### Calculs
 
