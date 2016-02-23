@@ -52,7 +52,7 @@ enum ReqType {
  */
 enum ErrorCode {
     ACTION_NOT_HANDlED, CALCUL_ABORTED, UNABLE_TO_CALCULATE
-
+};
 /**
  * @brief Cette énumération décrit les différents états que peut prendre un calcul
  */
@@ -60,7 +60,6 @@ enum CalculationStatus {
     CALCS_SCHEDULED,
     CALCS_COMPLETED,
     CALCS_CANCELED
->>>>>>> origin/master
 };
 
 

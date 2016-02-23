@@ -1,5 +1,7 @@
 #include "networkmanager.h"
 
+NetworkManager NetworkManager::_instance;
+
 NetworkManager::NetworkManager()
 {
     _TCPServer = new TCPServer(this);
@@ -12,10 +14,9 @@ NetworkManager::~NetworkManager()
 
 }
 
-NetworkManager &NetworkManager::GetInstance()
+NetworkManager &NetworkManager::getInstance()
 {
-    static NetworkManager instance;
-    return instance;
+    return _instance;
 }
 
 void NetworkManager::addAvailableClient(ClientSession *client)

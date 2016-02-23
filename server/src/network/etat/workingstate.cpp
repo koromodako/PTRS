@@ -16,7 +16,7 @@ void WorkingState::ProcessAbort(const QStringList &args)
 {
     if (args.size() > 0 && args.first() == _client->GetId().toString())
     {
-        emit NetworkManager::GetInstance().calculAborted(_client->FragmentId());
+        emit NetworkManager::getInstance().calculAborted(_client->FragmentId());
         _client->SetCurrentStateAfterError(CALCUL_ABORTED);
     }
 }
@@ -26,7 +26,7 @@ void WorkingState::ProcessDone(const QStringList &args)
     if (args.size() > 1 && args.first() == _client->GetId().toString())
     {
         QJsonDocument jsonResponse = QJsonDocument::fromJson(args[1].toUtf8());
-        emit NetworkManager::GetInstance().calculDone(_client->FragmentId(), jsonResponse.object());
+        emit NetworkManager::getInstance().calculDone(_client->FragmentId(), jsonResponse.object());
         _client->SetCurrentStateAfterSuccess();
     }
 }

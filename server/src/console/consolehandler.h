@@ -15,12 +15,6 @@ class ConsoleHandler : public QThread
     Q_OBJECT
 public:
     ~ConsoleHandler(){}
-    /**
-     * @brief Récupère l'instance unique de cette classe
-     * @return
-     */
-    static ConsoleHandler & GetInstance() { return _instance; }
-
 
 protected:
     /**
@@ -28,6 +22,12 @@ protected:
      * @see QThread::run()
      */
     void run();
+    /**
+     * @brief Récupère l'instance unique de cette classe
+     * @return
+     */
+    static ConsoleHandler & getInstance() { return _instance; }
+    friend class ApplicationManager;
 
 public slots:
     /**

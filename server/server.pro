@@ -49,9 +49,7 @@ HEADERS  += \
     src/utils/abstractidentifiable.h \
     src/utils/logger.h \
     src/applicationmanager.h \
-<<<<<<< HEAD
-    src/plugins/pluginmanager.h
-=======
+    src/plugins/pluginmanager.h \
     src/network/udpserver.h \
     src/network/tcpserver.h \
     src/network/etat/abstractstate.h \
@@ -60,6 +58,5 @@ HEADERS  += \
     src/network/etat/waitingstate.h \
     src/network/etat/workingabouttostartstate.h \
     src/network/etat/workingstate.h
->>>>>>> 7c5fab18aa26e914ce048f6dd89c46d267cf73fd
 
 FORMS    +=
