@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <QDateTime>
+#include <QStringList>
 
 Logger Logger::_instance;
 

@@ -31,12 +31,36 @@ enum Level {
 };
 
 /**
+ * @brief Cette énumération décrit les différentes commandes échangables entre le client et le serveur
+ */
+enum ReqType {
+    HELLO,
+    HELLO_FROM_SERVER,
+    READY,
+    WORKING,
+    UNABLE,
+    DONE,
+    ABORT,
+    OK,
+    KO,
+    DO,
+    STOP
+};
+
+/**
+ * @brief Cette énumération décrit les différents code d'erreur que peut retourner le programme
+ */
+enum ErrorCode {
+    ACTION_NOT_HANDlED, CALCUL_ABORTED, UNABLE_TO_CALCULATE
+
+/**
  * @brief Cette énumération décrit les différents états que peut prendre un calcul
  */
 enum CalculationStatus {
     CALCS_SCHEDULED,
     CALCS_COMPLETED,
     CALCS_CANCELED
+>>>>>>> origin/master
 };
 
 
