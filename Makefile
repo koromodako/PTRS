@@ -1,8 +1,9 @@
 Q=@
-BIN_DIR="bin/"
-PLUGINS_DIR="bin/plugins/"
-BUILD_DIR="build/"
-PLUGINS_BUILD_DIR="calculation_plugins/build/"
+BIN_DIR=bin/
+PLUGINS_DIR=bin/plugins/
+BUILD_DIR=build/
+PLUGINS_BUILD_DIR=calculation_plugins/build/
+BUILD_TYPE=debug
 
 all: deploy
 
@@ -11,10 +12,10 @@ deploy:
 	${Q}rm -rf ${BIN_DIR}
 	${Q}mkdir ${BIN_DIR}
 	${Q}mkdir ${PLUGINS_DIR}
-	${Q}echo "Exporting binaries..."
-	${Q}for dir in ${BUILD_DIR}*; do echo "ln -s ${dir}/debug/${dir:6} ${PLUGINS_DIR}${dir:6}"; done
-	${Q}echo "Exporting plugins..."
-	${Q}for dir in ${PLUGINS_BUILD_DIR}*; do echo "ln -s ${dir}/debug/${dir:26} ${PLUGINS_DIR}${dir:26}"; done
+	${Q}echo "Export binaries..."
+	${Q}./export.sh ${BUILD_DIR} ${BIN_DIR} ${BUILD_TYPE} ../
+	${Q}echo "Export plugins..."
+	${Q}./export.sh ${PLUGINS_BUILD_DIR} ${PLUGINS_DIR} ${BUILD_TYPE} ../../
 	${Q}echo "--------------- ! done ! ----------------"
 
 run-server: deploy
