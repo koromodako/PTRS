@@ -11,6 +11,10 @@ class PluginManager : public QObject
 {
 public:
     /**
+     * @brief Initiatlise le plugin manager en récupérant le chemin d'execution
+     */
+    bool Init();
+    /**
      * @brief Vérification de l'intégrité des plugins
      * @return
      */

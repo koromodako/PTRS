@@ -25,6 +25,7 @@ void ApplicationManager::Init()
 
     LOG_INFO("Initialisation des composants...");
     // -- initialisation des composants
+    PluginManager::getInstance().Init();
     if(!PluginManager::getInstance().CheckPlugins())
     {   LOG_CRITICAL("Plugins integrity check failed !");
     }
