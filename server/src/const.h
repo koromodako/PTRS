@@ -28,5 +28,23 @@ enum Level {
     LVL_FATAL       = 0x10
 };
 
+enum ReqType {
+    HELLO,
+    HELLO_FROM_SERVER,
+    READY,
+    WORKING,
+    UNABLE,
+    DONE,
+    ABORT,
+    OK,
+    KO,
+    DO,
+    STOP
+};
+
+enum ErrorCode {
+    ACTION_NOT_HANDlED, CALCUL_ABORTED, UNABLE_TO_CALCULATE
+};
+
 
 #endif // CONST_H

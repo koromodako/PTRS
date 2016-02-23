@@ -2,12 +2,15 @@
 #define CLIENT_SESSION_H
 
 #include <QTcpSocket>
+#include <QUdpSocket>
+#include <QThread>
+#include <QTimer>
 #include "src/network/etat/abstractstate.h"
-#include "src/utils/abstractidentifiable.h"
+#include "src/calculthread.h"
 /**
  * @brief Cette classe représente une session client, c'est à dire une connexion client active.
  */
-class ClientSession : public AbstractIdentifiable
+class ClientSession : public QObject
 {
     Q_OBJECT
 
@@ -15,9 +18,8 @@ public:
     /**
      * @brief Constructeur par défault
      * @param associatedSocket : le socket de la connexion
-     * @param parent : parent de l'objet
      */
-    ClientSession(QTcpSocket *associatedSocket, QObject *parent);
+    ClientSession();
 
     /**
      * @brief Destructeur de la classe
@@ -31,6 +33,11 @@ public:
     inline int FragmentId() const;
 
     /**
+     * @brief Retourne l'identifiant de ce client
+     */
+    QString Id() const;
+
+    /**
      * @brief Envoie la commande donnée au Client
      * @param reqtype le type de la commande
      * @param args les arguments à transmettre au client
@@ -38,52 +45,54 @@ public:
     void SendCmd(ReqType reqtype, const QString &args);
 
     /**
-     * @brief Change l'état courant et récupère le code d'erreur
-     * @param errorCode l'erreur émise par l'état courant qui a déclenché le changement
-     */
-    void SetCurrentStateAfterError(ErrorCode errorCode);
-
-    /**
      * @brief Change l'état courant
      */
-    void SetCurrentStateAfterSuccess();
+    void SetCurrentState();
 
     /**
-     * @brief Demande au client de démarrer le calcul donné
-     * @param fragmentId l'id du fragment de calcul (utile pour stopper
-     *                   éventuellement le calcul)
-     * @param args les arguments de calcul à transmettre au client
+     * @brief Definie le nouvel identifiant de ce client
      */
-    void StartCalcul(int FragmentId, QJsonObject args);
+    void setId(const QString &id);
+
+public slots:
+    /**
+     * @brief Prévient le serveur que le calcul a annulé
+     */
+    void AbortCalcul();
 
     /**
-     * @brief Arrête le calcul en cours s'il y en a un
+     * @brief Envoie le résultat du calcul au serveur
+     * @param args les résultats du calcul à transmettre au serveur
      */
-    void StopCalcul();
+    void SendResultToServer(QJsonObject args);
 
 signals:
     /**
-     * @brief Emis quand le client est prêt à recevoir un nouveau calcul.
-     * @param client Pointeur vers cette instance
+     * @brief Emis pour demander au thread de commencer le calcul
      */
-    void ready(ClientSession *client);
+    void requestCalculStart(QJsonObject args);
 
     /**
-     * @brief Emis quand le client commence à faire un calcul.
-     * @param client Pointeur vers cette instance
+     * @brief Emis pour demander au thread d'arrêter le calcul
      */
-    void working(ClientSession *client);
+    void requestCalculStop();
 
 private:
+
+    /**
+     * @brief Envoie un message UDP pour récuperer l'ID d'un serveur
+     */
+    void findServer();
+
     /**
      * @brief Initialise l'automate et les états
      */
     void initializeStateMachine();
 
     /**
-     * @brief Effectue la transition de l'automate avec la liste des transitions données
+     * @brief récupère la réponse du serveur et se connecte avec celui-ci en TCP
      */
-    void setCurrentState(const QMap<QObject *, AbstractState *> &transitionsMap);
+    void readBroadcastDatagram();
 
 private slots:
 
@@ -105,12 +114,16 @@ private slots:
     void processReadyRead();
 
 private:
-    AbstractState *_disconnectedState;
+    QTimer _broadcastTimer;
+    QUdpSocket *_broadcastSocket;
     AbstractState *_currentState;
-    QMap<QObject *, AbstractState *> _doneTransitionsMap;
-    QMap<QObject *, AbstractState *> _errorTransitionsMap;
+    AbstractState *_disconnectedState;
     int _fragmentId;
+    QString _id;
     QTcpSocket *_socket;
+    QThread *_thread;
+    QMap<QObject *, AbstractState *> _transitionsMap;
+    CalculThread* _worker;
 };
 
 inline int ClientSession::FragmentId() const
@@ -118,4 +131,8 @@ inline int ClientSession::FragmentId() const
     return _fragmentId;
 }
 
+inline QString ClientSession::Id() const
+{
+    return _id;
+}
 #endif // CLIENT_SESSION_H

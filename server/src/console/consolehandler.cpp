@@ -54,7 +54,12 @@ void ConsoleHandler::welcome()
 bool ConsoleHandler::prompt(QString * input)
 {
     print("server <: ", false);
-    return _in.readLineInto(input);
+    *input = _in.readLine();
+    if (input->isNull())
+        return false;
+    return true;
+    //J'ai remplacé le code ci dessous car j'ai pas Qt5.5 - rémy
+    //return _in.readLineInto(input);
 }
 
 void ConsoleHandler::respond(QString response)
@@ -86,19 +91,19 @@ void ConsoleHandler::help(const QString &cmd)
                 "\n"
                 "\tAvailable commands:\n"
                 "\n"
-                "\t\t+ "C_HELP" [<command>] : print server's help or a specific command help.\n"
+                "\t\t+ " C_HELP " [<command>] : print server's help or a specific command help.\n"
                 "\n"
-                "\t\t+ "C_STATE" : print server state.\n"
+                "\t\t+ " C_STATE " : print server state.\n"
                 "\n"
-                "\t\t+ "C_SHUTDOWN" : shutdown server.\n"
+                "\t\t+ " C_SHUTDOWN " : shutdown server.\n"
                 "\n"
-                "\t\t+ "C_STATUS" : print calculations statuses.\n"
+                "\t\t+ " C_STATUS " : print calculations statuses.\n"
                 "\n"
-                "\t\t+ "C_EXEC" <calculation_order_block> : print calculations statuses.\n"
+                "\t\t+ " C_EXEC " <calculation_order_block> : print calculations statuses.\n"
                 "\n"
-                "\t\t+ "C_CANCEL" <id> : cancel a calculation identified using <id>.\n"
+                "\t\t+ " C_CANCEL " <id> : cancel a calculation identified using <id>.\n"
                 "\n"
-                "\t\t+ "C_RESULT" <id> [<filename>] : print or export calculation result using <id>.\n");
+                "\t\t+ " C_RESULT " <id> [<filename>] : print or export calculation result using <id>.\n");
     }
     else
     {   if(cmd == C_HELP)
