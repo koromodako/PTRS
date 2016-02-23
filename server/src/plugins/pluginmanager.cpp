@@ -53,19 +53,21 @@ bool PluginManager::RunPlugin(const QString &name, const QStringList &args, QStr
 {
     bool ok = false;
     QProcess p;
-    p.setProgram(QString("./%1/%2").arg(PLUGINS_DIR, name));
-    p.setArguments(args);
-    if(p.open(QIODevice::ReadOnly))
-    {   p.waitForFinished();
-        if(p.state() != QProcess::NotRunning)
-        {   err.clear();
-            out.clear();
-            if(p.exitStatus() == QProcess::NormalExit)
-            {   out.append(p.readAllStandardOutput());
-            }
-            else
-            {   err.append(p.readAllStandardError());
-            }
+    QString program = QString("./%1/%2").arg(PLUGINS_DIR, name);
+    LOG_DEBUG(QString("Progam : ").append(program));
+    LOG_DEBUG(QString("Args : ").append(args.join(' ')));
+    p.start(program, args);
+    p.waitForFinished();
+    LOG_DEBUG(QString("Process state after wait loop : ").append(QString::number(p.state())));
+    if(p.state() != QProcess::NotRunning)
+    {   err.clear();
+        out.clear();
+        if(p.exitStatus() == QProcess::NormalExit)
+        {   out.append(p.readAllStandardOutput());
+            ok = true;
+        }
+        else
+        {   err.append(p.readAllStandardError());
         }
     }
     return ok;

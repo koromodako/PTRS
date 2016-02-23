@@ -20,9 +20,7 @@ SOURCES += \
     src/console/consolehandler.cpp \
     src/calculation/calculationmanager.cpp \
     src/network/networkmanager.cpp \
-    src/utils/calculationfactory.cpp \
     src/calculation/calculation.cpp \
-    src/calculation/calculationfragment.cpp \
     src/network/clientsession.cpp \
     src/utils/abstractidentifiable.cpp \
     src/utils/logger.cpp \
@@ -41,9 +39,7 @@ HEADERS  += \
     src/console/consolehandler.h \
     src/calculation/calculationmanager.h \
     src/network/networkmanager.h \
-    src/utils/calculationfactory.h \
     src/calculation/calculation.h \
-    src/calculation/calculationfragment.h \
     src/network/clientsession.h \
     src/const.h \
     src/utils/abstractidentifiable.h \
@@ -57,6 +53,7 @@ HEADERS  += \
     src/network/etat/readystate.h \
     src/network/etat/waitingstate.h \
     src/network/etat/workingabouttostartstate.h \
-    src/network/etat/workingstate.h
+    src/network/etat/workingstate.h \
+    src/calculation/specs.h
 
 FORMS    +=

@@ -14,14 +14,6 @@ class CalculationManager : public QObject
 public:
     virtual ~CalculationManager(){}
 
-protected:
-    /**
-     * @brief Récupère l'instance unique correspondant à cette classe
-     * @return
-     */
-    static CalculationManager & getInstance() { return _instance; }
-    // only application manager class can access this instance
-    friend class ApplicationManager;
 
     /**
      * @brief Réalise la fragmentation du calcul et programme son execution
@@ -58,6 +50,14 @@ protected:
     int AverageLifetime() const;
     int AverageFragmentCount() const;
 
+protected:
+    /**
+     * @brief Récupère l'instance unique correspondant à cette classe
+     * @return
+     */
+    static CalculationManager & getInstance() { return _instance; }
+    // only application manager class can access this instance
+    friend class ApplicationManager;
 
 private: // singleton
     CalculationManager();                // interdiction d'instancier en dehors de cette classe
