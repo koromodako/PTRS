@@ -25,12 +25,6 @@ public:
      */
     ~NetworkManager();
 
-    /**
-     * @brief Récupère l'instance unique correspondant à cette classe
-     * @return
-     */
-    static NetworkManager &GetInstance();
-
 public slots:
     /**
      * @brief Trouve un client dispo et demande au client de démarrer le calcul donné
@@ -66,6 +60,13 @@ private:
      *        Le constructeur est privé car c'est un singleton
      */
     NetworkManager();
+    /**
+     * @brief Récupère l'instance unique correspondant à cette classe
+     * @return
+     */
+    static NetworkManager &getInstance();
+    friend class ApplicationManager;
+    friend class WorkingState;
 
 private slots:
     /**
@@ -85,6 +86,7 @@ private slots:
     void addUnavailableClient(ClientSession *client);
 
 private:
+    static NetworkManager _instance;
     QSet<ClientSession *> _availableClients;
     QMap<int, ClientSession *> _fragmentsPlace;
     TCPServer *_TCPServer;

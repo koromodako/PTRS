@@ -11,7 +11,7 @@ CalculationManager CalculationManager::_instance;
 bool CalculationManager::Execute(Calculation *calculation)
 {
     bool ok = false;
-    if(PluginManager::PluginExists(calculation->GetBin()))
+    if(PluginManager::getInstance().PluginExists(calculation->GetBin()))
     {   // - construction des paramètres
         // -- recuperation du nom du binaire
         QString bin = calculation->GetBin();
@@ -22,7 +22,7 @@ bool CalculationManager::Execute(Calculation *calculation)
         json.setObject(QJsonObject::fromVariantMap(calculation->GetParams()));
         // -- construction des objet string pour récupération des sorties du plugin
         QString out, err;
-        if(PluginManager::RunPlugin(bin, args, out, err))
+        if(PluginManager::getInstance().RunPlugin(bin, args, out, err))
         {   LOG_INFO("Plugin exited normally.");
             // treat plugin output
             QString parsing_err;

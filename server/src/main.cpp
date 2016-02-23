@@ -9,14 +9,12 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    //LOGGER_CONFIGURE(LVL_NO_LVL, LOG_FORMAT_DETAILED);
+    LOGGER_CONFIGURE(LVL_NO_LVL, LOG_FORMAT_DETAILED);
 
-    //ApplicationManager::GetInstance().Init();
+    ApplicationManager::GetInstance().Init();
 
-    //QObject::connect(&(ApplicationManager::GetInstance()), SIGNAL(SIG_TERMINATE()),
-    //                 qApp, SLOT(quit()));
-
-    NetworkManager::GetInstance();
+    QObject::connect(&(ApplicationManager::GetInstance()), SIGNAL(SIG_TERMINATE()),
+                     qApp, SLOT(quit()));
 
     return a.exec();
 }

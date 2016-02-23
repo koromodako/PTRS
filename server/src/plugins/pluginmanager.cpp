@@ -1,37 +1,36 @@
 #include "pluginmanager.h"
-
 #include "src/const.h"
+#include "src/utils/logger.h"
+
 #include <QFile>
 #include <QProcess>
 
-QDir PluginManager::_plugin_dir(PLUGINS_DIR);
+#define ENTRY_LIST_FILTER   QDir::NoFilter
+#define ENTRY_LIST_SORT     QDir::Name
+#define ENTRY_LIST() _plugins_dir.entryList(ENTRY_LIST_FILTER, ENTRY_LIST_SORT)
 
-bool PluginManager::CheckPlugins()
+PluginManager PluginManager::_instance;
+
+bool PluginManager::CheckPlugins() const
 {
     bool ok = true;
-    QDir dir;
-    if(dir.exists())
-    {   if(!dir.mkdir(PLUGINS_DIR))
-        {   ok = false;
-        }
-    }
-    foreach (QString plugin, _plugin_dir.entryList(QDir::Executable, QDir::Name))
+    foreach (QString plugin, ENTRY_LIST())
     {   /// \todo do a MD5 checksum
     }
     return ok;
 }
 
-bool PluginManager::PluginExists(const QString &plugin_name)
+bool PluginManager::PluginExists(const QString &plugin_name) const
 {
-    return _plugin_dir.entryList(QDir::Executable, QDir::Name).contains(plugin_name);
+    return ENTRY_LIST().contains(plugin_name);
 }
 
-QStringList PluginManager::GetPluginsList()
+QStringList PluginManager::GetPluginsList() const
 {
-    return _plugin_dir.entryList(QDir::Executable, QDir::Name);
+    return ENTRY_LIST();
 }
 
-bool PluginManager::RunPlugin(const QString &name, const QStringList &args, QString &out, QString &err)
+bool PluginManager::RunPlugin(const QString &name, const QStringList &args, QString &out, QString &err) const
 {
     bool ok = false;
     QProcess p;
@@ -55,4 +54,11 @@ bool PluginManager::RunPlugin(const QString &name, const QStringList &args, QStr
 
 PluginManager::PluginManager()
 {
+    QDir dir;
+    if(!dir.exists())
+    {   if(!dir.mkdir(PLUGINS_DIR))
+        {   LOG_CRITICAL("Can't make plugins directory !");
+        }
+    }
+    _plugins_dir = QDir(PLUGINS_DIR);
 }

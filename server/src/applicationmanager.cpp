@@ -12,26 +12,26 @@ void ApplicationManager::Init()
     LOG_INFO("Initialisation des connexions SIG/SLOTS...");
     // -- initialisation des connexions pour la communication inter-threads
     // --- console_handler --> application_manager
-    QObject::connect(&(ConsoleHandler::GetInstance()), SIGNAL(SIG_EXEC(QByteArray)),        SLOT(SLOT_EXEC(QByteArray)));
-    QObject::connect(&(ConsoleHandler::GetInstance()), SIGNAL(SIG_STATUS()),                SLOT(SLOT_STATUS()));
-    QObject::connect(&(ConsoleHandler::GetInstance()), SIGNAL(SIG_STATE()),                 SLOT(SLOT_STATE()));
-    QObject::connect(&(ConsoleHandler::GetInstance()), SIGNAL(SIG_RESULT(QUuid,QString)),   SLOT(SLOT_RESULT(QUuid,QString)));
-    QObject::connect(&(ConsoleHandler::GetInstance()), SIGNAL(SIG_CANCEL(QUuid)),           SLOT(SLOT_CANCEL(QUuid)));
-    QObject::connect(&(ConsoleHandler::GetInstance()), SIGNAL(SIG_SHUTDOWN()),              SLOT(SLOT_SHUTDOWN()));
-    QObject::connect(&(ConsoleHandler::GetInstance()), SIGNAL(SIG_TERMINATED()),            SLOT(SLOT_TERMINATED()));
+    QObject::connect(&(ConsoleHandler::getInstance()), SIGNAL(SIG_EXEC(QByteArray)),        SLOT(SLOT_EXEC(QByteArray)));
+    QObject::connect(&(ConsoleHandler::getInstance()), SIGNAL(SIG_STATUS()),                SLOT(SLOT_STATUS()));
+    QObject::connect(&(ConsoleHandler::getInstance()), SIGNAL(SIG_STATE()),                 SLOT(SLOT_STATE()));
+    QObject::connect(&(ConsoleHandler::getInstance()), SIGNAL(SIG_RESULT(QUuid,QString)),   SLOT(SLOT_RESULT(QUuid,QString)));
+    QObject::connect(&(ConsoleHandler::getInstance()), SIGNAL(SIG_CANCEL(QUuid)),           SLOT(SLOT_CANCEL(QUuid)));
+    QObject::connect(&(ConsoleHandler::getInstance()), SIGNAL(SIG_SHUTDOWN()),              SLOT(SLOT_SHUTDOWN()));
+    QObject::connect(&(ConsoleHandler::getInstance()), SIGNAL(SIG_TERMINATED()),            SLOT(SLOT_TERMINATED()));
     // --- application_mgr --> console_handler
     QObject::connect(this, SIGNAL(SIG_RESPONSE(Command,bool,QString)),
-                     &(ConsoleHandler::GetInstance()), SLOT(SLOT_RESPONSE(Command,bool,QString)));
+                     &(ConsoleHandler::getInstance()), SLOT(SLOT_RESPONSE(Command,bool,QString)));
 
     LOG_INFO("Initialisation des composants...");
     // -- initialisation des composants
-    if(!PluginManager::CheckPlugins())
+    if(!PluginManager::getInstance().CheckPlugins())
     {   LOG_CRITICAL("Plugins integrity check failed !");
     }
 
     LOG_INFO("Démarrage du console handler...");
     // -- demarrage du thread d'interaction avec la console
-    ConsoleHandler::GetInstance().start();
+    ConsoleHandler::getInstance().start();
 }
 
 void ApplicationManager::SLOT_STATE()
@@ -40,7 +40,7 @@ void ApplicationManager::SLOT_STATE()
                      "----------------- SERVER STATE REPORT -----------------\n"
                      "\n"
                      "Available plugins :\n";
-    QStringList plugins = PluginManager::GetPluginsList();
+    QStringList plugins = PluginManager::getInstance().GetPluginsList();
     if(plugins.size() > 0)
     {   foreach (QString plugin, plugins)
         {   report += QString("  + %1\n").arg(plugin);
