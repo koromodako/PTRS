@@ -45,6 +45,7 @@ public:
     int ScheduledCount() const;
     int CompletedCount() const;
     int CanceledCount() const;
+    int CrashedCount() const;
     inline int Count() const { return _calculations.count(); }
 
     int AverageLifetime() const;

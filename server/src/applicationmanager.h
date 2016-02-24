@@ -5,7 +5,12 @@
 #include "calculation/calculationmanager.h"
 #include "network/networkmanager.h"
 
-#define TERMINATED_EXPECTED_TOTAL 1
+/*
+ *  Cette valeur définit le nombre de module dont l'arrêt doit être validé avant
+ *  de pouvoir terminer l'application. Pour l'instant on doit attendre la fin
+ *  confirmée du PluginManager et du ConsoleHandler avant de terminer.
+ */
+#define TERMINATED_EXPECTED_TOTAL 2
 
 /**
  * @brief Ce manager gère fait office de facade pour tous les autres managers.
@@ -71,6 +76,10 @@ signals:
      * @brief Ce signal est émis une fois que tous les composants se sont arrêtés correctement.
      */
     void SIG_TERMINATE();
+    /**
+     * @brief Ce signal est émis dès que SLOT_SHUTDOWN() est appelé
+     */
+    void SIG_TERMINATE_MODULE();
 
 private:
     ApplicationManager();

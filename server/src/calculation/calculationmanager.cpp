@@ -10,52 +10,35 @@ CalculationManager CalculationManager::_instance;
 bool CalculationManager::Execute(Calculation *calculation)
 {
     bool ok = false;
+    // -- on ajoute le calcul à la liste des calculs
+    _calculations.insert(calculation->GetId(), calculation);
+    // -- si le plugin existe
     if(PluginManager::getInstance().PluginExists(calculation->GetBin()))
-    {   // - construction des paramètres
-        // -- recuperation du nom du binaire
-        QString bin = calculation->GetBin();
-        // -- construction des arguments a passer au binaire
-        QStringList args;
-        args << CS_OP_SPLIT << calculation->ToJson();
-        // -- construction des objet string pour récupération des sorties du plugin
-        QString out, err;
-        if(PluginManager::getInstance().RunPlugin(bin, args, out, err))
-        {   LOG_INFO("Plugin exited normally.");
-            // treat plugin output
-            QString parsing_err;
-            foreach (QString json_fragment, out.split(CS_FRAGMENT_SEP))
-            {   Calculation * fragment = Calculation::FromJson(calculation, json_fragment.toUtf8(), parsing_err);
-                if(fragment == NULL)
-                {   LOG_ERROR("Calculation factory failed to parse fragment.");
-                    LOG_ERROR(parsing_err);
-                    ok = false;
-                    break; // interrupt here
-                }
-                else
-                {   calculation->AddFragment(fragment);
-                }
-                ok = true;
-            }
-        }
-        else
-        {   LOG_ERROR("Plugin exited abnormally.");
-            LOG_ERROR(calculation->dump());
-            LOG_ERROR(QString("Output is : ").append(out));
-            LOG_ERROR(QString("Errput is : ").append(err));
-        }
+    {   // -- démarrer la procédure de fragmentation
+        PluginManager::getInstance().Split(calculation);
+        // -- on lève le flag
+        ok = true;
     }
     else
-    {   LOG_ERROR("Call Execute on a missing plugin !");
-        LOG_ERROR(calculation->dump());
+    {   // -- on log l'erreur
+        LOG_ERROR("Call Execute on a missing plugin !");
+        // -- on annule le calcul
+        calculation->Crashed("Plugin missing !");
     }
     return ok;
 }
 
 bool CalculationManager::Cancel(QUuid id)
 {
-    /// \todo implement CalculationManager::Cancel(QUuid id)
-    ///         Demander au network manager de notifier les clients de l'annulation d'un calcul
-    return false;
+    bool ok = false;
+    CalculationHash::iterator c = _calculations.find(id);
+    if(c != _calculations.end())
+    {   c.value()->Cancel();
+    }
+    else
+    {   LOG_WARN("Trying to cancel an unknown calculation...");
+    }
+    return ok;
 }
 
 QString CalculationManager::Result(QUuid id, QString filename) const
@@ -77,7 +60,7 @@ int CalculationManager::ScheduledCount() const
     int count(0);
     for(CalculationHash::const_iterator c = _calculations.constBegin();
         c != _calculations.constEnd(); ++c)
-    {   if(c.value()->GetStatus() == CALCS_SCHEDULED) { count++; }
+    {   if(c.value()->GetStatus() == Calculation::SCHEDULED) { count++; }
     }
     return count;
 }
@@ -87,7 +70,7 @@ int CalculationManager::CompletedCount() const
     int count(0);
     for(CalculationHash::const_iterator c = _calculations.constBegin();
         c != _calculations.constEnd(); ++c)
-    {   if(c.value()->GetStatus() == CALCS_COMPLETED) { count++; }
+    {   if(c.value()->GetStatus() == Calculation::COMPLETED) { count++; }
     }
     return count;
 }
@@ -97,7 +80,17 @@ int CalculationManager::CanceledCount() const
     int count(0);
     for(CalculationHash::const_iterator c = _calculations.constBegin();
         c != _calculations.constEnd(); ++c)
-    {   if(c.value()->GetStatus() == CALCS_CANCELED) { count++; }
+    {   if(c.value()->GetStatus() == Calculation::CANCELED) { count++; }
+    }
+    return count;
+}
+
+int CalculationManager::CrashedCount() const
+{
+    int count(0);
+    for(CalculationHash::const_iterator c = _calculations.constBegin();
+        c != _calculations.constEnd(); ++c)
+    {   if(c.value()->GetStatus() == Calculation::CRASHED) { count++; }
     }
     return count;
 }

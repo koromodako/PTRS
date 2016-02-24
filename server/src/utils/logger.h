@@ -4,10 +4,12 @@
 #include <QString>
 #include "src/const.h"
 
+#define DEBUG
+
 // -- definition de quelques format de log
 #define LOG_FORMAT_LIGHT       "[%c] - %m"
 #define LOG_FORMAT_TIMED       "(%t)[%c] - %m"
-#define LOG_FORMAT_DETAILED    "(%t){%f:%l}[%c] - %m"
+#define LOG_FORMAT_DETAILED    "(%t)[%c] - %m - {%f:%l}"
 
 /**
  * @brief Cette structure permet de configurer le logger
@@ -64,10 +66,17 @@ private:
 // --- logging
 #define __QFILE__ QString(__FILE__)
 #define __QLINE__ QString::number(__LINE__)
-#define LOG_DEBUG(msg) Logger::GetInstance().Log(LVL_DEBUG, msg, __QLINE__, __QFILE__)
 #define LOG_INFO(msg) Logger::GetInstance().Log(LVL_INFO, msg, __QLINE__, __QFILE__)
+#define LOG_WARN(msg) Logger::GetInstance().Log(LVL_WARN, msg, __QLINE__, __QFILE__)
 #define LOG_ERROR(msg) Logger::GetInstance().Log(LVL_ERROR, msg, __QLINE__, __QFILE__)
 #define LOG_CRITICAL(msg) Logger::GetInstance().Log(LVL_CRITICAL, msg, __QLINE__, __QFILE__)
 #define LOG_FATAL(msg) Logger::GetInstance().Log(LVL_FATAL, msg, __QLINE__, __QFILE__)
+
+#ifdef DEBUG
+#   define LOG_DEBUG(msg) Logger::GetInstance().Log(LVL_DEBUG, msg, __QLINE__, __QFILE__)
+#else
+#   define LOG_DEBUG(msg)
+#endif
+
 
 #endif // LOGGER_H

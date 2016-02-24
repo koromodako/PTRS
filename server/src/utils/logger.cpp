@@ -17,12 +17,13 @@ void Logger::Log(Level lvl, QString message, QString line, QString file, bool en
         log = _config.format;
         QString level("unhandled_log_lvl");
         switch (lvl) {
-                case LVL_NO_LVL:    level = "NO_LVL"; break;
-                case LVL_DEBUG:     level = "DEBUG"; break;
-                case LVL_INFO:      level = "INFO"; break;
-                case LVL_ERROR:     level = "ERROR"; break;
-                case LVL_CRITICAL:  level = "CRITICAL"; break;
-                case LVL_FATAL:     level = "FATAL"; break;
+            case LVL_NO_LVL:    level = "NLVL"; break;
+            case LVL_DEBUG:     level = "DBUG"; break;
+            case LVL_INFO:      level = "INFO"; break;
+            case LVL_WARN:      level = "WARN"; break;
+            case LVL_ERROR:     level = "ERRO"; break;
+            case LVL_CRITICAL:  level = "CRIT"; break;
+            case LVL_FATAL:     level = "FATL"; break;
             }
         // substitute
         log.replace("%c", level)
@@ -35,6 +36,8 @@ void Logger::Log(Level lvl, QString message, QString line, QString file, bool en
     std::cerr << log.toStdString();
     // add endl if required
     if(endl) { std::cerr << std::endl; }
+    // flush
+    std::cerr << std::flush;
 }
 
 Logger::Logger() : _config() {}

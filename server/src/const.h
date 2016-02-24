@@ -25,9 +25,10 @@ enum Level {
     LVL_NO_LVL      = 0x00,
     LVL_DEBUG       = 0x01,
     LVL_INFO        = 0x02,
-    LVL_ERROR       = 0x04,
-    LVL_CRITICAL    = 0x08,
-    LVL_FATAL       = 0x10
+    LVL_WARN        = 0x04,
+    LVL_ERROR       = 0x08,
+    LVL_CRITICAL    = 0x10,
+    LVL_FATAL       = 0x20
 };
 
 /**
@@ -52,14 +53,6 @@ enum ReqType {
  */
 enum ErrorCode {
     ACTION_NOT_HANDlED, CALCUL_ABORTED, UNABLE_TO_CALCULATE
-};
-/**
- * @brief Cette énumération décrit les différents états que peut prendre un calcul
- */
-enum CalculationStatus {
-    CALCS_SCHEDULED,
-    CALCS_COMPLETED,
-    CALCS_CANCELED
 };
 
 
