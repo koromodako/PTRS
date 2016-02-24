@@ -1,17 +1,8 @@
 #include "calculation.h"
 #include "specs.h"
+#include "src/utils/logger.h"
 
 #include <QJsonObject>
-
-void Calculation::AddFragment(Calculation *fragment)
-{   _fragments.insert(fragment->GetId(), fragment);
-}
-
-void Calculation::AddFragment(QList<Calculation*> fragments)
-{   foreach (Calculation * calc_frag, fragments) {
-        AddFragment(calc_frag);
-    }
-}
 
 Calculation * Calculation::FromJson(QObject * parent, const QByteArray &json, QString & error_str)
 {
@@ -55,25 +46,78 @@ QString Calculation::ToJson(QJsonDocument::JsonFormat format) const
     return doc.toJson(format);
 }
 
-#ifdef QT_DEBUG
-QString Calculation::dump() const
-{   return QString("\n--------------- CALCULATION_DUMP ---------------\n"
-                   "ID : %1\n"
-                   "BIN : %2\n"
-                   "STATUS : %3\n"
-                   "PARAMS : %4\n"
-                   "FRAGMENT_COUNT : %5\n"
-                   "------------------------------------------------")
-            .arg(GetId().toString(), GetBin(),
-                 QString::number(GetStatus()),
-                 QJsonDocument(QJsonObject::fromVariantMap(GetParams())).toJson(QJsonDocument::Compact),
-                 QString::number(GetFragmentCount()));
+QString Calculation::FragmentsToJson(QJsonDocument::JsonFormat format) const
+{   QStringList json_frags;
+    // -- pour chaque fragment
+    for(QHash<QUuid,Calculation*>::const_iterator frag = _fragments.constBegin();
+    frag != _fragments.constEnd();
+    frag++)
+    {
+        json_frags << frag.value()->ToJson(format);
+    }
+    return json_frags.join(CS_FRAGMENT_SEP);
 }
-#endif
+
+void Calculation::Cancel()
+{
+    LOG_DEBUG("Entering state BEING_CANCELED.");
+    _state = BEING_CANCELED;
+    LOG_DEBUG("SIG_CANCELED() emitted.");
+    emit SIG_CANCELED();
+}
+
+void Calculation::Splitted(QString json)
+{
+    LOG_DEBUG(QString("Splitted received json=%1").arg(json));
+
+    /// \todo implement here
+
+    // mise à jour de l'état du calcul
+    LOG_DEBUG("Entering state SCHEDULED.");
+    _state = SCHEDULED;
+    LOG_DEBUG("SIG_SCHEDULED() emitted.");
+    emit SIG_SCHEDULED();
+}
+
+void Calculation::Joined(QString json)
+{
+    LOG_DEBUG(QString("Joined received json=%1").arg(json));
+
+    /// \todo implement here
+
+    // mise à jour de l'état du calcul
+    LOG_DEBUG("Entering state COMPLETED.");
+    _state = COMPLETED;
+    LOG_DEBUG("SIG_COMPLETED() emitted.");
+    emit SIG_COMPLETED();
+}
+
+void Calculation::Computed(QString json)
+{
+    LOG_DEBUG(QString("Computed received json=%1").arg(json));
+
+    /// \todo implement here
+
+    // mise à jour de l'état du calcul
+    LOG_DEBUG("Entering state COMPUTED.");
+    _state = COMPUTED;
+    LOG_DEBUG("SIG_COMPUTED() emitted.");
+    emit SIG_COMPUTED();
+}
+
+void Calculation::Crashed(QString error)
+{
+    LOG_ERROR(QString("Calculation crashed due to the following reason : %1").arg(error.isEmpty() ? "<unknown_reason>" : error));
+    // mise à jour de l'état du calcul
+    LOG_DEBUG("Entering state CRASHED.");
+    _state = CRASHED;
+    LOG_DEBUG("SIG_CRASHED() emitted.");
+    emit SIG_CRASHED();
+}
 
 Calculation::Calculation(const QString & bin, const QVariantMap &params, QObject * parent) :
     AbstractIdentifiable(parent),
-    _status(CALCS_SCHEDULED),
+    _state(BEING_SPLITTED),
     _bin(bin),
     _params(params),
     _fragments()

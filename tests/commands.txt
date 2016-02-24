@@ -1,0 +1,8 @@
+Bruteforce JSON block normal
+
+{"bin":"bruteforce","params":{"charset":"abcdefghijklmnopqrstuvwxyz","min_len":2,"max_len":15,"hash_func":"sha256","target":"5E884898DA28047151D0E56F8DC6292773603D0D6AABBDD62A11EF721D1542D8"}}
+
+Bruteforce incomplete JSON block
+
+{"bin":"bruteforce","params":{"charset":"abcdefghijklmnopqrstuvwxyz","min_len":2}}
+

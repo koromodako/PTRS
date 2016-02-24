@@ -1,6 +1,7 @@
 #ifndef PLUGINMANAGER_H
 #define PLUGINMANAGER_H
 
+#include "calculationprocess.h"
 #include <QStringList>
 #include <QDir>
 
@@ -9,7 +10,8 @@
  */
 class PluginManager : public QObject
 {
-public:
+    Q_OBJECT
+public:   
     /**
      * @brief Initiatlise le plugin manager en récupérant le chemin d'execution
      */
@@ -32,19 +34,38 @@ public:
      */
     QStringList GetPluginsList() const;
     /**
-     * @brief Execution du plugin <name> avec les arguments <args> et récupération
-     *      de la sortie standard dans <out> et de la sortie d'erreur dans <err>
-     * @param name
-     *      Nom du plugin à exécuter
-     * @param args
-     *      Arguments en entrée du plugin
-     * @param out
-     *      Contenu de la sortie standard
-     * @param err
-     *      Contenu de la sortie d'erreur
-     * @return
+     * @brief Lance le processus de fragmentation pour le calcul passé en paramètre
+     * @param calc
      */
-    bool RunPlugin(const QString & name, const QStringList & args, QString & out, QString & err) const;
+    void Split(Calculation * calc);
+    /**
+     * @brief Lance la procédure de fusion des résultats pour le calcul passé en paramètre
+     * @param calc
+     */
+    void Join(Calculation * calc);
+
+private:
+    /**
+     * @brief Démarre un nouveau processus pour un calcul
+     * @param program
+     * @param args
+     */
+    void startProcess(Calculation * calc, CalculationProcess::Operation op);
+
+signals:
+    /**
+     * @brief Ce signal est émis dès que SLOT_TERMINATE() a terminé ses traitements
+     * @see SLOT_TERMINATE()
+     */
+    void SIG_TERMINATED();
+
+public slots:
+    /**
+     * @brief Ce slot est appelé par l'application manager quand celui-ci souhaite terminer l'application.
+     *          Il émet le signal SIG_TERMINATED() dès qu'il a terminé ses traitements
+     * @see SIG_TERMINATED()
+     */
+    void SLOT_TERMINATE();
 
 
 private: // singleton
@@ -56,6 +77,7 @@ private: // singleton
     friend class CalculationManager;
 
     QDir _plugins_dir;
+    CalculationProcessList _pending_processes;
 };
 
 #endif // PLUGINMANAGER_H

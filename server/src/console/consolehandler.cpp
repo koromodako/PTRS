@@ -118,7 +118,7 @@ void ConsoleHandler::help(const QString &cmd)
         {   respond(C_STATUS" : print calculations statuses.");
         }
         else if(cmd == C_EXEC)
-        {   respond(C_EXEC" <calculation_order_block> : print calculations statuses.");
+        {   respond(C_EXEC" <calculation_order_block> : schedule new calculation.");
         }
         else if(cmd == C_CANCEL)
         {   respond(C_CANCEL" <id> : cancel a calculation identified using <id>.");
@@ -158,7 +158,7 @@ bool ConsoleHandler::interpret(QString &input)
         {   if(args.size() > 1)
             {   EMIT_AND_WAIT(SIG_EXEC(args[1].toUtf8()));
             }
-            HANDLE_SPE_ERR("Missing argument.", C_RESULT)
+            HANDLE_SPE_ERR("Missing argument.", C_EXEC)
         }
         else if(args[0] == C_STATUS)
         {  EMIT_AND_WAIT(SIG_STATUS());

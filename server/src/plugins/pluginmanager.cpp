@@ -1,6 +1,7 @@
 #include "pluginmanager.h"
 #include "src/const.h"
 #include "src/utils/logger.h"
+#include "src/calculation/specs.h"
 
 #include <QCoreApplication>
 #include <QFile>
@@ -49,31 +50,60 @@ QStringList PluginManager::GetPluginsList() const
     return ENTRY_LIST();
 }
 
-bool PluginManager::RunPlugin(const QString &name, const QStringList &args, QString &out, QString &err) const
+void PluginManager::Split(Calculation *calc)
+{   // -- lancement du processus associé
+    startProcess(calc, CalculationProcess::SPLIT);
+}
+
+void PluginManager::Join(Calculation *calc)
+{   // -- lancement du processus associé
+    startProcess(calc, CalculationProcess::JOIN);
+}
+
+void PluginManager::startProcess(Calculation * calc, CalculationProcess::Operation op)
 {
-    bool ok = false;
-    QProcess p;
-    QString program = QString("./%1/%2").arg(PLUGINS_DIR, name);
-    LOG_DEBUG(QString("Progam : ").append(program));
-    LOG_DEBUG(QString("Args : ").append(args.join(' ')));
-    p.start(program, args);
-    p.waitForFinished();
-    LOG_DEBUG(QString("Process state after wait loop : ").append(QString::number(p.state())));
-    if(p.state() != QProcess::NotRunning)
-    {   err.clear();
-        out.clear();
-        if(p.exitStatus() == QProcess::NormalExit)
-        {   out.append(p.readAllStandardOutput());
-            ok = true;
-        }
-        else
-        {   err.append(p.readAllStandardError());
-        }
+    // -- création d'un nouveau processus
+    CalculationProcess * cp = new CalculationProcess(calc, op);
+    // -- set process program
+    QString command = QString(".%1/%2 ").arg(_plugins_dir.absolutePath(),calc->GetBin());
+    // -- set process arguments
+    switch (op) {
+    case CalculationProcess::SPLIT:
+        command.append(CS_OP_SPLIT).append(' ').append(calc->ToJson());
+        break;
+    case CalculationProcess::JOIN:
+        command.append(CS_OP_JOIN).append(' ').append(calc->FragmentsToJson());
+        break;
+    case CalculationProcess::CALC:
+        command.append(CS_OP_CALC).append(' ').append(calc->ToJson());
+    default:
+        LOG_CRITICAL("Processus started without arguments : unhandled operation is the cause !");
+        break;
     }
-    return ok;
+    LOG_DEBUG(QString("Command is : '%1'").arg(command));
+    // -- ajout du process à la liste
+    _pending_processes.append(cp);
+    // -- lancement du processus
+    cp->start(command);
+    cp->waitForFinished();
+}
+
+void PluginManager::SLOT_TERMINATE()
+{   LOG_DEBUG("SLOT_TERMINATE() called.");
+    // -- kill all pending processes
+    while(!_pending_processes.isEmpty())
+    {   CalculationProcess * cp = _pending_processes.takeFirst();
+        cp->kill();
+        cp->waitForFinished();
+        delete cp;
+    }
+    // -- emit SIG_TERMINATED
+    LOG_DEBUG("SIG_TERMINATED() emitted.");
+    emit SIG_TERMINATED();
 }
 
 PluginManager::PluginManager() :
-    _plugins_dir()
+    _plugins_dir(),
+    _pending_processes()
 {
 }
