@@ -44,21 +44,28 @@ void CalculationProcess::SLOT_FINISHED(int exitCode, QProcess::ExitStatus exitSt
 {   LOG_DEBUG(QString("SLOT_FINISHED(%1,%2) called.").arg(exitCode).arg(exitStatus));
     switch (exitStatus) {
     case QProcess::NormalExit:
-        switch (_op) {
-        case SPLIT:
-            _calculation->Splitted(readAllStandardOutput());
-            break;
-        case JOIN:
-            _calculation->Joined(readAllStandardOutput());
-            break;
-        case CALC:
-            _calculation->Computed(readAllStandardOutput());
-            break;
+        if(exitCode == 0)
+        {   switch (_op) {
+            case SPLIT:
+                _calculation->Splitted(readAllStandardOutput());
+                break;
+            case JOIN:
+                _calculation->Joined(readAllStandardOutput());
+                break;
+            case CALC:
+                _calculation->Computed(readAllStandardOutput());
+                break;
+            }
+        }
+        else
+        {   LOG_ERROR(QString("Process crashed (exit_code=%1).").arg(exitCode));
+            // crash calculation
+            _calculation->Crashed(readAllStandardError());
         }
         break;
     case QProcess::CrashExit:
         LOG_ERROR(QString("Process crashed (exit_code=%1).").arg(exitCode));
-        // cancel calculation
+        // crash calculation
         _calculation->Crashed(readAllStandardError());
         break;
     }
