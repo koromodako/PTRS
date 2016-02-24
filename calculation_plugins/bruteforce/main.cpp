@@ -1,6 +1,7 @@
 #include "../../server/src/calculation/specs.h"
 #include "splitter.h"
 #include "joiner.h"
+#include "computer.h"
 
 #include <QString>
 #include <iostream>
@@ -33,6 +34,15 @@ int main(int argc, char *argv[])
             }
             else
             {   fail(splitter.error().toStdString());
+            }
+        }
+        else if(action == CS_OP_CALC)
+        {   Computer computer;
+            if(computer.compute(args.join(' ')))
+            {   success(computer.result().toStdString());
+            }
+            else
+            {   fail(computer.error().toStdString());
             }
         }
         else
