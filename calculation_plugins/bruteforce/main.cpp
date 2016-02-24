@@ -3,8 +3,9 @@
 #include "joiner.h"
 #include "computer.h"
 
-#include <QString>
 #include <iostream>
+#include <QUrl>
+#include <QString>
 #include <QStringList>
 
 void success(std::string response);
@@ -16,12 +17,16 @@ int main(int argc, char *argv[])
     QStringList args;
     for(int i = 1; i < argc; ++i) { args.append(QString(argv[i])); }
     // traitement principal
-    if(args.length() > 0)
-    {   QString action = args.takeFirst();
+    if(args.count() != 2)
+    {   fail(QString("Expecting exactly 2 arguments : (%1|%2|%3) <json_url_encoded>").arg(CS_OP_SPLIT, CS_OP_CALC, CS_OP_JOIN).toStdString());
+    }
+    else
+    {   QString action = args[0];
+        QString json = QUrl::fromPercentEncoding(args[1].toUtf8());
         if(action == CS_OP_JOIN)
         {   Joiner joiner;
-            if(joiner.join(args.join(' ')))
-            {   success(joiner.result().toStdString());
+            if(joiner.join(json))
+            {   success(QUrl::toPercentEncoding(joiner.result()).toStdString());
             }
             else
             {   fail(joiner.error().toStdString());
@@ -29,8 +34,8 @@ int main(int argc, char *argv[])
         }
         else if(action == CS_OP_SPLIT)
         {   Splitter splitter;
-            if(splitter.split(args.join(' ')))
-            {   success(splitter.result().toStdString());
+            if(splitter.split(json))
+            {   success(QUrl::toPercentEncoding(splitter.result()).toStdString());
             }
             else
             {   fail(splitter.error().toStdString());
@@ -38,8 +43,8 @@ int main(int argc, char *argv[])
         }
         else if(action == CS_OP_CALC)
         {   Computer computer;
-            if(computer.compute(args.join(' ')))
-            {   success(computer.result().toStdString());
+            if(computer.compute(json))
+            {   success(QUrl::toPercentEncoding(computer.result()).toStdString());
             }
             else
             {   fail(computer.error().toStdString());
@@ -48,9 +53,6 @@ int main(int argc, char *argv[])
         else
         {   fail("Unknown operation.");
         }
-    }
-    else
-    {   fail("Missing at least one argument");
     }
     // we should never reach this point
     exit(EXIT_FAILURE);
