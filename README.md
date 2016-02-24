@@ -118,6 +118,8 @@ Exemple pour un calcul de bruteforce :
 ```
 ## Serveur
 
+### CLI
+
 Les commandes permettant d'agir sur le serveur :
 
  - **EXEC** *\<calculation\_order\_block>* : Demande l'execution du calcul au serveur
@@ -159,7 +161,22 @@ Afin de garantir la qualité des résultats récupérés, le serveur se base sur
 
 Un système d'authentification pour garantir l'identité des clients pourra également être mis en place.
 
-Le serveur sera chargé de fragmenter le calcul initial et de le distribuer de manière équitable aux différents clients.
+### Système de plugins pour les calculs
+
+L'idéal étant d'avoir un serveur générique pour effectuer tout type de calcul distribuable, un système de plugin a été mis en place. Nous avons donc la relation un calcul = un plugin = un binaire.
+
+Ces plugins doivent être situés dans un dossier **plugins/** dans le même dossier que le binaire du serveur.
+
+Ces plugins doivent offrir les fonctionnalités suivantes :
+ + **-split \<json\_url\_encoded>** : qui permet de découpé un calcul en fragments parallèlisables
+ + **-calc \<json\_url\_encoded>** : qui permet de réaliser le calcul pour un fragment en particulier
+ + **-join \<json\_url\_encoded>** : qui permet de fusionner les résultats des fragments du calcul initial
+
+Suite à ces appels les plugins peuvent réagir de deux manières différentes :
+ + écrire dans la sortie standard le **résultat du traitement sous la forme d'un \<json\_url\_encoded>** si tout s'est déroulé comme prévu et terminer avec le **code de sortie égal à 0**,
+ + écrire dans la sortie d'erreur un **message décrivant l'erreur** et terminer avec un **code de sortie différent de 0**
+
+Nous envisageons de mettre en place un système de vérification d'intégrité des plugins basé sur un checksum MD5.
 
 ## Client
 
