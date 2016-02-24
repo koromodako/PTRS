@@ -65,7 +65,7 @@ void PluginManager::startProcess(Calculation * calc, CalculationProcess::Operati
     // -- création d'un nouveau processus
     CalculationProcess * cp = new CalculationProcess(calc, op);
     // -- set process program
-    QString command = QString(".%1/%2 ").arg(_plugins_dir.absolutePath(),calc->GetBin());
+    QString command = QString("%1/%2 ").arg(_plugins_dir.absolutePath(),calc->GetBin());
     // -- set process arguments
     switch (op) {
     case CalculationProcess::SPLIT:
