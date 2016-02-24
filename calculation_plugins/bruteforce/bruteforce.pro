@@ -11,9 +11,11 @@ TEMPLATE = app
 
 SOURCES += main.cpp \
     splitter.cpp \
-    joiner.cpp
+    joiner.cpp \
+    computer.cpp
 
 HEADERS += \
     splitter.h \
     joiner.h \
-    bruteforce_specs.h
+    bruteforce_specs.h \
+    computer.h
