@@ -5,7 +5,7 @@
 
 #include <QCoreApplication>
 #include <QFile>
-#include <QProcess>
+#include <QUrl>
 
 #define ENTRY_LIST_FILTER   QDir::Files | QDir::Executable
 #define ENTRY_LIST_SORT     QDir::Name
@@ -69,13 +69,13 @@ void PluginManager::startProcess(Calculation * calc, CalculationProcess::Operati
     // -- set process arguments
     switch (op) {
     case CalculationProcess::SPLIT:
-        command.append(CS_OP_SPLIT).append(' ').append(calc->ToJson());
+        command.append(CS_OP_SPLIT).append(' ').append(QUrl::toPercentEncoding(calc->ToJson()));
         break;
     case CalculationProcess::JOIN:
-        command.append(CS_OP_JOIN).append(' ').append(calc->FragmentsToJson());
+        command.append(CS_OP_JOIN).append(' ').append(QUrl::toPercentEncoding(calc->FragmentsToJson()));
         break;
     case CalculationProcess::CALC:
-        command.append(CS_OP_CALC).append(' ').append(calc->ToJson());
+        command.append(CS_OP_CALC).append(' ').append(QUrl::toPercentEncoding(calc->ToJson()));
     default:
         LOG_CRITICAL("Processus started without arguments : unhandled operation is the cause !");
         break;
@@ -85,6 +85,7 @@ void PluginManager::startProcess(Calculation * calc, CalculationProcess::Operati
     _pending_processes.append(cp);
     // -- lancement du processus
     cp->start(command);
+    // -- on attend la fin du processus
     cp->waitForFinished();
 }
 
