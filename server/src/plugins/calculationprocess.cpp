@@ -2,6 +2,8 @@
 #include "src/calculation/specs.h"
 #include "src/utils/logger.h"
 
+#include <QUrl>
+
 CalculationProcess::CalculationProcess(Calculation *calc, Operation op, QObject *parent) :
     QProcess(parent),
     _calculation(calc),
@@ -47,13 +49,13 @@ void CalculationProcess::SLOT_FINISHED(int exitCode, QProcess::ExitStatus exitSt
         if(exitCode == 0)
         {   switch (_op) {
             case SPLIT:
-                _calculation->Splitted(readAllStandardOutput());
+                _calculation->Splitted(QUrl::fromPercentEncoding(readAllStandardOutput()));
                 break;
             case JOIN:
-                _calculation->Joined(readAllStandardOutput());
+                _calculation->Joined(QUrl::fromPercentEncoding(readAllStandardOutput()));
                 break;
             case CALC:
-                _calculation->Computed(readAllStandardOutput());
+                _calculation->Computed(QUrl::fromPercentEncoding(readAllStandardOutput()));
                 break;
             }
         }
