@@ -21,9 +21,10 @@ private:
     QString _match_string;
     QCryptographicHash::Algorithm _hash_algorithm;
 
-    bool bruteForceRecursif(std::set<char> charset, QString prefixe, uint longueur, uint longueur_max, QString target);
-    bool bruteForce(std::set<char> charset, uint length, QString target);
+    bool bruteForceRecursif(std::set<QChar> charset, QString prefixe, uint longueur, uint longueur_max, QString target);
+    bool bruteForce(std::set<QChar> charset, uint length, QString target);
     bool decideHashAlgorithm(QString requested_algorithm);
+    bool possibleCharacters(std::set<QChar> *possible_characters, QString charset);
 };
 
 #endif // COMPUTER_H
