@@ -26,17 +26,17 @@ bool Computer::compute(const QString &json)
             QString hashFunction = params.value(PARAM_HASH_F).toString();
             QString target = params.value(PARAM_TARGET).toString();
 
+            // récupération de l'algo de hashage
             if(!decideHashAlgorithm(hashFunction)) return false;
 
             // génération du jeu de charactères
-            std::set<char> possibleChars;
-            possibleChars.insert('1');
-            possibleChars.insert('2');
+            std::set<QChar> characters;
+            if(!possibleCharacters(&characters, charset)) return false;
 
             // calcul brute force
             bool matchFound = false;
             for(uint i=minLen; i<=maxLen && !matchFound; i++)
-            {   matchFound = bruteForce(possibleChars, i, target);
+            {   matchFound = bruteForce(characters, i, target);
             }
 
             // construction de la réponse
@@ -73,7 +73,7 @@ Computer::Computer() :
 }
 
 
-bool Computer::bruteForce(std::set<char> charset, uint length, QString target)
+bool Computer::bruteForce(std::set<QChar> charset, uint length, QString target)
 {
     QString root = "";
     for(uint i=0; i<length; i++)
@@ -83,11 +83,11 @@ bool Computer::bruteForce(std::set<char> charset, uint length, QString target)
 }
 
 
-bool Computer::bruteForceRecursif(std::set<char> charset, QString prefixe, uint longueur, uint longueur_max, QString target)
+bool Computer::bruteForceRecursif(std::set<QChar> charset, QString prefixe, uint longueur, uint longueur_max, QString target)
 {
     if(longueur == longueur_max)
     {
-        for(std::set<char>::iterator charIter = charset.begin(); charIter != charset.end(); ++charIter)
+        for(std::set<QChar>::iterator charIter = charset.begin(); charIter != charset.end(); ++charIter)
         {
             // on génére et on teste une nouvelle proposition
             prefixe.replace(longueur_max - 1, 1, *charIter);
@@ -103,12 +103,28 @@ bool Computer::bruteForceRecursif(std::set<char> charset, QString prefixe, uint 
     }
     else
     {
-        for(std::set<char>::iterator charIter = charset.begin(); charIter != charset.end(); ++charIter)
+        for(std::set<QChar>::iterator charIter = charset.begin(); charIter != charset.end(); ++charIter)
         {   prefixe.replace(longueur - 1, 1, *charIter);
             if(bruteForceRecursif(charset, prefixe, longueur + 1, longueur_max, target)) return true;
         }
         return false;
     }
+}
+
+
+// A modifier au besoin, en fonction du format retenu pour le charset
+bool Computer::possibleCharacters(std::set<QChar> *possible_characters, QString charset)
+{
+    if(charset.size() == 0)
+    { _error = QString("Incorrect parameter : '%1' !").arg(PARAM_CHARSET);
+        return false;
+    }
+
+    for(int i = 0; i < charset.length(); i++)
+    {   possible_characters->insert(charset.at(i));
+    }
+
+    return true;
 }
 
 
