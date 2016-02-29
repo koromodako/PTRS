@@ -11,7 +11,7 @@ CalculThread::~CalculThread()
 
 }
 
-void CalculThread::StartCalcul(QJsonObject args)
+void CalculThread::Slot_startCalcul(QJsonObject args)
 {
     _continueCalcul = true;
 
@@ -23,10 +23,10 @@ void CalculThread::StartCalcul(QJsonObject args)
     }
 
     QJsonObject res;
-    emit calculDone(res);
+    emit sig_calculDone(res);
 }
 
-void CalculThread::StopCalcul()
+void CalculThread::Slot_stopCalcul()
 {
     _continueCalcul = false;
 }

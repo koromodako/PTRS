@@ -58,24 +58,24 @@ public slots:
     /**
      * @brief Prévient le serveur que le calcul a annulé
      */
-    void AbortCalcul();
+    void Slot_abortCalcul();
 
     /**
      * @brief Envoie le résultat du calcul au serveur
      * @param args les résultats du calcul à transmettre au serveur
      */
-    void SendResultToServer(QJsonObject args);
+    void Slot_sendResultToServer(QJsonObject args);
 
 signals:
     /**
      * @brief Emis pour demander au thread de commencer le calcul
      */
-    void requestCalculStart(QJsonObject args);
+    void sig_requestCalculStart(QJsonObject args);
 
     /**
      * @brief Emis pour demander au thread d'arrêter le calcul
      */
-    void requestCalculStop();
+    void sig_requestCalculStop();
 
 private:
 
@@ -99,19 +99,19 @@ private slots:
     /**
      * @brief Passe l'automate en mode déconnecté
      */
-    void disconnect();
+    void slot_disconnect();
 
     /**
      * @brief Traite la commande du type donné avec les arguments donnés
      * @param reqType le code de la requête récupéré
      * @param args les arguments de la requète
      */
-    void processCmd(ReqType reqType, const QStringList &args);
+    void slot_processCmd(ReqType reqType, const QStringList &args);
 
     /**
      * @brief Traite la reception des messages TCP du client
      */
-    void processReadyRead();
+    void slot_processReadyRead();
 
 private:
     QTimer _broadcastTimer;

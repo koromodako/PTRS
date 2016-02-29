@@ -27,7 +27,7 @@ signals:
     /**
      * @brief Signal emit quand une nouvelle connection arrive sur le serveur.
      */
-    void newConnection(ClientSession *newClient);
+    void sig_newConnection(ClientSession *newClient);
 
 protected:
     /**

@@ -6,7 +6,7 @@ NetworkManager::NetworkManager()
 {
     _TCPServer = new TCPServer(this);
     _UDPServer = new UDPServer(_TCPServer->serverPort(), this);
-    connect(_TCPServer, &TCPServer::newConnection, this, &NetworkManager::addUnavailableClient);
+    connect(_TCPServer, &TCPServer::sig_newConnection, this, &NetworkManager::addUnavailableClient);
 }
 
 NetworkManager::~NetworkManager()
@@ -44,17 +44,17 @@ void NetworkManager::addUnavailableClient(ClientSession *client)
     _unavailableClients.insert(client);
     if (!found)
     {
-        connect(client, &ClientSession::ready, this, &NetworkManager::addAvailableClient);
-        connect(client, &ClientSession::working, this, &NetworkManager::addUnavailableClient);
+        connect(client, &ClientSession::sig_ready, this, &NetworkManager::addAvailableClient);
+        connect(client, &ClientSession::sig_working, this, &NetworkManager::addUnavailableClient);
     }
 }
 
-void NetworkManager::StartCalcul(int fragmentId, QJsonObject args)
+void NetworkManager::Slot_startCalcul(int fragmentId, QJsonObject args)
 {
     QSet<ClientSession *>::iterator it = _availableClients.begin();
     if (it == _availableClients.end())
     {
-        emit calculAborted(fragmentId);
+        emit sig_calculAborted(fragmentId);
         return;
     }
 
@@ -64,7 +64,7 @@ void NetworkManager::StartCalcul(int fragmentId, QJsonObject args)
     (*it)->StartCalcul(fragmentId, args);
 }
 
-void NetworkManager::StopCalcul(int fragmentId)
+void NetworkManager::Slot_stopCalcul(int fragmentId)
 {
     ClientSession *client = _fragmentsPlace[fragmentId];
     if (client != NULL)

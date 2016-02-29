@@ -11,14 +11,14 @@ UDPServer::UDPServer(quint16 tcpServerPort, QObject *parent) : QObject(parent)
     _broadcastSocket.bind(QHostAddress::Any, broadcastPort, QUdpSocket::ShareAddress
                          | QUdpSocket::ReuseAddressHint);
 
-    connect(&_broadcastSocket, &QUdpSocket::readyRead, this, &UDPServer::readBroadcastDatagram);
+    connect(&_broadcastSocket, &QUdpSocket::readyRead, this, &UDPServer::slot_readBroadcastDatagram);
 }
 
 UDPServer::~UDPServer()
 {
 }
 
-void UDPServer::readBroadcastDatagram()
+void UDPServer::slot_readBroadcastDatagram()
 {
     while (_broadcastSocket.hasPendingDatagrams())
     {

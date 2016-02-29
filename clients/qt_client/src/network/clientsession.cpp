@@ -14,8 +14,8 @@ ClientSession::ClientSession()
     _broadcastSocket = new QUdpSocket(this);
     _socket = new QTcpSocket(this);
 
-    connect(_socket, &QTcpSocket::readyRead, this, &ClientSession::processReadyRead);
-    connect(_socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(disconnect()));
+    connect(_socket, &QTcpSocket::readyRead, this, &ClientSession::slot_processReadyRead);
+    connect(_socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(slot_disconnect()));
     initializeStateMachine();
 
     _broadcastSocket->bind(QHostAddress::Any, broadcastPort, QUdpSocket::ShareAddress
@@ -27,10 +27,10 @@ ClientSession::ClientSession()
     _thread = new QThread;
     _worker = new CalculThread;
     _worker->moveToThread(_thread);
-    connect(this, &ClientSession::requestCalculStart, _worker, &CalculThread::StartCalcul);
-    connect(this, &ClientSession::requestCalculStop, _worker, &CalculThread::StopCalcul);
-    connect(_worker, &CalculThread::calculAborted, this, &ClientSession::AbortCalcul);
-    connect(_worker, &CalculThread::calculDone, this, &ClientSession::SendResultToServer);
+    connect(this, &ClientSession::sig_requestCalculStart, _worker, &CalculThread::Slot_startCalcul);
+    connect(this, &ClientSession::sig_requestCalculStop, _worker, &CalculThread::Slot_stopCalcul);
+    connect(_worker, &CalculThread::sig_calculAborted, this, &ClientSession::Slot_abortCalcul);
+    connect(_worker, &CalculThread::sig_calculDone, this, &ClientSession::Slot_sendResultToServer);
     connect(_thread, &QThread::finished, _thread, &QThread::deleteLater);
     _thread->start();
 
@@ -44,12 +44,12 @@ ClientSession::~ClientSession()
     _socket->deleteLater();
 }
 
-void ClientSession::AbortCalcul()
+void ClientSession::Slot_abortCalcul()
 {
     _currentState->ProcessAbort();
 }
 
-void ClientSession::disconnect()
+void ClientSession::slot_disconnect()
 {
     _currentState->OnExit();
     _currentState = _disconnectedState;
@@ -89,7 +89,7 @@ void ClientSession::initializeStateMachine()
     _currentState = _disconnectedState = disconnectedState;
 }
 
-void ClientSession::processCmd(ReqType reqType, const QStringList &args)
+void ClientSession::slot_processCmd(ReqType reqType, const QStringList &args)
 {
     switch (reqType)
     {
@@ -108,7 +108,7 @@ void ClientSession::processCmd(ReqType reqType, const QStringList &args)
     }
 }
 
-void ClientSession::processReadyRead()
+void ClientSession::slot_processReadyRead()
 {
     if (_socket->bytesAvailable() <= 0)
         return;
@@ -120,7 +120,7 @@ void ClientSession::processReadyRead()
         QList<QString> args = datagram.split("##");
 
         ReqType reqType = (ReqType)args.takeFirst().toInt();
-        processCmd(reqType, args);
+        slot_processCmd(reqType, args);
     }
 }
 
@@ -181,7 +181,7 @@ void ClientSession::setId(const QString &id)
     _id = id;
 }
 
-void ClientSession::SendResultToServer(QJsonObject args)
+void ClientSession::Slot_sendResultToServer(QJsonObject args)
 {
     _currentState->ProcessDone(args);
 }

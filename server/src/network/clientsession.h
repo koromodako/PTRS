@@ -66,13 +66,13 @@ signals:
      * @brief Emis quand le client est prêt à recevoir un nouveau calcul.
      * @param client Pointeur vers cette instance
      */
-    void ready(ClientSession *client);
+    void sig_ready(ClientSession *client);
 
     /**
      * @brief Emis quand le client commence à faire un calcul.
      * @param client Pointeur vers cette instance
      */
-    void working(ClientSession *client);
+    void sig_working(ClientSession *client);
 
 private:
     /**
@@ -90,19 +90,19 @@ private slots:
     /**
      * @brief Passe l'automate en mode déconnecté
      */
-    void disconnect();
+    void slot_disconnect();
 
     /**
      * @brief Traite la commande du type donné avec les arguments donnés
      * @param reqType le code de la requête récupéré
      * @param args les arguments de la requète
      */
-    void processCmd(ReqType reqType, const QStringList &args);
+    void slot_processCmd(ReqType reqType, const QStringList &args);
 
     /**
      * @brief Traite la reception des messages TCP du client
      */
-    void processReadyRead();
+    void slot_processReadyRead();
 
 private:
     AbstractState *_disconnectedState;

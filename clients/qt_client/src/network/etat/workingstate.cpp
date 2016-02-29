@@ -26,6 +26,6 @@ void WorkingState::ProcessDone(const QJsonObject &args)
 
 void WorkingState::ProcessStop()
 {
-    emit _client->requestCalculStop();
+    emit _client->sig_requestCalculStop();
     _client->SetCurrentState();
 }
