@@ -35,7 +35,7 @@ public:
     Xxxx();
     ~Xxxx(){}                                   // --> toujours mettre un destructeur permet de verifier qu'il n'a pas été oublié.
 
-    void UneMethodePublique(int un_argument);   // --> methode publique CamelCase avec les arguments en lowercase et underscore pour les espace (! non préfixé comme les attributs cf. fin de ce fichier).
+    void UneMethodePublique(int unArgument);   // --> methode publique CamelCase avec les arguments en CamelCase (! non préfixé comme les attributs cf. fin de ce fichier).
 
 protected:
     /**
@@ -44,13 +44,16 @@ protected:
     void uneMethodeProtegeeOuPrivee();          // --> méthode protegee ou privee CamelCase avec une minuscule au debut                                 
 
 public slots: 
-    void SLOT_UN_SLOT();                        // --> un slot (spécial Qt) : UPPER_CASE préfixé par 'SLOT_'
+	void Slot_unSlot();                        // --> un slot publique (spécial Qt) : CamelCase préfixé par 'Slot_'                               
+
+private slots: 
+	void slot_unAutreSlot();                        // --> un slot privé (spécial Qt) : CamelCase préfixé par 'slot_'
 
 signals:
-    void SIG_UN_SIGNAL();                            // --> un signal (spécial Qt) : UPPER_CASE préfixé par 'SIG_'
+    void sig_unSignal();                            // --> un signal (spécial Qt) : CamelCase préfixé par 'sig_'
 
 private:
-    int _un_attribut_prive;                     // --> un attribut (toujours privé #encapsulation, et pas de Setter sauf cas très particulier) préfixé par '_' et lowercase et underscore. 
+    int _unAttributPrive;                     // --> un attribut (toujours privé #encapsulation, et pas de Setter sauf cas très particulier) préfixé par '_' et lowercase et underscore. 
 
 };
 
@@ -63,11 +66,11 @@ Dans le fichier source (.cpp)
 #include "xxxx.h"
 
 Xxxx::Xxxx() :
-     _un_attribut_prive(0) 
+     _unAttributPrive(0) 
 {
 }
 
-void Xxxx::UneMethodePublique(int un_argument) 
+void Xxxx::UneMethodePublique(int unArgument) 
 {
         int uneVariableLocale = 0;              // --> une variable locale en CamelCase et commençant par une minuscule. Comme les méthodes protégées et privées.
         uneVariableLocale++;

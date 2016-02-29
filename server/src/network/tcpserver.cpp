@@ -16,5 +16,5 @@ void TCPServer::incomingConnection(qintptr socketDescriptor)
     socket->setSocketDescriptor(socketDescriptor);
 
     ClientSession *client = new ClientSession(socket, this);
-    emit newConnection(client);
+    emit sig_newConnection(client);
 }

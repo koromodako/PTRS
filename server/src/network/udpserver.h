@@ -27,7 +27,7 @@ private slots:
     /**
      * @brief Reçoit les messages UDP qui sont broadcastés et transmet l'ip et le port du server TCP
      */
-    void readBroadcastDatagram();
+    void slot_readBroadcastDatagram();
 
 private:
     QUdpSocket _broadcastSocket;

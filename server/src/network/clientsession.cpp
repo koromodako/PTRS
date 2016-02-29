@@ -12,8 +12,8 @@ ClientSession::ClientSession(QTcpSocket *associatedSocket, QObject *parent) : Ab
 {
     _socket = associatedSocket;
 
-    connect(_socket, &QTcpSocket::readyRead, this, &ClientSession::processReadyRead);
-    connect(_socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(disconnect()));
+    connect(_socket, &QTcpSocket::readyRead, this, &ClientSession::slot_processReadyRead);
+    connect(_socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(slot_disconnect()));
     initializeStateMachine();
 }
 
@@ -22,7 +22,7 @@ ClientSession::~ClientSession()
     _socket->deleteLater();
 }
 
-void ClientSession::disconnect()
+void ClientSession::slot_disconnect()
 {
     _currentState->OnExit();
     _currentState = _disconnectedState;
@@ -48,7 +48,7 @@ void ClientSession::initializeStateMachine()
     _currentState = _disconnectedState = disconnectedState;
 }
 
-void ClientSession::processCmd(ReqType reqType, const QStringList &args)
+void ClientSession::slot_processCmd(ReqType reqType, const QStringList &args)
 {
     switch (reqType)
     {
@@ -76,7 +76,7 @@ void ClientSession::processCmd(ReqType reqType, const QStringList &args)
     }
 }
 
-void ClientSession::processReadyRead()
+void ClientSession::slot_processReadyRead()
 {
     if (_socket->bytesAvailable() <= 0)
         return;
@@ -88,7 +88,7 @@ void ClientSession::processReadyRead()
         QList<QString> args = datagram.split("##");
 
         ReqType reqType = (ReqType)args.takeFirst().toInt();
-        processCmd(reqType, args);
+        slot_processCmd(reqType, args);
     }
 }
 

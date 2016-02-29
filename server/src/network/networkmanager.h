@@ -32,27 +32,35 @@ public slots:
      *                   éventuellement le calcul)
      * @param args les arguments de calcul à transmettre au client
      */
-    void StartCalcul(int fragmentId, QJsonObject args);
+    void Slot_startCalcul(int fragmentId, QJsonObject args);
 
     /**
      * @brief Arrête le calcul avec l'ID donné
      * @param fragmentId l'id du fragment de calcul
      */
-    void StopCalcul(int fragmentId);
+    void Slot_stopCalcul(int fragmentId);
 
 signals:
     /**
      * @brief Emit quand aucun client ne peut effectuer le calcul
+     *        ou que client a arrété son calcul prématurément
      * @param fragmentId l'id du fragment de calcul
      */
-    void calculAborted(int fragmentId);
+    void sig_calculAborted(int fragmentId);
 
     /**
      * @brief Emit quand un fragment à fini avec succès son calcul
      * @param fragmentId l'id du fragment de calcul
      * @param args les résultat du calcul transmis par le client
      */
-    void calculDone(int fragmentId, QJsonObject args);
+    void sig_calculDone(int fragmentId, QJsonObject args);
+
+    /**
+     * @brief Emit si le client ne peut pas effectuer le calcul donné
+     *        (il n'a pas le plugin)
+     * @param fragmentId l'id du fragment de calcul
+     */
+    void sig_unableToCalculate(int fragmentId);
 
 private:
     /**
@@ -67,6 +75,7 @@ private:
     static NetworkManager &getInstance();
     friend class ApplicationManager;
     friend class WorkingState;
+    friend class WorkingAboutToStartState;
 
 private slots:
     /**

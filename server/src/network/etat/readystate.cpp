@@ -16,12 +16,12 @@ ReadyState::~ReadyState()
 
 void ReadyState::OnEntry()
 {
-    emit _client->ready(_client);
+    emit _client->sig_ready(_client);
 }
 
 void ReadyState::OnExit()
 {
-    emit _client->working(_client);
+    emit _client->sig_working(_client);
 }
 
 void ReadyState::ProcessDo(const QJsonObject &args)

@@ -28,24 +28,24 @@ public slots:
      * @brief Démarre le calcul
      * args   argument du calcul
      */
-    void StartCalcul(QJsonObject args);
+    void Slot_startCalcul(QJsonObject args);
 
     /**
      * @brief Arrête le calcul en cours
      */
-    void StopCalcul();
+    void Slot_stopCalcul();
 
 signals:
     /**
      * @brief Emis quand le calcul est terminé
      * args   résultat du calcul
      */
-    void calculDone(QJsonObject args);
+    void sig_calculDone(QJsonObject args);
 
     /**
      * @brief Emis quand le calcul doit être annulé avant la fin
      */
-    void calculAborted();
+    void sig_calculAborted();
 
 private:
     bool _continueCalcul;
