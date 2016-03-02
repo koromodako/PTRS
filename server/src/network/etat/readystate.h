@@ -35,7 +35,7 @@ public:
     /**
      * @brief Effectue la commande DO
      */
-    void ProcessDo(const QJsonObject &args) override;
+    void ProcessDo(const QString &args) override;
 };
 
 #endif // READY_STATE_H

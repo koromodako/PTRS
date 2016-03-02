@@ -24,45 +24,45 @@ void AbstractState::OnExit()
 void AbstractState::ProcessAbort(const QStringList &args)
 {
     Q_UNUSED(args)
-    _client->SetCurrentStateAfterError(ACTION_NOT_HANDlED);
+    _client->setCurrentStateAfterError(ACTION_NOT_HANDlED);
 }
 
-void AbstractState::ProcessDo(const QJsonObject &args)
+void AbstractState::ProcessDo(const QString &args)
 {
     Q_UNUSED(args)
-    _client->SetCurrentStateAfterError(ACTION_NOT_HANDlED);
+    _client->setCurrentStateAfterError(ACTION_NOT_HANDlED);
 }
 
 void AbstractState::ProcessDone(const QStringList &args)
 {
     Q_UNUSED(args)
-    _client->SetCurrentStateAfterError(ACTION_NOT_HANDlED);
+    _client->setCurrentStateAfterError(ACTION_NOT_HANDlED);
 }
 
 void AbstractState::ProcessHello()
 {
-    _client->SetCurrentStateAfterError(ACTION_NOT_HANDlED);
+    _client->setCurrentStateAfterError(ACTION_NOT_HANDlED);
 }
 
 void AbstractState::ProcessReady(const QStringList &args)
 {
     Q_UNUSED(args)
-    _client->SetCurrentStateAfterError(ACTION_NOT_HANDlED);
+    _client->setCurrentStateAfterError(ACTION_NOT_HANDlED);
 }
 
 void AbstractState::ProcessStop()
 {
-    _client->SetCurrentStateAfterError(ACTION_NOT_HANDlED);
+    _client->setCurrentStateAfterError(ACTION_NOT_HANDlED);
 }
 
 void AbstractState::ProcessUnable(const QStringList &args)
 {
     Q_UNUSED(args)
-    _client->SetCurrentStateAfterError(ACTION_NOT_HANDlED);
+    _client->setCurrentStateAfterError(ACTION_NOT_HANDlED);
 }
 
 void AbstractState::ProcessWorking(const QStringList &args)
 {
     Q_UNUSED(args)
-    _client->SetCurrentStateAfterError(ACTION_NOT_HANDlED);
+    _client->setCurrentStateAfterError(ACTION_NOT_HANDlED);
 }

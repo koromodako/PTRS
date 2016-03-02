@@ -1,4 +1,5 @@
 #include "networkmanager.h"
+#include "src/utils/logger.h"
 
 NetworkManager NetworkManager::_instance;
 
@@ -14,6 +15,21 @@ NetworkManager::~NetworkManager()
 
 }
 
+int NetworkManager::AvailableClientCount() const
+{
+    return _availableClients.count();
+}
+
+int NetworkManager::ClientCount() const
+{
+    return _availableClients.count() + _unavailableClients.count();
+}
+
+int NetworkManager::WorkingClientCount() const
+{
+    return _unavailableClients.count();
+}
+
 NetworkManager &NetworkManager::getInstance()
 {
     return _instance;
@@ -24,7 +40,7 @@ void NetworkManager::addAvailableClient(ClientSession *client)
     if (client == NULL)
         return;
     if (_unavailableClients.remove(client))
-        _fragmentsPlace.remove(client->FragmentId());
+        _fragmentsPlace.remove(client->Fragment()->GetId());
     _availableClients.insert(client);
 }
 
@@ -39,7 +55,7 @@ void NetworkManager::addUnavailableClient(ClientSession *client)
     if (_unavailableClients.remove(client))
     {
         found = true;
-        _fragmentsPlace.remove(client->FragmentId());
+        _fragmentsPlace.remove(client->Fragment()->GetId());
     }
     _unavailableClients.insert(client);
     if (!found)
@@ -49,24 +65,18 @@ void NetworkManager::addUnavailableClient(ClientSession *client)
     }
 }
 
-void NetworkManager::Slot_startCalcul(int fragmentId, QJsonObject args)
+void NetworkManager::Slot_startCalcul(const QString &json, const Calculation *fragment)
 {
     QSet<ClientSession *>::iterator it = _availableClients.begin();
     if (it == _availableClients.end())
     {
-        emit sig_calculAborted(fragmentId);
+        LOG_INFO("Aucun client n'est disponible pour le calcul.");
+        //TODO : Ajouter à une liste de calcul en attente
         return;
     }
 
     _availableClients.remove(*it);
-    _fragmentsPlace.insert(fragmentId, *it);
+    _fragmentsPlace.insert(fragment->GetId(), *it);
     _unavailableClients.insert(*it);
-    (*it)->StartCalcul(fragmentId, args);
-}
-
-void NetworkManager::Slot_stopCalcul(int fragmentId)
-{
-    ClientSession *client = _fragmentsPlace[fragmentId];
-    if (client != NULL)
-        client->StopCalcul();
+    (*it)->StartCalcul(fragment, json);
 }

@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
         if(action == CS_OP_JOIN)
         {   Joiner joiner;
             if(joiner.join(json))
-            {   success(QUrl::toPercentEncoding(joiner.result()).toStdString());
+            {   success(QString(QUrl::toPercentEncoding(joiner.result())).toStdString());
             }
             else
             {   fail(joiner.error().toStdString());
@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
         else if(action == CS_OP_SPLIT)
         {   Splitter splitter;
             if(splitter.split(json))
-            {   success(QUrl::toPercentEncoding(splitter.result()).toStdString());
+            {   success(QString(QUrl::toPercentEncoding(splitter.result())).toStdString());
             }
             else
             {   fail(splitter.error().toStdString());
@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
         else if(action == CS_OP_CALC)
         {   Computer computer;
             if(computer.compute(json))
-            {   success(QUrl::toPercentEncoding(computer.result()).toStdString());
+            {   success(QString(QUrl::toPercentEncoding(computer.result())).toStdString());
             }
             else
             {   fail(computer.error().toStdString());

@@ -3,11 +3,11 @@
 #include "utils/logger.h"
 #include "console/consolehandler.h"
 #include "plugins/pluginmanager.h"
-
 ApplicationManager ApplicationManager::_instance;
 
 void ApplicationManager::Init()
 {
+
     LOG_INFO("Initialisation des connexions SIG/SLOTS...");
     // -- initialisation des connexions pour la communication inter-threads
     // --- console_handler --> application_manager
@@ -37,6 +37,10 @@ void ApplicationManager::Init()
     LOG_INFO("Démarrage du console handler...");
     // -- demarrage du thread d'interaction avec la console
     ConsoleHandler::getInstance().start();
+
+    LOG_INFO("Démarrage du network manager...");
+    NetworkManager::getInstance().moveToThread(&_networkThread);
+    _networkThread.start();
 }
 
 void ApplicationManager::SLOT_STATE()
@@ -78,9 +82,9 @@ void ApplicationManager::SLOT_STATE()
             .arg(CalculationManager::getInstance().CrashedCount())
             .arg(CalculationManager::getInstance().CompletedCount())
             .arg(CalculationManager::getInstance().Count())
-            .arg(-1) /// \todo complete here with NetworkManager stats
-            .arg(-1) /// \todo complete here with NetworkManager stats
-            .arg(-1) /// \todo complete here with NetworkManager stats
+            .arg(NetworkManager::getInstance().AvailableClientCount())
+            .arg(NetworkManager::getInstance().WorkingClientCount())
+            .arg(NetworkManager::getInstance().ClientCount())
             .arg(CalculationManager::getInstance().AverageLifetime())
             .arg(CalculationManager::getInstance().AverageFragmentCount());
     LOG_DEBUG("SIG_RESPONSE(CMD_STATE) emitted.");
@@ -161,5 +165,10 @@ void ApplicationManager::SLOT_TERMINATED()
 ApplicationManager::ApplicationManager() :
     _terminated_ctr(0)
 {
+}
 
+ApplicationManager::~ApplicationManager()
+{
+    _networkThread.quit();
+    _networkThread.wait();
 }

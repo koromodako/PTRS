@@ -1,9 +1,6 @@
 #include "readystate.h"
 #include "src/network/networkmanager.h"
 
-#include <QJsonObject>
-#include <QJsonDocument>
-
 ReadyState::ReadyState(ClientSession *parent) : AbstractState(parent)
 {
 
@@ -24,9 +21,8 @@ void ReadyState::OnExit()
     emit _client->sig_working(_client);
 }
 
-void ReadyState::ProcessDo(const QJsonObject &args)
+void ReadyState::ProcessDo(const QString &args)
 {
-    QJsonDocument doc(args);
-    _client->SendCmd(DO, doc.toJson(QJsonDocument::Compact));
-    _client->SetCurrentStateAfterSuccess();
+    _client->sendCmd(DO, args);
+    _client->setCurrentStateAfterSuccess();
 }

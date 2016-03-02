@@ -25,6 +25,21 @@ public:
      */
     ~NetworkManager();
 
+    /**
+     * @brief Retourne le nombre de client prêt à travailler
+     */
+    int AvailableClientCount() const;
+
+    /**
+     * @brief Retourne le nombre de client total
+     */
+    int ClientCount() const;
+
+    /**
+     * @brief Retourne le nombre de client en train de travailler
+     */
+    int WorkingClientCount() const;
+
 public slots:
     /**
      * @brief Trouve un client dispo et demande au client de démarrer le calcul donné
@@ -32,35 +47,7 @@ public slots:
      *                   éventuellement le calcul)
      * @param args les arguments de calcul à transmettre au client
      */
-    void Slot_startCalcul(int fragmentId, QJsonObject args);
-
-    /**
-     * @brief Arrête le calcul avec l'ID donné
-     * @param fragmentId l'id du fragment de calcul
-     */
-    void Slot_stopCalcul(int fragmentId);
-
-signals:
-    /**
-     * @brief Emit quand aucun client ne peut effectuer le calcul
-     *        ou que client a arrété son calcul prématurément
-     * @param fragmentId l'id du fragment de calcul
-     */
-    void sig_calculAborted(int fragmentId);
-
-    /**
-     * @brief Emit quand un fragment à fini avec succès son calcul
-     * @param fragmentId l'id du fragment de calcul
-     * @param args les résultat du calcul transmis par le client
-     */
-    void sig_calculDone(int fragmentId, QJsonObject args);
-
-    /**
-     * @brief Emit si le client ne peut pas effectuer le calcul donné
-     *        (il n'a pas le plugin)
-     * @param fragmentId l'id du fragment de calcul
-     */
-    void sig_unableToCalculate(int fragmentId);
+    void Slot_startCalcul(const QString &json, const Calculation *fragment);
 
 private:
     /**
@@ -74,8 +61,7 @@ private:
      */
     static NetworkManager &getInstance();
     friend class ApplicationManager;
-    friend class WorkingState;
-    friend class WorkingAboutToStartState;
+    friend class Calculation;
 
 private slots:
     /**
@@ -97,7 +83,7 @@ private slots:
 private:
     static NetworkManager _instance;
     QSet<ClientSession *> _availableClients;
-    QMap<int, ClientSession *> _fragmentsPlace;
+    QMap<QUuid, ClientSession *> _fragmentsPlace;
     TCPServer *_TCPServer;
     UDPServer *_UDPServer;
     QSet<ClientSession *> _unavailableClients;

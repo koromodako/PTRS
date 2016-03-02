@@ -1,6 +1,8 @@
 #ifndef APPLICATIONMANAGER_H
 #define APPLICATIONMANAGER_H
 
+#include <QThread>
+
 #include "src/const.h"
 #include "calculation/calculationmanager.h"
 #include "network/networkmanager.h"
@@ -20,7 +22,7 @@ class ApplicationManager : public QObject
 {
     Q_OBJECT
 public:
-    ~ApplicationManager(){}
+    ~ApplicationManager();
     static ApplicationManager & GetInstance() { return _instance; }
 
     void Init();
@@ -85,6 +87,7 @@ private:
     ApplicationManager();
     Q_DISABLE_COPY(ApplicationManager)
     static ApplicationManager _instance;
+    QThread _networkThread;
 
     int _terminated_ctr;
 };
