@@ -39,7 +39,7 @@ void CalculationProcess::SLOT_ERROR(QProcess::ProcessError error)
         msg.append("unknown error.");
         break;
     }
-    _calculation->Crashed(msg);
+    _calculation->Slot_crashed(msg);
 }
 
 void CalculationProcess::SLOT_FINISHED(int exitCode, QProcess::ExitStatus exitStatus)
@@ -55,20 +55,20 @@ void CalculationProcess::SLOT_FINISHED(int exitCode, QProcess::ExitStatus exitSt
                 _calculation->Joined(QUrl::fromPercentEncoding(readAllStandardOutput()));
                 break;
             case CALC:
-                _calculation->Computed(QUrl::fromPercentEncoding(readAllStandardOutput()));
+                _calculation->Slot_computed(QUrl::fromPercentEncoding(readAllStandardOutput()));
                 break;
             }
         }
         else
         {   LOG_ERROR(QString("Process crashed (exit_code=%1).").arg(exitCode));
             // crash calculation
-            _calculation->Crashed(readAllStandardError());
+            _calculation->Slot_crashed(readAllStandardError());
         }
         break;
     case QProcess::CrashExit:
         LOG_ERROR(QString("Process crashed (exit_code=%1).").arg(exitCode));
         // crash calculation
-        _calculation->Crashed(readAllStandardError());
+        _calculation->Slot_crashed(readAllStandardError());
         break;
     }
 }

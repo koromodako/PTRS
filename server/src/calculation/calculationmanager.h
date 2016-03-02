@@ -62,7 +62,14 @@ protected:
 
 private: // singleton
     CalculationManager();                // interdiction d'instancier en dehors de cette classe
+
+    /**
+     * @brief Retourne le nombre de calcul dans l'état donné
+     */
+    int countWithState(Calculation::State state) const;
+
     Q_DISABLE_COPY(CalculationManager)   // interdiction de réaliser une copie de l'instance
+
     static CalculationManager _instance; // instance unique de la classe
 
     CalculationHash _calculations;

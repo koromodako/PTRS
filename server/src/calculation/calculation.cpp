@@ -1,6 +1,7 @@
 #include "calculation.h"
 #include "specs.h"
 #include "src/utils/logger.h"
+#include "src/network/networkmanager.h"
 
 #include <QJsonObject>
 
@@ -25,6 +26,8 @@ Calculation * Calculation::FromJson(QObject * parent, const QByteArray &json, QS
             {   calculation = new Calculation(doc.object().value(CS_JSON_KEY_CALC_BIN).toString(),
                                               doc.object().value(CS_JSON_KEY_CALC_PARAMS).toObject().toVariantMap(),
                                               parent);
+                connect(calculation, &Calculation::sig_scheduled, &NetworkManager::getInstance(), &NetworkManager::Slot_startCalcul);
+
             }
         }
         else
@@ -48,10 +51,10 @@ QString Calculation::ToJson(QJsonDocument::JsonFormat format) const
 
 QString Calculation::FragmentsToJson(QJsonDocument::JsonFormat format) const
 {   QStringList json_frags;
+
     // -- pour chaque fragment
-    for(QHash<QUuid,Calculation*>::const_iterator frag = _fragments.constBegin();
-    frag != _fragments.constEnd();
-    frag++)
+    QHash<QUuid,Calculation*>::const_iterator frag;
+    for(frag = _fragments.constBegin() ; frag != _fragments.constEnd() ; frag++)
     {
         json_frags << frag.value()->ToJson(format);
     }
@@ -63,20 +66,33 @@ void Calculation::Cancel()
     LOG_DEBUG("Entering state BEING_CANCELED.");
     _state = BEING_CANCELED;
     LOG_DEBUG("SIG_CANCELED() emitted.");
-    emit SIG_CANCELED();
+    emit sig_canceled();
 }
 
 void Calculation::Splitted(QString json)
 {
     LOG_DEBUG(QString("Splitted received json=%1").arg(json));
 
-    /// \todo implement here
+    //TODO : découper en plusieurs calculation à mettre dans _fragments en fonction du json
+    //TODO : envoyer les calculs au network manager
+
+    /// QJsonDocument doc(args);
+    /// doc.toJson(QJsonDocument::Compact)
 
     // mise à jour de l'état du calcul
     LOG_DEBUG("Entering state SCHEDULED.");
     _state = SCHEDULED;
     LOG_DEBUG("SIG_SCHEDULED() emitted.");
-    emit SIG_SCHEDULED();
+
+    QHash<QUuid,Calculation*>::const_iterator fragment;
+    for(fragment = _fragments.constBegin() ; fragment != _fragments.constEnd() ; fragment++)
+        emit sig_scheduled(json, fragment.value());
+
+    // TODO: J'ai mis json car le découpage n'est pas fait, mais il faudra le json à envoyer
+    //       au client après découpage.
+
+    emit sig_scheduled(json, this); //TODO : A suppr quand le découpage sera géré
+
 }
 
 void Calculation::Joined(QString json)
@@ -89,30 +105,33 @@ void Calculation::Joined(QString json)
     LOG_DEBUG("Entering state COMPLETED.");
     _state = COMPLETED;
     LOG_DEBUG("SIG_COMPLETED() emitted.");
-    emit SIG_COMPLETED();
+    emit sig_completed();
 }
 
-void Calculation::Computed(QString json)
+void Calculation::Slot_computed(QString json)
 {
     LOG_DEBUG(QString("Computed received json=%1").arg(json));
 
     /// \todo implement here
+    ///
+    ///  QJsonDocument jsonResponse = QJsonDocument::fromJson(json);
+    ///  jsonResponse.object();
 
     // mise à jour de l'état du calcul
     LOG_DEBUG("Entering state COMPUTED.");
     _state = COMPUTED;
     LOG_DEBUG("SIG_COMPUTED() emitted.");
-    emit SIG_COMPUTED();
+    emit sig_computed();
 }
 
-void Calculation::Crashed(QString error)
+void Calculation::Slot_crashed(QString error)
 {
     LOG_ERROR(QString("Calculation crashed due to the following reason : %1").arg(error.isEmpty() ? "<unknown_reason>" : error));
     // mise à jour de l'état du calcul
     LOG_DEBUG("Entering state CRASHED.");
     _state = CRASHED;
     LOG_DEBUG("SIG_CRASHED() emitted.");
-    emit SIG_CRASHED();
+    emit sig_crashed();
 }
 
 Calculation::Calculation(const QString & bin, const QVariantMap &params, QObject * parent) :

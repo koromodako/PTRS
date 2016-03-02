@@ -23,7 +23,7 @@ bool CalculationManager::Execute(Calculation *calculation)
     {   // -- on log l'erreur
         LOG_ERROR("Call Execute on a missing plugin !");
         // -- on annule le calcul
-        calculation->Crashed("Plugin missing !");
+        calculation->Slot_crashed("Plugin missing !");
     }
     return ok;
 }
@@ -43,61 +43,53 @@ bool CalculationManager::Cancel(QUuid id)
 
 QString CalculationManager::Result(QUuid id, QString filename) const
 {
-    /// \todo implement CalculationManager::Result(QUuid id, QString filename)
+    /// TODO implement CalculationManager::Result(QUuid id, QString filename)
     ///     Utiliser QProcess pour faire appel aux plugins
     return QString("We are working on this functionality.");
 }
 
 QString CalculationManager::Status() const
 {
-    /// \todo implement CalculationManager::Status()
+    /// TODO implement CalculationManager::Status()
     ///     Construire la table des status des calculs en cours
     return QString("We are working on this functionality.");
 }
 
 int CalculationManager::ScheduledCount() const
 {
-    int count(0);
-    for(CalculationHash::const_iterator c = _calculations.constBegin();
-        c != _calculations.constEnd(); ++c)
-    {   if(c.value()->GetStatus() == Calculation::SCHEDULED) { count++; }
-    }
-    return count;
+    return countWithState(Calculation::SCHEDULED);
 }
 
 int CalculationManager::CompletedCount() const
 {
-    int count(0);
-    for(CalculationHash::const_iterator c = _calculations.constBegin();
-        c != _calculations.constEnd(); ++c)
-    {   if(c.value()->GetStatus() == Calculation::COMPLETED) { count++; }
-    }
-    return count;
+    return countWithState(Calculation::COMPLETED);
 }
 
 int CalculationManager::CanceledCount() const
 {
-    int count(0);
-    for(CalculationHash::const_iterator c = _calculations.constBegin();
-        c != _calculations.constEnd(); ++c)
-    {   if(c.value()->GetStatus() == Calculation::CANCELED) { count++; }
-    }
-    return count;
+    return countWithState(Calculation::CANCELED);
 }
 
 int CalculationManager::CrashedCount() const
 {
+    return countWithState(Calculation::CRASHED);
+}
+
+int CalculationManager::countWithState(Calculation::State state) const
+{
     int count(0);
-    for(CalculationHash::const_iterator c = _calculations.constBegin();
-        c != _calculations.constEnd(); ++c)
-    {   if(c.value()->GetStatus() == Calculation::CRASHED) { count++; }
+    CalculationHash::const_iterator c;
+    for(c = _calculations.constBegin() ; c != _calculations.constEnd() ; ++c)
+    {
+        if(c.value()->GetStatus() == state)
+            count++;
     }
     return count;
 }
 
 int CalculationManager::AverageLifetime() const
 {
-    /// \todo implement CalculationManager::AverageLifetime()
+    /// TODO implement CalculationManager::AverageLifetime()
     ///     Ajouter au calcul ce qu'il faut pour évaluer ce temps différence entre date de debut et date de complétion
     return -1;
 }

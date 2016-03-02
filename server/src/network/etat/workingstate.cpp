@@ -1,7 +1,6 @@
 #include "workingstate.h"
 #include "src/network/clientsession.h"
 #include "src/network/networkmanager.h"
-#include <QJsonDocument>
 
 WorkingState::WorkingState(ClientSession *parent) : AbstractState(parent)
 {
@@ -16,8 +15,9 @@ void WorkingState::ProcessAbort(const QStringList &args)
 {
     if (args.size() > 0 && args.first() == _client->GetId().toString())
     {
-        emit NetworkManager::getInstance().sig_calculAborted(_client->FragmentId());
-        _client->SetCurrentStateAfterError(CALCUL_ABORTED);
+        _client->_fragment = NULL;
+        emit _client->sig_calculAborted("Client abort the calcul");
+        _client->setCurrentStateAfterError(CALCUL_ABORTED);
     }
 }
 
@@ -25,14 +25,14 @@ void WorkingState::ProcessDone(const QStringList &args)
 {
     if (args.size() > 1 && args.first() == _client->GetId().toString())
     {
-        QJsonDocument jsonResponse = QJsonDocument::fromJson(args[1].toUtf8());
-        emit NetworkManager::getInstance().sig_calculDone(_client->FragmentId(), jsonResponse.object());
-        _client->SetCurrentStateAfterSuccess();
+        _client->_fragment = NULL;
+        emit _client->sig_calculDone(args[1].toUtf8());
+        _client->setCurrentStateAfterSuccess();
     }
 }
 
 void WorkingState::ProcessStop()
 {
-    _client->SendCmd(STOP, "");
-    _client->SetCurrentStateAfterSuccess();
+    _client->sendCmd(STOP, "");
+    _client->setCurrentStateAfterSuccess();
 }

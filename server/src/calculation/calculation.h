@@ -36,16 +36,19 @@ public:
      * @return
      */
     inline int GetFragmentCount() const { return _fragments.count(); }
+
     /**
      * @brief Etat du calcul
      * @return
      */
     inline State GetStatus() const { return _state; }
+
     /**
      * @brief Binaire utilisé pour les operations split, calc et join
      * @return
      */
     inline QString GetBin() const { return _bin; }
+
     /**
      * @brief Paramètres nécessaires à l'execution du calcul
      * @return
@@ -60,69 +63,84 @@ public:
      * @return
      */
     static Calculation *FromJson(QObject * parent, const QByteArray & json, QString &error_str);
+
     /**
      * @brief Donne la représentation JSON du calcul
      * @param format
      * @return
      */
     QString ToJson(QJsonDocument::JsonFormat format = QJsonDocument::Compact) const;
+
     /**
      * @brief Donne la représentation JSON des fragments
      * @param format
      * @return
      */
     QString FragmentsToJson(QJsonDocument::JsonFormat format = QJsonDocument::Compact) const;
+
     /**
     * @brief Demande l'annulation du calcul
     */
     void Cancel();
+
     /**
      * @brief Cette méthode est appelée une fois le calcul fragmenté
      * @param json
      */
     void Splitted(QString json);
+
     /**
      * @brief Cette méthode est appelée une fois les résultats du calcul fusionnés
      * @param json
      */
     void Joined(QString json);
+
+public slots:
     /**
-     * @brief Cette méthode est appelée une fois le calcul effectué
-     * @param json
+     * @brief Ce slot est appelée une fois le calcul effectué
+     * @param json résultat en provenance du client
      */
-    void Computed(QString json);
+    void Slot_computed(QString json);
+
     /**
-     * @brief Cette méthode est appelée quand le calcul à crashé
-     * @param error
+     * @brief Ce slot est appelée quand le calcul à crashé
+     * @param error message d'erreur
      */
-    void Crashed(QString error);
+    void Slot_crashed(QString error);
 
 signals:
     /**
      * @brief Ce signal est émis lorsque le calcul doit être annulé
      */
-    void SIG_CANCELED();
+    void sig_canceled();
+
     /**
      * @brief Ce signal est émis lorsque le calcul est prêt à être distribué
+     * @param args argument à fournir au client pour démarrer son calcul
+     * @param fragment fragment que le client devra calculer
      */
-    void SIG_SCHEDULED();
+    void sig_scheduled(const QString &args, const Calculation *fragment);
+
     /**
      * @brief Ce signal est émis lorsque le calcul est terminé (tous les fragments ont été fusionnés)
      */
-    void SIG_COMPLETED();
+    void sig_completed();
+
     /**
      * @brief Ce signal est émis lorsque le calcul est terminé (dans le cas où le calcul est un fragment de calcul, coté client)
      */
-    void SIG_COMPUTED();
+    void sig_computed();
+
     /**
      * @brief Ce signal est émis lorsque le plugin du calcul crash
      */
-    void SIG_CRASHED();
+    void sig_crashed();
 
 private:
     // non instanciable autrement qu'en fabrique et non copiable
     Calculation(const QString &bin, const QVariantMap &params, QObject * parent = NULL);
     Q_DISABLE_COPY(Calculation)
+
     // attributs
     State _state;
     QString _bin;

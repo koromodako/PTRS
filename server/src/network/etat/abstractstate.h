@@ -44,7 +44,7 @@ public:
     /**
      * @brief Effectue la commande ABORT
      */
-    virtual void ProcessDo(const QJsonObject &args);
+    virtual void ProcessDo(const QString &args);
 
     /**
      * @brief Effectue la commande DONE

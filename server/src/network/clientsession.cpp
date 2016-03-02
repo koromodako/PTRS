@@ -11,6 +11,7 @@
 ClientSession::ClientSession(QTcpSocket *associatedSocket, QObject *parent) : AbstractIdentifiable(parent)
 {
     _socket = associatedSocket;
+    _fragment = NULL;
 
     connect(_socket, &QTcpSocket::readyRead, this, &ClientSession::slot_processReadyRead);
     connect(_socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(slot_disconnect()));
@@ -92,7 +93,7 @@ void ClientSession::slot_processReadyRead()
     }
 }
 
-void ClientSession::SendCmd(ReqType reqType, const QString &args)
+void ClientSession::sendCmd(ReqType reqType, const QString &args)
 {
     QByteArray data = QByteArray::number(reqType);
     if (args.size() > 0)
@@ -114,28 +115,44 @@ void ClientSession::setCurrentState(const QMap<QObject *, AbstractState *> &tran
     }
 }
 
-void ClientSession::SetCurrentStateAfterError(ErrorCode errorCode)
+void ClientSession::setCurrentStateAfterError(ErrorCode errorCode)
 {
     LOG_ERROR("Erreur in state " + _currentState->objectName() + " : " + QString::number(errorCode));
 
     setCurrentState(_errorTransitionsMap);
 }
 
-void ClientSession::SetCurrentStateAfterSuccess()
+void ClientSession::setCurrentStateAfterSuccess()
 {
     setCurrentState(_doneTransitionsMap);
 }
 
-void ClientSession::StartCalcul(int fragmentId, QJsonObject args)
+bool ClientSession::StartCalcul(const Calculation *fragment, const QString &json)
 {
-    _fragmentId = fragmentId;
-    _currentState->ProcessDo(args);
+    //Impossible de commencer un autre calcul quand il y en a un en cours
+    if (fragment == NULL || _fragment != NULL)
+        return false;
+
+    if (_fragment != NULL)
+    {
+        disconnect(this, &ClientSession::sig_calculAborted, _fragment, &Calculation::Slot_crashed);
+        disconnect(this, &ClientSession::sig_calculDone, _fragment, &Calculation::Slot_computed);
+        disconnect(_fragment, &Calculation::sig_canceled, this, &ClientSession::Slot_stopCalcul);
+    }
+
+    connect(this, &ClientSession::sig_calculAborted, fragment, &Calculation::Slot_crashed);
+    connect(this, &ClientSession::sig_calculDone, fragment, &Calculation::Slot_computed);
+    connect(fragment, &Calculation::sig_canceled, this, &ClientSession::Slot_stopCalcul);
+
+    _fragment = fragment;
+    _currentState->ProcessDo(json);
+    return true;
 }
 
-void ClientSession::StopCalcul()
+void ClientSession::Slot_stopCalcul()
 {
-    if (_fragmentId == -1)
+    if (_fragment == NULL)
         return;
     _currentState->ProcessStop();
-    _fragmentId = -1;
+    _fragment = NULL;
 }

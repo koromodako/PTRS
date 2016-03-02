@@ -13,15 +13,16 @@ WorkingAboutToStartState::~WorkingAboutToStartState()
 
 void WorkingAboutToStartState::ProcessUnable(const QStringList &args)
 {
+    //TODO: transmettre à networkManager pour qu'il transmette le calcul à un autre client
     if (args.size() > 0 && args.first() == _client->GetId().toString())
     {
-        emit NetworkManager::getInstance().sig_unableToCalculate(_client->FragmentId());
-        _client->SetCurrentStateAfterError(UNABLE_TO_CALCULATE);
+        _client->_fragment = NULL;
+        _client->setCurrentStateAfterError(UNABLE_TO_CALCULATE);
     }
 }
 
 void WorkingAboutToStartState::ProcessWorking(const QStringList &args)
 {
     if (args.size() > 0 && args.first() == _client->GetId().toString())
-        _client->SetCurrentStateAfterSuccess();
+        _client->setCurrentStateAfterSuccess();
 }
