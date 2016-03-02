@@ -5,8 +5,6 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 
-CalculationManager CalculationManager::_instance;
-
 bool CalculationManager::Execute(Calculation *calculation)
 {
     bool ok = false;
@@ -107,3 +105,9 @@ int CalculationManager::AverageFragmentCount() const
 
 CalculationManager::CalculationManager()
 {}
+
+CalculationManager &CalculationManager::getInstance()
+{
+    static CalculationManager instance;
+    return instance;
+}

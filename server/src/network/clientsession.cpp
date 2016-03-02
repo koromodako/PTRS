@@ -27,7 +27,9 @@ void ClientSession::slot_disconnect()
 {
     _currentState->OnExit();
     _currentState = _disconnectedState;
-    _currentState->OnEntry();}
+    _currentState->OnEntry();
+    emit sig_disconnected(this);
+}
 
 void ClientSession::initializeStateMachine()
 {
@@ -115,10 +117,9 @@ void ClientSession::setCurrentState(const QMap<QObject *, AbstractState *> &tran
     }
 }
 
-void ClientSession::setCurrentStateAfterError(ErrorCode errorCode)
+void ClientSession::setCurrentStateAfterError(const QString &error)
 {
-    LOG_ERROR("Erreur in state " + _currentState->objectName() + " : " + QString::number(errorCode));
-
+    LOG_ERROR("Erreur in state " + _currentState->objectName() + " : " + error);
     setCurrentState(_errorTransitionsMap);
 }
 

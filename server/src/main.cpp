@@ -4,12 +4,15 @@
 #include "console/consolehandler.h"
 #include "applicationmanager.h"
 #include "src/network/networkmanager.h"
+#include "src/const.h"
 
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
     LOGGER_CONFIGURE(LVL_NO_LVL, LOG_FORMAT_DETAILED);
+
+    qRegisterMetaType<Command>("Command");
 
     ApplicationManager::GetInstance().Init();
 

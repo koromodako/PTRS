@@ -3,7 +3,7 @@
 
 WaitingState::WaitingState(ClientSession *parent) : AbstractState(parent)
 {
-
+    setObjectName("WaitingState");
 }
 
 WaitingState::~WaitingState()

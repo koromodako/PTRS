@@ -4,6 +4,7 @@
 #define PLUGINS_DIR "plugins"
 
 #include <QString>
+#include <QObject>
 
 /**
  * @brief Cette énumération décrit les différentes commandes pouvant être traitées par le console handler.
@@ -17,6 +18,7 @@ enum Command {
     CMD_SHUTDOWN,
     CMD_STATE
 };
+Q_DECLARE_METATYPE(Command);
 
 /**
  * @brief Cette enumeration décrit les différents niveaux de log possible
@@ -46,13 +48,6 @@ enum ReqType {
     KO,
     DO,
     STOP
-};
-
-/**
- * @brief Cette énumération décrit les différents code d'erreur que peut retourner le programme
- */
-enum ErrorCode {
-    ACTION_NOT_HANDlED, CALCUL_ABORTED, UNABLE_TO_CALCULATE
 };
 
 

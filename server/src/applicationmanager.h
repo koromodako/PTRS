@@ -31,37 +31,43 @@ public slots:
     /**
      * @brief Ce slot reçoit les demandes de consultation de l'état du serveur
      */
-    void SLOT_STATE();
+    void Slot_state();
+
     /**
      * @brief Ce slot reçoit les demandes d'exécution de calculs
      * @param calculationOrder
      *      Objet contenant les spécification du calcul à effectuer
      */
-    void SLOT_EXEC(QByteArray json);
+    void Slot_exec(QByteArray json);
+
     /**
      * @brief Ce slot reçoit les demandes de status des calculs en cours
      */
-    void SLOT_STATUS();
+    void Slot_status();
+
     /**
      * @brief Ce slot reçoit les demandes de résultats pour un calcul en particulier
      * @param id
      *      Identifiant du calcul dont on doit retourner le résultat
      */
-    void SLOT_RESULT(QUuid id, QString filename);
+    void Slot_result(QUuid id, QString filename);
+
     /**
      * @brief Ce slot reçoit les demandes d'annulation pour un calcul en particulier
      * @param id
      *      Identifiant du calcul que l'on doit annuler
      */
-    void SLOT_CANCEL(QUuid id);
+    void Slot_cancel(QUuid id);
+
     /**
      * @brief Ce slot reçoit les demandes d'arrêt du serveur
      */
-    void SLOT_SHUTDOWN();
+    void Slot_shutdown();
+
     /**
      * @brief Ce slot reçoit les notifications d'arrêt des composants
      */
-    void SLOT_TERMINATED();
+    void Slot_terminated();
 
 signals:
     /**
@@ -73,22 +79,25 @@ signals:
      * @param message
      *      Message détaillant la réponse
      */
-    void SIG_RESPONSE(Command command, bool ok, QString message);
+    void sig_response(Command command, bool ok, QString message);
+
     /**
      * @brief Ce signal est émis une fois que tous les composants se sont arrêtés correctement.
      */
-    void SIG_TERMINATE();
+    void sig_terminated();
+
     /**
      * @brief Ce signal est émis dès que SLOT_SHUTDOWN() est appelé
      */
-    void SIG_TERMINATE_MODULE();
+    void sig_terminateModule();
 
 private:
     ApplicationManager();
     Q_DISABLE_COPY(ApplicationManager)
+
+    QThread _consoleThread;
     static ApplicationManager _instance;
     QThread _networkThread;
-
     int _terminated_ctr;
 };
 

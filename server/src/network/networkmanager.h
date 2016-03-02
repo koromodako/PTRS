@@ -42,12 +42,23 @@ public:
 
 public slots:
     /**
+     * Initialise le manager et démarre les serveurs UDP et TCP
+     */
+    void Slot_init();
+
+    /**
      * @brief Trouve un client dispo et demande au client de démarrer le calcul donné
      * @param fragmentId l'id du fragment de calcul (utile pour stopper
      *                   éventuellement le calcul)
      * @param args les arguments de calcul à transmettre au client
      */
     void Slot_startCalcul(const QString &json, const Calculation *fragment);
+
+signals:
+    /**
+     * Emis quand le network manager et les serveurs ont démarré
+     */
+    void sig_started();
 
 private:
     /**
@@ -80,8 +91,12 @@ private slots:
      */
     void addUnavailableClient(ClientSession *client);
 
+    /**
+     * @brief Supprime la session avec le client donné
+     */
+    void slot_deleteClient(ClientSession *client);
+
 private:
-    static NetworkManager _instance;
     QSet<ClientSession *> _availableClients;
     QMap<QUuid, ClientSession *> _fragmentsPlace;
     TCPServer *_TCPServer;

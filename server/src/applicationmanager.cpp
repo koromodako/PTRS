@@ -7,24 +7,31 @@ ApplicationManager ApplicationManager::_instance;
 
 void ApplicationManager::Init()
 {
+    ConsoleHandler::getInstance().moveToThread(&_consoleThread);
+    NetworkManager::getInstance().moveToThread(&_networkThread);
 
     LOG_INFO("Initialisation des connexions SIG/SLOTS...");
+
     // -- initialisation des connexions pour la communication inter-threads
+    connect(&_consoleThread, &QThread::started, &ConsoleHandler::getInstance(), &ConsoleHandler::Slot_init);
+    connect(&_networkThread, &QThread::started, &NetworkManager::getInstance(), &NetworkManager::Slot_init);
+    connect(&NetworkManager::getInstance(), SIGNAL(sig_started()), &_consoleThread, SLOT(start()));
+
     // --- console_handler --> application_manager
-    connect(&(ConsoleHandler::getInstance()), SIGNAL(SIG_EXEC(QByteArray)),        SLOT(SLOT_EXEC(QByteArray)));
-    connect(&(ConsoleHandler::getInstance()), SIGNAL(SIG_STATUS()),                SLOT(SLOT_STATUS()));
-    connect(&(ConsoleHandler::getInstance()), SIGNAL(SIG_STATE()),                 SLOT(SLOT_STATE()));
-    connect(&(ConsoleHandler::getInstance()), SIGNAL(SIG_RESULT(QUuid,QString)),   SLOT(SLOT_RESULT(QUuid,QString)));
-    connect(&(ConsoleHandler::getInstance()), SIGNAL(SIG_CANCEL(QUuid)),           SLOT(SLOT_CANCEL(QUuid)));
-    connect(&(ConsoleHandler::getInstance()), SIGNAL(SIG_SHUTDOWN()),              SLOT(SLOT_SHUTDOWN()));
-    connect(&(ConsoleHandler::getInstance()), SIGNAL(SIG_TERMINATED()),            SLOT(SLOT_TERMINATED()));
+    connect(&(ConsoleHandler::getInstance()), SIGNAL(SIG_EXEC(QByteArray)),        SLOT(Slot_exec(QByteArray)));
+    connect(&(ConsoleHandler::getInstance()), SIGNAL(SIG_STATUS()),                SLOT(Slot_status()));
+    connect(&(ConsoleHandler::getInstance()), SIGNAL(SIG_STATE()),                 SLOT(Slot_state()));
+    connect(&(ConsoleHandler::getInstance()), SIGNAL(SIG_RESULT(QUuid,QString)),   SLOT(Slot_result(QUuid,QString)));
+    connect(&(ConsoleHandler::getInstance()), SIGNAL(SIG_CANCEL(QUuid)),           SLOT(Slot_cancel(QUuid)));
+    connect(&(ConsoleHandler::getInstance()), SIGNAL(SIG_SHUTDOWN()),              SLOT(Slot_shutdown()));
+    connect(&(ConsoleHandler::getInstance()), SIGNAL(SIG_TERMINATED()),            SLOT(Slot_terminated()));
     // --- application_mgr --> console_handler
-    connect(this, SIGNAL(SIG_RESPONSE(Command,bool,QString)),
+    connect(this, SIGNAL(sig_response(Command,bool,QString)),
             &(ConsoleHandler::getInstance()), SLOT(SLOT_RESPONSE(Command,bool,QString)));
     // --- plugin_mgr --> application_mgr
-    connect(&(PluginManager::getInstance()), SIGNAL(SIG_TERMINATED()), SLOT(SLOT_TERMINATED()));
+    connect(&(PluginManager::getInstance()), SIGNAL(SIG_TERMINATED()), SLOT(Slot_terminated()));
     // --- application_mgr --> plugin_mgr
-    connect(this, SIGNAL(SIG_TERMINATE_MODULE()),
+    connect(this, SIGNAL(sig_terminateModule()),
             &(PluginManager::getInstance()), SLOT(SLOT_TERMINATE()));
 
     LOG_INFO("Initialisation des composants...");
@@ -34,16 +41,10 @@ void ApplicationManager::Init()
     {   LOG_CRITICAL("Plugins integrity check failed !");
     }
 
-    LOG_INFO("Démarrage du console handler...");
-    // -- demarrage du thread d'interaction avec la console
-    ConsoleHandler::getInstance().start();
-
-    LOG_INFO("Démarrage du network manager...");
-    NetworkManager::getInstance().moveToThread(&_networkThread);
     _networkThread.start();
 }
 
-void ApplicationManager::SLOT_STATE()
+void ApplicationManager::Slot_state()
 {
     QString report = "\n"
                      "----------------- SERVER STATE REPORT -----------------\n"
@@ -88,57 +89,57 @@ void ApplicationManager::SLOT_STATE()
             .arg(CalculationManager::getInstance().AverageLifetime())
             .arg(CalculationManager::getInstance().AverageFragmentCount());
     LOG_DEBUG("SIG_RESPONSE(CMD_STATE) emitted.");
-    emit SIG_RESPONSE(CMD_STATE, true, report);
+    emit sig_response(CMD_STATE, true, report);
 }
 
-void ApplicationManager::SLOT_EXEC(QByteArray json)
+void ApplicationManager::Slot_exec(QByteArray json)
 {
     QString error;
     Calculation * calculation = Calculation::FromJson(&_instance, json, error);
     if(calculation == NULL)
     {   LOG_DEBUG("SIG_RESPONSE(CMD_EXEC,false) emitted.");
-        emit SIG_RESPONSE(CMD_EXEC, false, error);
+        emit sig_response(CMD_EXEC, false, error);
     }
     else
     {   if(CalculationManager::getInstance().Execute(calculation))
         {   LOG_DEBUG("SIG_RESPONSE(CMD_EXEC,true) emitted.");
-            emit SIG_RESPONSE(CMD_EXEC, true, QString("Calculation accepted id=%1.").arg(
+            emit sig_response(CMD_EXEC, true, QString("Calculation accepted id=%1.").arg(
                                   calculation->GetId().toString()));
         }
         else
         {   LOG_DEBUG("SIG_RESPONSE(CMD_EXEC,false) emitted.");
-            emit SIG_RESPONSE(CMD_EXEC, false, "Missing binary for this calculation.");
+            emit sig_response(CMD_EXEC, false, "Missing binary for this calculation.");
         }
     }
 }
 
-void ApplicationManager::SLOT_STATUS()
+void ApplicationManager::Slot_status()
 {   LOG_DEBUG("SLOT_STATUS() called.");
     LOG_DEBUG("SIG_RESPONSE(CMD_STATUS) emitted.");
-    emit SIG_RESPONSE(CMD_STATUS, true, CalculationManager::getInstance().Status());
+    emit sig_response(CMD_STATUS, true, CalculationManager::getInstance().Status());
 }
 
-void ApplicationManager::SLOT_RESULT(QUuid id, QString filename)
+void ApplicationManager::Slot_result(QUuid id, QString filename)
 {   LOG_DEBUG("SLOT_RESULT() called.");
     LOG_DEBUG("SIG_RESPONSE(CMD_RESULT) emitted.");
-    emit SIG_RESPONSE(CMD_RESULT, true, CalculationManager::getInstance().Result(id, filename));
+    emit sig_response(CMD_RESULT, true, CalculationManager::getInstance().Result(id, filename));
 }
 
-void ApplicationManager::SLOT_CANCEL(QUuid id)
+void ApplicationManager::Slot_cancel(QUuid id)
 {   LOG_DEBUG("SLOT_CANCEL() called.");
     if(CalculationManager::getInstance().Cancel(id))
     {   LOG_DEBUG("SIG_RESPONSE(CMD_CANCEL,true) emitted.");
-        emit SIG_RESPONSE(CMD_CANCEL, true, QString("Calculation id=%1 scheduled for cancelation.").arg(id.toString()));
+        emit sig_response(CMD_CANCEL, true, QString("Calculation id=%1 scheduled for cancelation.").arg(id.toString()));
     }
     else
     {   LOG_DEBUG("SIG_RESPONSE(CMD_CANCEL,false) emitted.");
-        emit SIG_RESPONSE(CMD_CANCEL, false, QString("Unknown calculation id=%1").arg(id.toString()));
+        emit sig_response(CMD_CANCEL, false, QString("Unknown calculation id=%1").arg(id.toString()));
     }
 }
 
-void ApplicationManager::SLOT_SHUTDOWN()
+void ApplicationManager::Slot_shutdown()
 {   LOG_DEBUG("SLOT_SHUTDOWN() called.");
-    emit SIG_TERMINATE_MODULE();
+    emit sig_terminateModule();
 #if TERMINATED_EXPECTED_TOTAL == 1
     if(TERMINATED_EXPECTED_TOTAL - _terminated_ctr == 1)
     {   LOG_DEBUG("SIG_RESPONSE(CMD_SHUTDOWN) emitted.");
@@ -147,19 +148,24 @@ void ApplicationManager::SLOT_SHUTDOWN()
 #endif
 }
 
-void ApplicationManager::SLOT_TERMINATED()
+void ApplicationManager::Slot_terminated()
 {   LOG_DEBUG("SLOT_TERMINATED() called.");
     _terminated_ctr++;
     if(_terminated_ctr >= TERMINATED_EXPECTED_TOTAL)
     {   LOG_DEBUG("SIG_TERMINATE() emitted.");
-        emit SIG_TERMINATE();
+        emit sig_terminated();
     }
     else if(TERMINATED_EXPECTED_TOTAL - _terminated_ctr == 1)
     {   LOG_DEBUG("SIG_RESPONSE(CMD_SHUTDOWN) emitted.");
-        emit SIG_RESPONSE(CMD_SHUTDOWN, true, "STATUS command received !");
+        emit sig_response(CMD_SHUTDOWN, true, "STATUS command received !");
     }
     // emission du signal de terminaison quand tous les composants attendus ont notofié l'app manager de leur terminaison
 
+    _networkThread.quit();
+    _networkThread.wait();
+
+    _consoleThread.quit();
+    _consoleThread.wait();
 }
 
 ApplicationManager::ApplicationManager() :
@@ -169,6 +175,4 @@ ApplicationManager::ApplicationManager() :
 
 ApplicationManager::~ApplicationManager()
 {
-    _networkThread.quit();
-    _networkThread.wait();
 }

@@ -3,7 +3,7 @@
 
 DisconnectedState::DisconnectedState(ClientSession *parent) : AbstractState(parent)
 {
-
+    setObjectName("DisconnectedState");
 }
 
 DisconnectedState::~DisconnectedState()

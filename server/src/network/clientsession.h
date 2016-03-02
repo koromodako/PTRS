@@ -67,6 +67,12 @@ signals:
     void sig_calculDone(const QString &json);
 
     /**
+     * @brief Emit quand le client s'est déconnecté
+     * @param client pointeur vers ce client
+     */
+    void sig_disconnected(ClientSession *client);
+
+    /**
      * @brief Emis quand le client est prêt à recevoir un nouveau calcul.
      * @param client Pointeur vers cette instance
      */
@@ -98,9 +104,9 @@ private:
 
     /**
      * @brief Change l'état courant et récupère le code d'erreur
-     * @param errorCode l'erreur émise par l'état courant qui a déclenché le changement
+     * @param error le message d'erreur associé par l'état courant qui a déclenché le changement
      */
-    void setCurrentStateAfterError(ErrorCode errorCode);
+    void setCurrentStateAfterError(const QString &error);
 
     /**
      * @brief Change l'état courant

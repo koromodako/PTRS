@@ -4,7 +4,7 @@
 
 WorkingState::WorkingState(ClientSession *parent) : AbstractState(parent)
 {
-
+    setObjectName("WorkingState");
 }
 
 WorkingState::~WorkingState()
@@ -17,7 +17,7 @@ void WorkingState::ProcessAbort(const QStringList &args)
     {
         _client->_fragment = NULL;
         emit _client->sig_calculAborted("Client abort the calcul");
-        _client->setCurrentStateAfterError(CALCUL_ABORTED);
+        _client->setCurrentStateAfterError("CalculAborted");
     }
 }
 

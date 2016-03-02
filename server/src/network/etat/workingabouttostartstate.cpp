@@ -4,7 +4,7 @@
 
 WorkingAboutToStartState::WorkingAboutToStartState(ClientSession *parent) : AbstractState(parent)
 {
-
+    setObjectName("WorkingAboutToStartState");
 }
 
 WorkingAboutToStartState::~WorkingAboutToStartState()
@@ -17,7 +17,7 @@ void WorkingAboutToStartState::ProcessUnable(const QStringList &args)
     if (args.size() > 0 && args.first() == _client->GetId().toString())
     {
         _client->_fragment = NULL;
-        _client->setCurrentStateAfterError(UNABLE_TO_CALCULATE);
+        _client->setCurrentStateAfterError("Unable to calculate");
     }
 }
 

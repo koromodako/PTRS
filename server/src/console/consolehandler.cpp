@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include <QStringList>
+#include <QDebug>
 
 // -- define command keywords
 #define C_STATE       "STATE"
@@ -21,8 +22,11 @@
 
 ConsoleHandler ConsoleHandler::_instance;
 
-void ConsoleHandler::run()
-{   // say hello
+void ConsoleHandler::Slot_init()
+{
+    LOG_INFO("Démarrage du console handler...");
+
+    // say hello
     welcome();
     // loop while user input
     QString input;
@@ -30,18 +34,17 @@ void ConsoleHandler::run()
 }
 
 void ConsoleHandler::SLOT_RESPONSE(Command command, bool ok, QString message)
-{   //LOG_DEBUG("SLOT_RESPONSE called");
+{
+    //LOG_DEBUG("SLOT_RESPONSE called");
     if(command == CMD_SHUTDOWN) {
         // say goodbye
         goodbye();
         // notify termination
         emit SIG_TERMINATED();
-        // terminate thread
-        quit();
     } else {
         respond(message);
         QString input;
-        while(prompt(&input) && !interpret(input));
+        while (prompt(&input) && !interpret(input));
     }
 }
 
