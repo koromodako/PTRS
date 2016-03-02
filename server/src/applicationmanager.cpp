@@ -171,8 +171,11 @@ void ApplicationManager::Slot_terminated()
 ApplicationManager::ApplicationManager() :
     _terminated_ctr(0)
 {
+    Logger::GetInstance().SetConsoleMutex(&_consoleMutex);
+    ConsoleHandler::getInstance().SetConsoleMutex(&_consoleMutex);
 }
 
 ApplicationManager::~ApplicationManager()
 {
+
 }

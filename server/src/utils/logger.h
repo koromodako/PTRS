@@ -2,6 +2,7 @@
 #define LOGGER_H
 
 #include <QString>
+#include <QMutex>
 #include "src/const.h"
 
 #define DEBUG
@@ -47,10 +48,16 @@ public:
 
     void Log(Level lvl, QString message, QString line = QString(), QString file = QString(), bool endl = true) const;
 
+    /**
+     * @brief Defini le mutex à utiliser pour les entrées/sorties
+     */
+    void SetConsoleMutex(QMutex *mutex);
+
 private: // singleton
     Logger();
     Q_DISABLE_COPY(Logger)
     static Logger _instance;
+    QMutex *_consoleMutex;
 
 private:
     LoggerConfiguration _config;
