@@ -15,8 +15,8 @@ void CalculThread::Slot_startCalcul(QJsonObject args)
 {
     _continueCalcul = true;
 
-    long i = 1; //Pour simuler
-    while (i > 0 && _continueCalcul)
+    int i = 1; //Pour simuler
+    while (i > 10 && _continueCalcul)
     {
         //emit calculAborted();
         i++;

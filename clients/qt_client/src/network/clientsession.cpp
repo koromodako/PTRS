@@ -54,7 +54,6 @@ void ClientSession::slot_disconnect()
     _currentState->OnExit();
     _currentState = _disconnectedState;
     _currentState->OnEntry();
-
     findServer();
 }
 
@@ -84,6 +83,7 @@ void ClientSession::initializeStateMachine()
 
     _transitionsMap[disconnectedState] = waitingState;
     _transitionsMap[waitingState] = readyState;
+    _transitionsMap[readyState] = workingState;
     _transitionsMap[workingState] = readyState;
 
     _currentState = _disconnectedState = disconnectedState;
@@ -149,6 +149,8 @@ void ClientSession::readBroadcastDatagram()
             _socket->connectToHost(senderIp, data[1].toInt());
             _socket->waitForConnected();
             _currentState->ProcessHello();
+
+            return;
         }
     }
 }
