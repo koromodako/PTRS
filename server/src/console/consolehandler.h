@@ -10,18 +10,13 @@
  * @brief Cette classe gère les interactions avec l'utilisateur en console.
  *  Elle s'exécute dans un thread en parallèle de la boucle d'évènement principale de Qt.
  */
-class ConsoleHandler : public QThread
+class ConsoleHandler : public QObject
 {
     Q_OBJECT
 public:
     ~ConsoleHandler(){}
 
 protected:
-    /**
-     * @override
-     * @see QThread::run()
-     */
-    void run();
     /**
      * @brief Récupère l'instance unique de cette classe
      * @return
@@ -30,6 +25,11 @@ protected:
     friend class ApplicationManager;
 
 public slots:
+    /**
+     * Affiche le message de bienvenue et demande à l'utilisateur quoi faire
+     */
+    void Slot_init();
+
     /**
      * @brief Ce slot reçoit les réponse aux commandes envoyées en utilisant les signaux
      * @param command

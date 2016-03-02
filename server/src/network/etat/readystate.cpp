@@ -3,7 +3,7 @@
 
 ReadyState::ReadyState(ClientSession *parent) : AbstractState(parent)
 {
-
+    setObjectName("ReadyState");
 }
 
 ReadyState::~ReadyState()

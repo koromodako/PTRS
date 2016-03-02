@@ -1,7 +1,9 @@
 #include "tcpserver.h"
+#include "src/utils/logger.h"
 
 TCPServer::TCPServer(QObject *parent) : QTcpServer(parent)
 {
+    LOG_INFO("Démarrage du serveur TCP...");
     listen(QHostAddress::Any);
 }
 

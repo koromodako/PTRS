@@ -5,7 +5,7 @@
 
 #include <QJsonObject>
 
-Calculation * Calculation::FromJson(QObject * parent, const QByteArray &json, QString & error_str)
+Calculation * Calculation::FromJson(QObject * parent, const QByteArray &json, QString & errorStr)
 {
     Calculation * calculation = NULL;
 
@@ -15,11 +15,11 @@ Calculation * Calculation::FromJson(QObject * parent, const QByteArray &json, QS
     {   if(doc.isObject())
         {   bool ok = true;
             if(!doc.object().contains(CS_JSON_KEY_CALC_BIN))
-            {   error_str = QString("Missing '%1' key in JSON structure.").arg(CS_JSON_KEY_CALC_BIN);
+            {   errorStr = QString("Missing '%1' key in JSON structure.").arg(CS_JSON_KEY_CALC_BIN);
                 ok = false;
             }
             else if(!doc.object().contains(CS_JSON_KEY_CALC_PARAMS) || !doc.object().value(CS_JSON_KEY_CALC_PARAMS).isObject())
-            {   error_str = QString("Missing '%1' key in JSON structure or value is not an object.").arg(CS_JSON_KEY_CALC_PARAMS);
+            {   errorStr = QString("Missing '%1' key in JSON structure or value is not an object.").arg(CS_JSON_KEY_CALC_PARAMS);
                 ok = false;
             }
             if(ok)
@@ -31,11 +31,11 @@ Calculation * Calculation::FromJson(QObject * parent, const QByteArray &json, QS
             }
         }
         else
-        {   error_str = "Given JSON block is not an object.";
+        {   errorStr = "Given JSON block is not an object.";
         }
     }
     else
-    {   error_str = error.errorString();
+    {   errorStr = error.errorString();
     }
     return calculation;
 }

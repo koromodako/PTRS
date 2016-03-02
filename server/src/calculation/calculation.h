@@ -62,7 +62,7 @@ public:
      * @param error_str
      * @return
      */
-    static Calculation *FromJson(QObject * parent, const QByteArray & json, QString &error_str);
+    static Calculation *FromJson(QObject * parent, const QByteArray & json, QString &errorStr);
 
     /**
      * @brief Donne la représentation JSON du calcul

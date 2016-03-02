@@ -1,13 +1,10 @@
 #include "networkmanager.h"
 #include "src/utils/logger.h"
 
-NetworkManager NetworkManager::_instance;
+#include <QThread>
 
 NetworkManager::NetworkManager()
 {
-    _TCPServer = new TCPServer(this);
-    _UDPServer = new UDPServer(_TCPServer->serverPort(), this);
-    connect(_TCPServer, &TCPServer::sig_newConnection, this, &NetworkManager::addUnavailableClient);
 }
 
 NetworkManager::~NetworkManager()
@@ -27,19 +24,20 @@ int NetworkManager::ClientCount() const
 
 int NetworkManager::WorkingClientCount() const
 {
-    return _unavailableClients.count();
+    return _fragmentsPlace.count();
 }
 
 NetworkManager &NetworkManager::getInstance()
 {
-    return _instance;
+    static NetworkManager instance;
+    return instance;
 }
 
 void NetworkManager::addAvailableClient(ClientSession *client)
 {
     if (client == NULL)
         return;
-    if (_unavailableClients.remove(client))
+    if (_unavailableClients.remove(client) && client->Fragment() != NULL)
         _fragmentsPlace.remove(client->Fragment()->GetId());
     _availableClients.insert(client);
 }
@@ -62,7 +60,28 @@ void NetworkManager::addUnavailableClient(ClientSession *client)
     {
         connect(client, &ClientSession::sig_ready, this, &NetworkManager::addAvailableClient);
         connect(client, &ClientSession::sig_working, this, &NetworkManager::addUnavailableClient);
+        connect(client, &ClientSession::sig_disconnected, this, &NetworkManager::slot_deleteClient);
+
     }
+}
+
+void NetworkManager::slot_deleteClient(ClientSession *client)
+{
+    _availableClients.remove(client);
+    if (_unavailableClients.remove(client) && client->Fragment() != NULL)
+        _fragmentsPlace.remove(client->Fragment()->GetId());
+    client->deleteLater();
+}
+
+void NetworkManager::Slot_init()
+{
+    LOG_INFO("Démarrage du network manager...");
+
+    _TCPServer = new TCPServer(this);
+    _UDPServer = new UDPServer(_TCPServer->serverPort(), this);
+    connect(_TCPServer, &TCPServer::sig_newConnection, this, &NetworkManager::addUnavailableClient);
+
+    emit sig_started();
 }
 
 void NetworkManager::Slot_startCalcul(const QString &json, const Calculation *fragment)

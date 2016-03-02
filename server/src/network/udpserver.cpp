@@ -1,5 +1,6 @@
 #include "udpserver.h"
 #include "../const.h"
+#include "src/utils/logger.h"
 
 #include <QNetworkInterface>
 
@@ -8,10 +9,12 @@ static const unsigned broadcastPort = 45000;
 UDPServer::UDPServer(quint16 tcpServerPort, QObject *parent) : QObject(parent)
 {
     _tcpServerPort = tcpServerPort;
+    LOG_INFO("Démarrage du serveur UDP...");
     _broadcastSocket.bind(QHostAddress::Any, broadcastPort, QUdpSocket::ShareAddress
                          | QUdpSocket::ReuseAddressHint);
 
     connect(&_broadcastSocket, &QUdpSocket::readyRead, this, &UDPServer::slot_readBroadcastDatagram);
+
 }
 
 UDPServer::~UDPServer()

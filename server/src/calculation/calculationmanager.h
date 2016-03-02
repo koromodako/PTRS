@@ -14,7 +14,6 @@ class CalculationManager : public QObject
 public:
     virtual ~CalculationManager(){}
 
-
     /**
      * @brief Réalise la fragmentation du calcul et programme son execution
      * @param calculation
@@ -22,6 +21,7 @@ public:
      * @return false si le binaire de fragmentation correspondant au calcul n'existe pas
      */
     bool Execute(Calculation * calculation);
+
     /**
      * @brief Démarre le processus d'annulation d'un calcul
      * @param id
@@ -29,11 +29,13 @@ public:
      * @return false si l'identifiant de calcul n'est pas alloué
      */
     bool Cancel(QUuid id);
+
     /**
      * @brief Result
      * @return
      */
     QString Result(QUuid id, QString filename) const;
+
     /**
      * @brief Status
      * @return
@@ -56,12 +58,13 @@ protected:
      * @brief Récupère l'instance unique correspondant à cette classe
      * @return
      */
-    static CalculationManager & getInstance() { return _instance; }
+    static CalculationManager & getInstance();
+
     // only application manager class can access this instance
     friend class ApplicationManager;
 
 private: // singleton
-    CalculationManager();                // interdiction d'instancier en dehors de cette classe
+    CalculationManager(); // interdiction d'instancier en dehors de cette classe
 
     /**
      * @brief Retourne le nombre de calcul dans l'état donné
@@ -70,10 +73,7 @@ private: // singleton
 
     Q_DISABLE_COPY(CalculationManager)   // interdiction de réaliser une copie de l'instance
 
-    static CalculationManager _instance; // instance unique de la classe
-
     CalculationHash _calculations;
-
 };
 
 #endif // CALCULATIONMANAGER_H
