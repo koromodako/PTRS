@@ -2,6 +2,7 @@
 #define APPLICATIONMANAGER_H
 
 #include <QThread>
+#include <QMutex>
 
 #include "src/const.h"
 #include "calculation/calculationmanager.h"
@@ -95,6 +96,7 @@ private:
     ApplicationManager();
     Q_DISABLE_COPY(ApplicationManager)
 
+    QMutex _consoleMutex;
     QThread _consoleThread;
     static ApplicationManager _instance;
     QThread _networkThread;

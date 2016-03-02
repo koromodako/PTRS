@@ -4,7 +4,7 @@
 
 #include <stdio.h>
 #include <QStringList>
-#include <QDebug>
+#include <QMutexLocker>
 
 // -- define command keywords
 #define C_STATE       "STATE"
@@ -55,7 +55,8 @@ void ConsoleHandler::welcome()
 
 bool ConsoleHandler::prompt(QString * input)
 {
-    print("server <: ", false);
+    QMutexLocker locker(_consoleMutex);
+     _out << "server <: " << flush;
     *input = _in.readLine();
     if (input->isNull())
         return false;
@@ -81,6 +82,7 @@ void ConsoleHandler::error(QString error_str, QString cmd)
 
 void ConsoleHandler::print(const QString & string, bool eol)
 {
+    QMutexLocker locker(_consoleMutex);
     _out << string;
     if(eol) { _out << endl; }
     _out << flush;
@@ -198,6 +200,14 @@ bool ConsoleHandler::interpret(QString &input)
     return wait;
 }
 
+void ConsoleHandler::SetConsoleMutex(QMutex *mutex)
+{
+    _consoleMutex = mutex;
+}
+
+
 ConsoleHandler::ConsoleHandler() :
     _out(stdout), _in(stdin)
-{}
+{
+    _consoleMutex = NULL;
+}

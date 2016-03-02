@@ -89,7 +89,7 @@ void NetworkManager::Slot_startCalcul(const QString &json, const Calculation *fr
     QSet<ClientSession *>::iterator it = _availableClients.begin();
     if (it == _availableClients.end())
     {
-        LOG_INFO("Aucun client n'est disponible pour le calcul.");
+        LOG_INFO("Aucun client n'est actuellement disponible pour le calcul.");
         //TODO : Ajouter à une liste de calcul en attente
         return;
     }
