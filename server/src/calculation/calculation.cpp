@@ -65,7 +65,7 @@ void Calculation::Cancel()
 {
     LOG_DEBUG("Entering state BEING_CANCELED.");
     _state = BEING_CANCELED;
-    LOG_DEBUG("SIG_CANCELED() emitted.");
+    LOG_DEBUG("sig_cancelED() emitted.");
     emit sig_canceled();
 }
 

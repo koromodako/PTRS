@@ -89,8 +89,8 @@ void PluginManager::startProcess(Calculation * calc, CalculationProcess::Operati
     cp->waitForFinished();
 }
 
-void PluginManager::SLOT_TERMINATE()
-{   LOG_DEBUG("SLOT_TERMINATE() called.");
+void PluginManager::Slot_terminate()
+{   LOG_DEBUG("Slot_terminate() called.");
     // -- kill all pending processes
     while(!_pending_processes.isEmpty())
     {   CalculationProcess * cp = _pending_processes.takeFirst();
@@ -98,9 +98,9 @@ void PluginManager::SLOT_TERMINATE()
         cp->waitForFinished();
         delete cp;
     }
-    // -- emit SIG_TERMINATED
-    LOG_DEBUG("SIG_TERMINATED() emitted.");
-    emit SIG_TERMINATED();
+    // -- emit sig_terminated
+    LOG_DEBUG("sig_terminated() emitted.");
+    emit sig_terminated();
 }
 
 PluginManager::PluginManager() :
