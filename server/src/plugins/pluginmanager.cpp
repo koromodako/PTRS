@@ -40,9 +40,9 @@ bool PluginManager::CheckPlugins() const
     return ok;
 }
 
-bool PluginManager::PluginExists(const QString &plugin_name) const
+bool PluginManager::PluginExists(const QString &pluginName) const
 {
-    return ENTRY_LIST().contains(plugin_name);
+    return ENTRY_LIST().contains(pluginName);
 }
 
 QStringList PluginManager::GetPluginsList() const

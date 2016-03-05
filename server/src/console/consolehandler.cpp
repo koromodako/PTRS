@@ -70,14 +70,14 @@ void ConsoleHandler::respond(QString response)
     print(response.prepend("server :> "));
 }
 
-void ConsoleHandler::error(QString error_str, QString cmd)
+void ConsoleHandler::error(QString errorStr, QString cmd)
 {
     QString details("");
     if(!cmd.isEmpty())
     {   details.append("about ").append(cmd).append(" command");
     }
     QString msg = QString(" Type %1 %2to get some hints and tips%3. ").arg(C_HELP,cmd.append(' '),details.prepend(' '));
-    respond(error_str.append(msg));
+    respond(errorStr.append(msg));
 }
 
 void ConsoleHandler::print(const QString & string, bool eol)
