@@ -54,18 +54,18 @@ private:
 
 signals:
     /**
-     * @brief Ce signal est émis dès que SLOT_TERMINATE() a terminé ses traitements
-     * @see SLOT_TERMINATE()
+     * @brief Ce signal est émis dès que Slot_terminate() a terminé ses traitements
+     * @see Slot_terminate()
      */
-    void SIG_TERMINATED();
+    void sig_terminated();
 
 public slots:
     /**
      * @brief Ce slot est appelé par l'application manager quand celui-ci souhaite terminer l'application.
-     *          Il émet le signal SIG_TERMINATED() dès qu'il a terminé ses traitements
-     * @see SIG_TERMINATED()
+     *          Il émet le signal sig_terminated() dès qu'il a terminé ses traitements
+     * @see sig_terminated()
      */
-    void SLOT_TERMINATE();
+    void Slot_terminate();
 
 
 private: // singleton

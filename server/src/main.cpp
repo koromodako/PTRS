@@ -16,7 +16,7 @@ int main(int argc, char *argv[])
 
     ApplicationManager::GetInstance().Init();
 
-    QObject::connect(&(ApplicationManager::GetInstance()), SIGNAL(SIG_TERMINATE()),
+    QObject::connect(&(ApplicationManager::GetInstance()), SIGNAL(sig_terminated()),
                      qApp, SLOT(quit()));
 
     return a.exec();

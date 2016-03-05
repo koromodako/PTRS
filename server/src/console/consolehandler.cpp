@@ -33,14 +33,14 @@ void ConsoleHandler::Slot_init()
     while(prompt(&input) && !interpret(input));
 }
 
-void ConsoleHandler::SLOT_RESPONSE(Command command, bool ok, QString message)
+void ConsoleHandler::Slot_response(Command command, bool ok, QString message)
 {
-    //LOG_DEBUG("SLOT_RESPONSE called");
+    //LOG_DEBUG("Slot_response called");
     if(command == CMD_SHUTDOWN) {
         // say goodbye
         goodbye();
         // notify termination
-        emit SIG_TERMINATED();
+        emit sig_terminated();
     } else {
         respond(message);
         QString input;
@@ -146,10 +146,10 @@ bool ConsoleHandler::interpret(QString &input)
     QStringList args = input.split(' ', QString::SkipEmptyParts);
     if(!args.empty())
     {   if(args[0] == C_STATE)
-        {   EMIT_AND_WAIT(SIG_STATE());
+        {   EMIT_AND_WAIT(sig_state());
         }
         else if(args[0] == C_SHUTDOWN)
-        {   EMIT_AND_WAIT(SIG_SHUTDOWN());
+        {   EMIT_AND_WAIT(sig_shutdown());
         }
         else if(args[0] == C_HELP)
         {   if(args.size() > 1)
@@ -161,22 +161,22 @@ bool ConsoleHandler::interpret(QString &input)
         }
         else if(args[0] == C_EXEC) // exec command received
         {   if(args.size() > 1)
-            {   EMIT_AND_WAIT(SIG_EXEC(args[1].toUtf8()));
+            {   EMIT_AND_WAIT(sig_exec(args[1].toUtf8()));
             }
             HANDLE_SPE_ERR("Missing argument.", C_EXEC)
         }
         else if(args[0] == C_STATUS)
-        {  EMIT_AND_WAIT(SIG_STATUS());
+        {  EMIT_AND_WAIT(sig_status());
         }
         else if(args[0] == C_RESULT)
         {   if(args.size() > 1)
             {   QUuid id(args[1].toUtf8());
                 if(!id.isNull())
                 {   if(args.size() > 2)
-                    {   EMIT_AND_WAIT(SIG_RESULT(id, args[2]));
+                    {   EMIT_AND_WAIT(sig_result(id, args[2]));
                     }
                     else
-                    {   EMIT_AND_WAIT(SIG_RESULT(id));
+                    {   EMIT_AND_WAIT(sig_result(id));
                     }
                 }
                 HANDLE_SPE_ERR("Invalid id.", C_RESULT)
@@ -187,7 +187,7 @@ bool ConsoleHandler::interpret(QString &input)
         {   if(args.size() > 1)
             {   QUuid id(args[1].toUtf8());
                 if(!id.isNull())
-                {   EMIT_AND_WAIT(SIG_CANCEL(id));
+                {   EMIT_AND_WAIT(sig_cancel(id));
                 }
                 HANDLE_SPE_ERR("Invalid id.", C_CANCEL)
             }
@@ -207,7 +207,7 @@ void ConsoleHandler::SetConsoleMutex(QMutex *mutex)
 
 
 ConsoleHandler::ConsoleHandler() :
-    _out(stdout), _in(stdin)
+    _out(stdout), _in(stdin),
+    _consoleMutex(NULL)
 {
-    _consoleMutex = NULL;
 }

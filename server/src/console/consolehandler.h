@@ -45,7 +45,7 @@ public slots:
      * @param message
      *      Message de réponse construit par l'émetteur de cette dernière
      */
-    void SLOT_RESPONSE(Command command, bool ok, QString message);
+    void Slot_response(Command command, bool ok, QString message);
 
 signals:
     /**
@@ -53,35 +53,35 @@ signals:
      * @param calculationOrderJSON
      *      Bloc JSON de description du calcul à segmenter et répartir
      */
-    void SIG_EXEC(QByteArray calculationOrderJSON);
+    void sig_exec(QByteArray calculationOrderJSON);
     /**
      * @brief Ce signal est émis chaque fois que l'utilisateur demande le statut des calculs enregistrés
      */
-    void SIG_STATUS();
+    void sig_status();
     /**
      * @brief Ce signal est émis chaque fois que l'utilisateur demande les résultat d'un calcul
      * @param id
      *      Identifiant du calcul dont l'utilisateur souhaite obtenir le résultat
      */
-    void SIG_RESULT(QUuid id, QString filename = QString());
+    void sig_result(QUuid id, QString filename = QString());
     /**
      * @brief Ce signal est émis chaque fois que l'utilisateur demande l'annulation d'un calcul
      * @param id
      *      Identifiant du calcul dont l'utilisateur souhaite obtenir le résultat
      */
-    void SIG_CANCEL(QUuid id);
+    void sig_cancel(QUuid id);
     /**
      * @brief Ce signal est émis chaque fois que l'utilisateur demande l'état du serveur
      */
-    void SIG_STATE();
+    void sig_state();
     /**
      * @brief Ce signal est émis lorsque l'utilisateur demande l'arrêt du serveur
      */
-    void SIG_SHUTDOWN();
+    void sig_shutdown();
     /**
      * @brief Ce signal est émis lorsque le thread de la console est sur le point de s'arrêter.
      */
-    void SIG_TERMINATED();
+    void sig_terminated();
 
 private:
     /**
