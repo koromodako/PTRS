@@ -27,7 +27,7 @@ public:
      *      Nom du plugin dont l'existence doit être vérifiée
      * @return
      */
-    bool PluginExists(const QString & plugin_name) const;
+    bool PluginExists(const QString & pluginName) const;
     /**
      * @brief Récupération de la liste des plugins
      * @return

@@ -108,7 +108,7 @@ private:
      * @param cmd
      *      Nom de la commande liée à l'erreur si il y a lieu
      */
-    void error(QString error_str, QString cmd = QString());
+    void error(QString errorStr, QString cmd = QString());
     /**
      * @brief Affiche un message dans la sortie standard (stdout)
      * @param output
