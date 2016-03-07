@@ -94,7 +94,7 @@ bool Computer::bruteForceRecursif(std::set<QChar> charset, QString prefixe, uint
             QString hashed = QCryptographicHash::hash(prefixe.toUtf8(), _hash_algorithm).toHex();
 
             // si la cible a été trouvée, on met à jour le résultat et on arrête l'exploration récursive
-            if(target == hashed)
+            if(QString::compare(target, hashed, Qt::CaseInsensitive) == 0)
             {   _match_string = prefixe;
                 return true;
             }
