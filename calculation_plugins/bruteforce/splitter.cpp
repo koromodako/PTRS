@@ -43,13 +43,15 @@ bool Splitter::split(const QString &json)
         QStringList fragments;
         // -- pour chaque longueur entre min et max len, création d'un fragment
         for (uint l = min_len; l <= max_len; ++l) {
+            // --- récupération de l'objet calcul de base
+            QJsonObject frag = doc.object();
+            // --- identifiant du bloc de calcul
+            frag.insert(CS_JSON_KEY_FRAG_ID, QString::number(l-min_len+1));
             // --- récupération des paramètres du calcul de base
             QVariantMap frag_params = params;
             // --- modification des champs min et max len dans les paramètre
             frag_params.insert(PARAM_MIN_LEN, l);
             frag_params.insert(PARAM_MAX_LEN, l);
-            // --- récupération de l'objet calcul de base et mise à jour du champ paramètres
-            QJsonObject frag = doc.object();
             // --- modification du champ paramètre
             frag.insert(CS_JSON_KEY_CALC_PARAMS, QJsonObject::fromVariantMap(frag_params));
             // --- insertion du fragment dans la liste
