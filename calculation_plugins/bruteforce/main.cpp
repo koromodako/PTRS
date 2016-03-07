@@ -20,10 +20,10 @@ int main(int argc, char *argv[])
     QString action;
     QString json;
     qtin >> action;
-    for(QString line; line != CS_EOF; line = qtin.readLine()) json += line;
+    for(QString line; !qtin.atEnd() && line != CS_EOF; line = qtin.readLine()) json += line;
 
     // traitement principal    
-    if(action == CS_OP_JOIN)
+    if(QString::compare(action, CS_OP_JOIN, Qt::CaseInsensitive) == 0)
     {   Joiner joiner;
         if(joiner.join(json))
         {   success(QString(joiner.result()).toStdString());
@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
         {   fail(joiner.error().toStdString());
         }
     }
-    else if(action == CS_OP_SPLIT)
+    else if(QString::compare(action, CS_OP_SPLIT, Qt::CaseInsensitive) == 0)
     {   Splitter splitter;
         if(splitter.split(json))
         {   success(QString(splitter.result()).toStdString());
@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
         {   fail(splitter.error().toStdString());
         }
     }
-    else if(action == CS_OP_CALC)
+    else if(QString::compare(action, CS_OP_CALC, Qt::CaseInsensitive) == 0)
     {   Computer computer;
         if(computer.compute(json))
         {   success(QString(computer.result()).toStdString());
