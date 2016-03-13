@@ -1,0 +1,12 @@
+split
+{
+  "bin":"bruteforce",
+  "params":{
+    "charset":"abcdefghijklmnopqrstuvwxyz0123456789",
+    "min_len":1,
+    "max_len":10,
+    "hash_func":"md5",
+    "target":"1bc29b36f623ba82aaf6724fd3b16718"
+  }
+}
+EOF

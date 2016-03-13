@@ -1,0 +1,13 @@
+calc
+{
+  "bin":"bruteforce",
+  "fragment_id":3
+  "params":{
+    "charset":"abcdefghijklmnopqrstuvwxyz0123456789",
+    "hash_func":"md5",
+    "max_len":3,
+    "min_len":3,
+    "target":"1bc29b36f623ba82aaf6724fd3b16718"
+  }
+}
+EOF
