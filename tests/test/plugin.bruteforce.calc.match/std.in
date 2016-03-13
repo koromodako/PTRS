@@ -1,7 +1,7 @@
 calc
 {
   "bin":"bruteforce",
-  "fragment_id":3
+  "fragment_id":"3",
   "params":{
     "charset":"abcdefghijklmnopqrstuvwxyz0123456789",
     "hash_func":"md5",
