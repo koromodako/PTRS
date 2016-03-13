@@ -11,10 +11,7 @@
  * @see ConsoleHandler
  */
 enum Command {
-    CMD_EXEC,
-    CMD_STATUS,
-    CMD_RESULT,
-    CMD_CANCEL,
+    CMD_CONNECT,
     CMD_SHUTDOWN,
     CMD_STATE
 };
