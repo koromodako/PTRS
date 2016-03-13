@@ -23,7 +23,11 @@ SOURCES += \
     src/network/etat/readystate.cpp \
     src/network/etat/waitingstate.cpp \
     src/network/etat/workingstate.cpp \
-    src/calculthread.cpp
+    src/plugins/calculationprocess.cpp \
+    src/plugins/pluginmanager.cpp \
+    src/calculation/calculation.cpp \
+    src/utils/logger.cpp \
+    src/utils/abstractidentifiable.cpp
 
 HEADERS  += \
     src/network/clientsession.h \
@@ -33,6 +37,11 @@ HEADERS  += \
     src/network/etat/waitingstate.h \
     src/network/etat/workingstate.h \
     src/const.h \
-    src/calculthread.h
+    src/plugins/calculationprocess.h \
+    src/plugins/pluginmanager.h \
+    src/calculation/calculation.h \
+    src/calculation/specs.h \
+    src/utils/logger.h \
+    src/utils/abstractidentifiable.h
 
 FORMS    +=
