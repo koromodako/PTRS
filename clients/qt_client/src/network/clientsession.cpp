@@ -3,6 +3,7 @@
 #include "src/network/etat/readystate.h"
 #include "src/network/etat/waitingstate.h"
 #include "src/network/etat/workingstate.h"
+#include "src/plugins/pluginmanager.h"
 
 #include <QJsonObject>
 #include <QNetworkInterface>
@@ -24,23 +25,11 @@ ClientSession::ClientSession()
     _broadcastTimer.setInterval(2000);
     connect(&_broadcastTimer, &QTimer::timeout, this, &ClientSession::findServer);
 
-    _thread = new QThread;
-    _worker = new CalculThread;
-    _worker->moveToThread(_thread);
-    connect(this, &ClientSession::sig_requestCalculStart, _worker, &CalculThread::Slot_startCalcul);
-    connect(this, &ClientSession::sig_requestCalculStop, _worker, &CalculThread::Slot_stopCalcul);
-    connect(_worker, &CalculThread::sig_calculAborted, this, &ClientSession::Slot_abortCalcul);
-    connect(_worker, &CalculThread::sig_calculDone, this, &ClientSession::Slot_sendResultToServer);
-    connect(_thread, &QThread::finished, _thread, &QThread::deleteLater);
-    _thread->start();
-
     findServer();
 }
 
 ClientSession::~ClientSession()
 {
-    _thread->quit();
-    _thread->wait();
     _socket->deleteLater();
 }
 
@@ -88,6 +77,7 @@ void ClientSession::initializeStateMachine()
 
     _currentState = _disconnectedState = disconnectedState;
 }
+
 
 void ClientSession::slot_processCmd(ReqType reqType, const QStringList &args)
 {
