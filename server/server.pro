@@ -34,7 +34,7 @@ SOURCES += \
     src/network/etat/waitingstate.cpp \
     src/network/etat/workingabouttostartstate.cpp \
     src/network/etat/workingstate.cpp \
-    src/plugins/calculationprocess.cpp
+    src/plugins/pluginprocess.cpp
 
 HEADERS  += \
     src/console/consolehandler.h \
@@ -56,6 +56,6 @@ HEADERS  += \
     src/network/etat/workingabouttostartstate.h \
     src/network/etat/workingstate.h \
     src/calculation/specs.h \
-    src/plugins/calculationprocess.h
+    src/plugins/pluginprocess.h
 
 FORMS    +=

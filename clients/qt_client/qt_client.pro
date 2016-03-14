@@ -4,6 +4,7 @@
 
 TEMPLATE = app
 TARGET = qt_client
+CONFIG += c++11
 INCLUDEPATH += . \
                src/network \
                src/network/etat \
