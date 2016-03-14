@@ -93,6 +93,7 @@ void ApplicationManager::Slot_connect()
     LOG_DEBUG("Slot_connect() called.");
     QString report = "";
     //report += "not implemented yet\n";
+    //TODO gerer si le client fait 2 fois CONNECT (à voir avec le multi server)
     _clientSession = new ClientSession();
     LOG_DEBUG("sig_response(CMD_CONNECT) emitted.");
     emit sig_response(CMD_CONNECT, true, report);
