@@ -5,8 +5,9 @@
 #include <QUdpSocket>
 #include <QThread>
 #include <QTimer>
+#include <QJsonObject>
 #include "src/network/etat/abstractstate.h"
-#include "src/calculthread.h"
+#include "src/plugins/calculationprocess.h"
 /**
  * @brief Cette classe représente une session client, c'est à dire une connexion client active.
  */
@@ -121,9 +122,7 @@ private:
     int _fragmentId;
     QString _id;
     QTcpSocket *_socket;
-    QThread *_thread;
     QMap<QObject *, AbstractState *> _transitionsMap;
-    CalculThread* _worker;
 };
 
 inline int ClientSession::FragmentId() const
