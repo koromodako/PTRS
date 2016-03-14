@@ -1,7 +1,7 @@
 #ifndef PLUGINMANAGER_H
 #define PLUGINMANAGER_H
 
-#include "calculationprocess.h"
+#include "pluginprocess.h"
 #include <QStringList>
 #include <QDir>
 
@@ -50,7 +50,7 @@ private:
      * @param program
      * @param args
      */
-    void startProcess(Calculation * calc, CalculationProcess::Operation op);
+    void startProcess(Calculation * calc, PluginProcess::Operation op);
 
 signals:
     /**
@@ -77,7 +77,7 @@ private: // singleton
     friend class CalculationManager;
 
     QDir _plugins_dir;
-    CalculationProcessList _pending_processes;
+    PluginProcessList _pending_processes;
 };
 
 #endif // PLUGINMANAGER_H

@@ -6,6 +6,7 @@
 #include <QHash>
 #include <QVariantMap>
 #include <QJsonDocument>
+#include <QJsonObject>
 
 /**
  * @brief Cette classe représente un calcul distribuable
@@ -47,13 +48,19 @@ public:
      * @brief Binaire utilisé pour les operations split, calc et join
      * @return
      */
-    inline QString GetBin() const { return _bin; }
+    inline const QString & GetBin() const { return _bin; }
 
     /**
      * @brief Paramètres nécessaires à l'execution du calcul
      * @return
      */
-    inline QVariantMap GetParams() const { return _params; }
+    inline const QVariantMap & GetParams() const { return _params; }
+
+    /**
+     * @brief Retourne le résultat du calcul
+     * @return
+     */
+    inline const QJsonObject & GetResult() const { return _result; }
 
     /**
      * @brief Méthode de fabrique pour construire un calcul à partir de sa représentation JSON
@@ -76,7 +83,7 @@ public:
      * @param format
      * @return
      */
-    QString FragmentsToJson(QJsonDocument::JsonFormat format = QJsonDocument::Compact) const;
+    QString FragmentsResultsToJson(QJsonDocument::JsonFormat format = QJsonDocument::Compact) const;
 
     /**
     * @brief Demande l'annulation du calcul
@@ -87,20 +94,20 @@ public:
      * @brief Cette méthode est appelée une fois le calcul fragmenté
      * @param json
      */
-    void Splitted(QString json);
+    void Splitted(const QByteArray &json);
 
     /**
      * @brief Cette méthode est appelée une fois les résultats du calcul fusionnés
      * @param json
      */
-    void Joined(QString json);
+    void Joined(const QByteArray &json);
 
 public slots:
     /**
      * @brief Ce slot est appelée une fois le calcul effectué
      * @param json résultat en provenance du client
      */
-    void Slot_computed(QString json);
+    void Slot_computed(const QByteArray &json);
 
     /**
      * @brief Ce slot est appelée quand le calcul à crashé
@@ -146,6 +153,7 @@ private:
     QString _bin;
     QVariantMap _params;
     QHash<QUuid,Calculation*> _fragments;
+    QJsonObject _result;
 };
 
 #endif // CALCULATION_H

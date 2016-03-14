@@ -52,39 +52,45 @@ QStringList PluginManager::GetPluginsList() const
 
 void PluginManager::Split(Calculation *calc)
 {   // -- lancement du processus associé
-    startProcess(calc, CalculationProcess::SPLIT);
+    startProcess(calc, PluginProcess::SPLIT);
 }
 
 void PluginManager::Join(Calculation *calc)
 {   // -- lancement du processus associé
-    startProcess(calc, CalculationProcess::JOIN);
+    startProcess(calc, PluginProcess::JOIN);
 }
 
-void PluginManager::startProcess(Calculation * calc, CalculationProcess::Operation op)
+void PluginManager::startProcess(Calculation * calc, PluginProcess::Operation op)
 {
     // -- création d'un nouveau processus
-    CalculationProcess * cp = new CalculationProcess(calc, op);
+    PluginProcess * cp = new PluginProcess(calc, op);
     // -- set process program
     QString command = QString("%1/%2 ").arg(_plugins_dir.absolutePath(),calc->GetBin());
-    // -- set process arguments
-    switch (op) {
-    case CalculationProcess::SPLIT:
-        command.append(CS_OP_SPLIT).append(' ').append(QUrl::toPercentEncoding(calc->ToJson()));
-        break;
-    case CalculationProcess::JOIN:
-        command.append(CS_OP_JOIN).append(' ').append(QUrl::toPercentEncoding(calc->FragmentsToJson()));
-        break;
-    case CalculationProcess::CALC:
-        command.append(CS_OP_CALC).append(' ').append(QUrl::toPercentEncoding(calc->ToJson()));
-    default:
-        LOG_CRITICAL("Processus started without arguments : unhandled operation is the cause !");
-        break;
-    }
     LOG_DEBUG(QString("Command is : '%1'").arg(command));
     // -- ajout du process à la liste
     _pending_processes.append(cp);
     // -- lancement du processus
     cp->start(command);
+    // -- write in process stdin
+    switch (op) {
+    case PluginProcess::SPLIT: // utile côté serveur
+        cp->write(CS_OP_SPLIT);
+        cp->write(calc->ToJson().toUtf8().data()); // ici calc est supposé être un ensemble de fragments
+        cp->write(CS_EOF);
+        break;
+    case PluginProcess::JOIN: // utile côté serveur
+        cp->write(CS_OP_JOIN);
+        cp->write(calc->FragmentsResultsToJson().toUtf8().data()); // ici calc est supposé contenir un ensemble de fragment
+        cp->write(CS_EOF);
+        break;
+    case PluginProcess::CALC: // utile côté client
+        cp->write(CS_OP_CALC);
+        cp->write(calc->ToJson().toUtf8().data()); // ici calc est supposé être un fragment
+        cp->write(CS_EOF);
+    default:
+        LOG_CRITICAL("Processus started without arguments : unhandled operation is the cause !");
+        break;
+    }
     // -- on attend la fin du processus
     cp->waitForFinished();
 }
@@ -93,7 +99,7 @@ void PluginManager::Slot_terminate()
 {   LOG_DEBUG("Slot_terminate() called.");
     // -- kill all pending processes
     while(!_pending_processes.isEmpty())
-    {   CalculationProcess * cp = _pending_processes.takeFirst();
+    {   PluginProcess * cp = _pending_processes.takeFirst();
         cp->kill();
         cp->waitForFinished();
         delete cp;

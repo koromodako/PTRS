@@ -1,10 +1,10 @@
-#ifndef CALCULATIONPROCESS_H
-#define CALCULATIONPROCESS_H
+#ifndef PluginProcess_H
+#define PluginProcess_H
 
 #include "src/calculation/calculation.h"
 #include <QProcess>
 
-class CalculationProcess : public QProcess
+class PluginProcess : public QProcess
 {
     Q_OBJECT
 public:
@@ -24,8 +24,8 @@ public:
      * @param op
      *      Opération réalisée par le plugin sur le calcul passé en paramètre
      */
-    CalculationProcess(Calculation * calc, Operation op, QObject * parent = NULL);
-    ~CalculationProcess(){} //do not delete calc here
+    PluginProcess(Calculation * calc, Operation op, QObject * parent = NULL);
+    ~PluginProcess(){} //do not delete calc here
 
 private slots:
     /**
@@ -51,6 +51,6 @@ private:
     QString _err;
 };
 
-typedef QList<CalculationProcess*> CalculationProcessList;
+typedef QList<PluginProcess*> PluginProcessList;
 
-#endif // CALCULATIONPROCESS_H
+#endif // PluginProcess_H

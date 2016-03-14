@@ -1,10 +1,10 @@
-#include "calculationprocess.h"
+#include "pluginprocess.h"
 #include "src/calculation/specs.h"
 #include "src/utils/logger.h"
 
 #include <QUrl>
 
-CalculationProcess::CalculationProcess(Calculation *calc, Operation op, QObject *parent) :
+PluginProcess::PluginProcess(Calculation *calc, Operation op, QObject *parent) :
     QProcess(parent),
     _calculation(calc),
     _op(op),
@@ -16,7 +16,7 @@ CalculationProcess::CalculationProcess(Calculation *calc, Operation op, QObject 
     connect(this, SIGNAL(finished(int,QProcess::ExitStatus)), SLOT(SLOT_FINISHED(int,QProcess::ExitStatus)));
 }
 
-void CalculationProcess::SLOT_ERROR(QProcess::ProcessError error)
+void PluginProcess::SLOT_ERROR(QProcess::ProcessError error)
 {   LOG_DEBUG(QString("SLOT_ERROR(%1) called.").arg(error));
     QString msg("");
     switch (error) {
@@ -42,20 +42,20 @@ void CalculationProcess::SLOT_ERROR(QProcess::ProcessError error)
     _calculation->Slot_crashed(msg);
 }
 
-void CalculationProcess::SLOT_FINISHED(int exitCode, QProcess::ExitStatus exitStatus)
+void PluginProcess::SLOT_FINISHED(int exitCode, QProcess::ExitStatus exitStatus)
 {   LOG_DEBUG(QString("SLOT_FINISHED(%1,%2) called.").arg(exitCode).arg(exitStatus));
     switch (exitStatus) {
     case QProcess::NormalExit:
         if(exitCode == 0)
         {   switch (_op) {
             case SPLIT:
-                _calculation->Splitted(QUrl::fromPercentEncoding(readAllStandardOutput()));
+                _calculation->Splitted(readAllStandardOutput());
                 break;
             case JOIN:
-                _calculation->Joined(QUrl::fromPercentEncoding(readAllStandardOutput()));
+                _calculation->Joined(readAllStandardOutput());
                 break;
             case CALC:
-                _calculation->Slot_computed(QUrl::fromPercentEncoding(readAllStandardOutput()));
+                _calculation->Slot_computed(readAllStandardOutput());
                 break;
             }
         }

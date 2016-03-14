@@ -3,7 +3,7 @@
 #include "src/utils/logger.h"
 #include "src/network/networkmanager.h"
 
-#include <QJsonObject>
+#include <QJsonArray>
 
 Calculation * Calculation::FromJson(QObject * parent, const QByteArray &json, QString & errorStr)
 {
@@ -49,16 +49,16 @@ QString Calculation::ToJson(QJsonDocument::JsonFormat format) const
     return doc.toJson(format);
 }
 
-QString Calculation::FragmentsToJson(QJsonDocument::JsonFormat format) const
-{   QStringList json_frags;
+QString Calculation::FragmentsResultsToJson(QJsonDocument::JsonFormat format) const
+{   QJsonArray array;
 
     // -- pour chaque fragment
     QHash<QUuid,Calculation*>::const_iterator frag;
     for(frag = _fragments.constBegin() ; frag != _fragments.constEnd() ; frag++)
     {
-        json_frags << frag.value()->ToJson(format);
+        array.append(frag.value()->GetResult());
     }
-    return json_frags.join(CS_FRAGMENT_SEP);
+    return QJsonDocument(array).toJson(format);
 }
 
 void Calculation::Cancel()
@@ -69,15 +69,31 @@ void Calculation::Cancel()
     emit sig_canceled();
 }
 
-void Calculation::Splitted(QString json)
+void Calculation::Splitted(const QByteArray & json)
 {
-    LOG_DEBUG(QString("Splitted received json=%1").arg(json));
+    LOG_DEBUG(QString("Splitted received json=%1").arg(QString(json)));
 
-    //TODO : découper en plusieurs calculation à mettre dans _fragments en fonction du json
-    //TODO : envoyer les calculs au network manager
-
-    /// QJsonDocument doc(args);
-    /// doc.toJson(QJsonDocument::Compact)
+    QJsonParseError jsonError;
+    QJsonDocument doc = QJsonDocument::fromJson(json, &jsonError);
+    if(jsonError.error != QJsonParseError::NoError)
+    {   LOG_ERROR("an error occured while parsing splitted json block.");
+        _state = CRASHED;
+        return;
+    }
+    QJsonArray fragments = doc.array();
+    foreach (QJsonValue fragment, fragments)
+    {
+        QString error;
+        Calculation * frag = Calculation::FromJson(this, QJsonDocument(fragment.toObject()).toJson(QJsonDocument::Compact), error);
+        if(frag != NULL)
+        {   _fragments.insert(frag->GetId(), frag);
+        }
+        else
+        {   LOG_ERROR("fragment creation failed !");
+            _state = CRASHED;
+            return;
+        }
+    }
 
     // mise à jour de l'état du calcul
     LOG_DEBUG("Entering state SCHEDULED.");
@@ -95,11 +111,18 @@ void Calculation::Splitted(QString json)
 
 }
 
-void Calculation::Joined(QString json)
+void Calculation::Joined(const QByteArray &json)
 {
-    LOG_DEBUG(QString("Joined received json=%1").arg(json));
+    LOG_DEBUG(QString("Joined received json=%1").arg(QString(json)));
 
-    /// \todo implement here
+    QJsonParseError jsonError;
+    QJsonDocument doc = QJsonDocument::fromJson(json, &jsonError);
+    if(jsonError.error != QJsonParseError::NoError)
+    {   LOG_ERROR("an error occured while parsing joined json block.");
+        _state = CRASHED;
+        return;
+    }
+    _result = doc.object();
 
     // mise à jour de l'état du calcul
     LOG_DEBUG("Entering state COMPLETED.");
@@ -108,14 +131,18 @@ void Calculation::Joined(QString json)
     emit sig_completed();
 }
 
-void Calculation::Slot_computed(QString json)
+void Calculation::Slot_computed(const QByteArray & json)
 {
-    LOG_DEBUG(QString("Computed received json=%1").arg(json));
+    LOG_DEBUG(QString("Computed received json=%1").arg(QString(json)));
 
-    /// \todo implement here
-    ///
-    ///  QJsonDocument jsonResponse = QJsonDocument::fromJson(json);
-    ///  jsonResponse.object();
+    QJsonParseError jsonError;
+    QJsonDocument doc = QJsonDocument::fromJson(json, &jsonError);
+    if(jsonError.error != QJsonParseError::NoError)
+    {   LOG_ERROR("an error occured while parsing fragment result json block.");
+        _state = CRASHED;
+        return;
+    }
+    _result = doc.object();
 
     // mise à jour de l'état du calcul
     LOG_DEBUG("Entering state COMPUTED.");
