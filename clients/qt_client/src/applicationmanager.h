@@ -7,13 +7,14 @@
 
 #include "src/const.h"
 #include "calculation/calculationmanager.h"
+#include "network/clientsession.h"
 
 /*
  *  Cette valeur définit le nombre de module dont l'arrêt doit être validé avant
  *  de pouvoir terminer l'application. Pour l'instant on doit attendre la fin
  *  confirmée du PluginManager et du ConsoleHandler avant de terminer.
  */
-#define TERMINATED_EXPECTED_TOTAL 1
+#define TERMINATED_EXPECTED_TOTAL 2
 
 /**
  * @brief Ce manager gère fait office de facade pour tous les autres managers.
@@ -79,7 +80,7 @@ private:
 
     QMutex _consoleMutex;
     QThread _consoleThread;
-    QThread _clientSession;
+    ClientSession* _clientSession;
     static ApplicationManager _instance;
     int _terminated_ctr;
 };

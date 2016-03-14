@@ -35,6 +35,7 @@ void ApplicationManager::Init()
     if(!PluginManager::getInstance().CheckPlugins())
     {   LOG_CRITICAL("Plugins integrity check failed !");
     }
+    _clientSession = NULL;
     _consoleThread.start();
 }
 
@@ -64,8 +65,9 @@ void ApplicationManager::Slot_shutdown()
     emit sig_terminateModule();
 #if TERMINATED_EXPECTED_TOTAL == 1
     if(TERMINATED_EXPECTED_TOTAL - _terminated_ctr == 1)
-    {   LOG_DEBUG("sig_response(CMD_SHUTDOWN) emitted.");
-        emit sig_response(CMD_SHUTDOWN, true, "SHUTDOWN command received !");
+    {   delete _clientSession;
+        LOG_DEBUG("sig_response(CMD_SHUTDOWN) emitted.");
+        emit sig_response(CMD_SHUTDOWN, true, QString("SHUTDOWN command received !"));
     }
 #endif
 }
@@ -79,7 +81,7 @@ void ApplicationManager::Slot_terminated()
     }
     else if(TERMINATED_EXPECTED_TOTAL - _terminated_ctr == 1)
     {   LOG_DEBUG("sig_response(CMD_SHUTDOWN) emitted.");
-        emit sig_response(CMD_SHUTDOWN, true, "STATUS command received !");
+        emit sig_response(CMD_SHUTDOWN, true, QString("SHUTDOWN command received !"));
     }
     // emission du signal de terminaison quand tous les composants attendus ont notofié l'app manager de leur terminaison
 
@@ -90,7 +92,9 @@ void ApplicationManager::Slot_connect()
 {
     LOG_DEBUG("Slot_connect() called.");
     QString report = "";
-    report += "not implemented yet\n";
+    //report += "not implemented yet\n";
+    _clientSession = new ClientSession();
+    LOG_DEBUG("sig_response(CMD_CONNECT) emitted.");
     emit sig_response(CMD_CONNECT, true, report);
 }
 
