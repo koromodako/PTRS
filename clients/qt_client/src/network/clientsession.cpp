@@ -4,6 +4,7 @@
 #include "src/network/etat/waitingstate.h"
 #include "src/network/etat/workingstate.h"
 #include "src/plugins/pluginmanager.h"
+#include "src/utils/logger.h"
 
 #include <QJsonObject>
 #include <QNetworkInterface>
@@ -14,7 +15,6 @@ ClientSession::ClientSession()
 {
     _broadcastSocket = new QUdpSocket(this);
     _socket = new QTcpSocket(this);
-
     connect(_socket, &QTcpSocket::readyRead, this, &ClientSession::slot_processReadyRead);
     connect(_socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(slot_disconnect()));
     initializeStateMachine();
@@ -137,6 +137,7 @@ void ClientSession::readBroadcastDatagram()
             _broadcastTimer.stop();
             QObject::disconnect(_broadcastSocket, &QUdpSocket::readyRead, this, &ClientSession::readBroadcastDatagram);
             _socket->connectToHost(senderIp, data[1].toInt());
+            LOG_INFO("connected to " + senderIp.toString());
             _socket->waitForConnected();
             _currentState->ProcessHello();
 
