@@ -4,6 +4,7 @@
 
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QJsonArray>
 #include <QVariantMap>
 #include <iostream>
 
@@ -40,7 +41,7 @@ bool Splitter::split(const QString &json)
         // -- récupération des valeurs de min et max len dans les champs des paramètres
         uint min_len = params.value(PARAM_MIN_LEN).toInt();
         uint max_len = params.value(PARAM_MAX_LEN).toInt();
-        QStringList fragments;
+        QJsonArray fragments;
         // -- pour chaque longueur entre min et max len, création d'un fragment
         for (uint l = min_len; l <= max_len; ++l) {
             // --- récupération de l'objet calcul de base
@@ -55,10 +56,10 @@ bool Splitter::split(const QString &json)
             // --- modification du champ paramètre
             frag.insert(CS_JSON_KEY_CALC_PARAMS, QJsonObject::fromVariantMap(frag_params));
             // --- insertion du fragment dans la liste
-            fragments << QJsonDocument(frag).toJson(QJsonDocument::Compact);
+            fragments.append(frag);
         }
         // -- insertion des fragment dans l'attribut résultat de l'objet splitter
-        _result = fragments.join(CS_FRAGMENT_SEP);
+        _result = QJsonDocument(fragments).toJson(QJsonDocument::Compact);
         // on lève le drapeau
         ok = true;
     }
