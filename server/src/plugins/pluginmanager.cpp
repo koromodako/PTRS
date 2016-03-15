@@ -5,7 +5,6 @@
 
 #include <QCoreApplication>
 #include <QFile>
-#include <QUrl>
 
 #define ENTRY_LIST_FILTER   QDir::Files | QDir::Executable
 #define ENTRY_LIST_SORT     QDir::Name
@@ -70,7 +69,9 @@ void PluginManager::startProcess(Calculation * calc, PluginProcess::Operation op
     // -- ajout du process à la liste
     _pending_processes.append(cp);
     // -- lancement du processus
-    cp->start(command);
+    cp->start(command, QStringList(), QIODevice::ReadWrite);
+    // -- on attend que le process se lance
+    cp->waitForStarted();
     // -- write in process stdin
     switch (op) {
     case PluginProcess::SPLIT: // utile côté serveur

@@ -2,8 +2,6 @@
 #include "src/calculation/specs.h"
 #include "src/utils/logger.h"
 
-#include <QUrl>
-
 PluginProcess::PluginProcess(Calculation *calc, Operation op, QObject *parent) :
     QProcess(parent),
     _calculation(calc),

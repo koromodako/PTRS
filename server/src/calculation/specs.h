@@ -11,7 +11,4 @@
 #define CS_OP_CALC  "calc"
 #define CS_EOF "EOF"
 
-#define CS_FRAGMENT_SEP ';'
-
-
 #endif // SPECS_H
