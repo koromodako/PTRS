@@ -5,7 +5,6 @@
 
 #include <QCoreApplication>
 #include <QFile>
-#include <QUrl>
 
 #define ENTRY_LIST_FILTER   QDir::Files | QDir::Executable
 #define ENTRY_LIST_SORT     QDir::Name
@@ -71,26 +70,44 @@ void PluginManager::startProcess(Calculation * calc, CalculationProcess::Operati
     CalculationProcess * cp = new CalculationProcess(calc, op);
     // -- set process program
     QString command = QString("%1/%2").arg(_plugins_dir.absolutePath(),calc->GetBin());
-    // -- set process arguments
+    LOG_DEBUG(QString("Command is : '%1'").arg(command));
+    // -- ajout du process à la liste
+    _pending_processes.append(cp);
+    // -- lancement du processus
+    cp->start(command, QStringList(), QIODevice::ReadWrite);
+    // -- on attend que le process se lance
+    cp->waitForStarted();
+    // -- write in process stdin
     switch (op) {
-    case CalculationProcess::SPLIT:
-        command.append(CS_OP_SPLIT).append(' ').append(QUrl::toPercentEncoding(calc->ToJson()));
+    case CalculationProcess::SPLIT: // utile côté serveur
+        cp->write(CS_OP_SPLIT);
+        cp->write("\n");
+        cp->write(calc->ToJson().toUtf8().data()); // ici calc est supposé être un ensemble de fragments
+        cp->write("\n");
+        cp->write(CS_EOF);
+        cp->write("\n");
         break;
-    case CalculationProcess::JOIN:
-        command.append(CS_OP_JOIN).append(' ').append(QUrl::toPercentEncoding(calc->FragmentsToJson()));
+    case CalculationProcess::JOIN: // utile côté serveur
+        cp->write(CS_OP_JOIN);
+        cp->write("\n");
+        cp->write(calc->FragmentsToJson().toUtf8().data()); // ici calc est supposé contenir un ensemble de fragment
+        cp->write("\n");
+        cp->write(CS_EOF);
+        cp->write("\n");
         break;
-    case CalculationProcess::CALC:
-        command.append(CS_OP_CALC).append(' ').append(QUrl::toPercentEncoding(calc->ToJson()));
+    case CalculationProcess::CALC: // utile côté client
+        cp->write(CS_OP_CALC);
+        cp->write("\n");
+        cp->write(calc->ToJson().toUtf8().data()); // ici calc est supposé être un fragment
+        cp->write("\n");
+        cp->write(CS_EOF);
+        cp->write("\n");
+        LOG_DEBUG(QString("JSON param is : '%1'").arg(calc->ToJson().toUtf8().data()));
         break;
     default:
         LOG_CRITICAL("Processus started without arguments : unhandled operation is the cause !");
         break;
     }
-    LOG_DEBUG(QString("Command is : '%1'").arg(command));
-    // -- ajout du process à la liste
-    _pending_processes.append(cp);
-    // -- lancement du processus
-    cp->start(command);
     // -- on attend la fin du processus
     cp->waitForFinished();
 }
