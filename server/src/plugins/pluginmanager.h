@@ -77,7 +77,7 @@ private: // singleton
     friend class CalculationManager;
 
     QDir _plugins_dir;
-    PluginProcessList _pending_processes;
+    PluginProcessList _processes;
 };
 
 #endif // PLUGINMANAGER_H
