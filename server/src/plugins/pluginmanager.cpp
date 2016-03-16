@@ -64,7 +64,7 @@ void PluginManager::startProcess(Calculation * calc, PluginProcess::Operation op
     // -- création d'un nouveau processus
     PluginProcess * cp = new PluginProcess(calc, op);
     // -- set process program
-    QString command = QString("%1/%2 ").arg(_plugins_dir.absolutePath(),calc->GetBin());
+    QString command = QString("%1/%2").arg(_plugins_dir.absolutePath(),calc->GetBin());
     LOG_DEBUG(QString("Command is : '%1'").arg(command));
     // -- ajout du process à la liste
     _pending_processes.append(cp);
