@@ -2,8 +2,9 @@
 #include "src/calculation/specs.h"
 #include "src/utils/logger.h"
 
-PluginProcess::PluginProcess(Calculation *calc, Operation op, QObject *parent) :
+PluginProcess::PluginProcess(QString absExecDir, Calculation *calc, Operation op, QObject *parent) :
     QProcess(parent),
+    _absExecDir(absExecDir),
     _calculation(calc),
     _op(op),
     _out(""),
@@ -12,6 +13,37 @@ PluginProcess::PluginProcess(Calculation *calc, Operation op, QObject *parent) :
     // -- connexion du calcul aux évènements du processus
     connect(this, SIGNAL(error(QProcess::ProcessError)),      SLOT(SLOT_ERROR(QProcess::ProcessError)));
     connect(this, SIGNAL(finished(int,QProcess::ExitStatus)), SLOT(SLOT_FINISHED(int,QProcess::ExitStatus)));
+}
+
+bool PluginProcess::Start()
+{
+    // construction de la commande en fonction du type de binaire
+    QString command(_absExecDir);
+    // on ajoute le nom du binaire à la fin
+    command.append('/').append(_calculation->GetBin());
+    // en fonction du type on effectue des opérations supplémentaires
+    bool ok = true;
+    switch (detectType()) {
+    case BINARY: break;
+    case JAR:
+        command.prepend("java -jar ");
+        break;
+    case SCRIPT:
+        if(! selectInterpreter().isNull() )
+        {   command.prepend(selectInterpreter()).prepend(" ");
+        }
+        else
+        {   ok = false;
+        }
+        break;
+    }
+    // -- démarrage du plugin
+    if(ok)
+    {   // on exécute la commande trimmée pour éviter les espaces traitres
+        start(command.trimmed());
+    }
+    // -- retour du statut
+    return ok;
 }
 
 void PluginProcess::SLOT_ERROR(QProcess::ProcessError error)
@@ -55,6 +87,8 @@ void PluginProcess::SLOT_FINISHED(int exitCode, QProcess::ExitStatus exitStatus)
             case CALC:
                 _calculation->Slot_computed(readAllStandardOutput());
                 break;
+            case UI:
+                break; // là il ne se passe rien pour cette commande.
             }
         }
         else
@@ -69,4 +103,33 @@ void PluginProcess::SLOT_FINISHED(int exitCode, QProcess::ExitStatus exitStatus)
         _calculation->Slot_crashed(readAllStandardError());
         break;
     }
+}
+
+#define JAR_EXT "jar"
+#define SCRIPT_EXT() QStringList({"py","sh"})
+#define SCRIPT_INTERPRETER() QStringList({"python", "bash"})
+
+PluginProcess::Type PluginProcess::detectType()
+{
+    Type type = BINARY;
+    QStringList parts = _calculation->GetBin().split('.', QString::SkipEmptyParts);
+    if(!parts.isEmpty())
+    {   if(parts.last() == JAR_EXT)
+        {   type = JAR;
+        }
+        else if(SCRIPT_EXT().contains(parts.last()))
+        {   type = SCRIPT;
+        }
+    }
+    return type;
+}
+
+QString PluginProcess::selectInterpreter()
+{
+    QStringList parts = _calculation->GetBin().split('.', QString::SkipEmptyParts);
+    int index(-1);
+    if(!parts.isEmpty())
+    {   index = SCRIPT_EXT().indexOf(parts.last());
+    }
+    return (index >= 0 ? SCRIPT_INTERPRETER()[index] : QString());
 }
