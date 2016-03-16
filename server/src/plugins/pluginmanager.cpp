@@ -76,18 +76,27 @@ void PluginManager::startProcess(Calculation * calc, PluginProcess::Operation op
     switch (op) {
     case PluginProcess::SPLIT: // utile côté serveur
         cp->write(CS_OP_SPLIT);
+        cp->write("\n");
         cp->write(calc->ToJson().toUtf8().data()); // ici calc est supposé être un ensemble de fragments
+        cp->write("\n");
         cp->write(CS_EOF);
+        cp->write("\n");
         break;
     case PluginProcess::JOIN: // utile côté serveur
         cp->write(CS_OP_JOIN);
+        cp->write("\n");
         cp->write(calc->FragmentsResultsToJson().toUtf8().data()); // ici calc est supposé contenir un ensemble de fragment
+        cp->write("\n");
         cp->write(CS_EOF);
+        cp->write("\n");
         break;
     case PluginProcess::CALC: // utile côté client
         cp->write(CS_OP_CALC);
+        cp->write("\n");
         cp->write(calc->ToJson().toUtf8().data()); // ici calc est supposé être un fragment
+        cp->write("\n");
         cp->write(CS_EOF);
+        cp->write("\n");
     default:
         LOG_CRITICAL("Processus started without arguments : unhandled operation is the cause !");
         break;
