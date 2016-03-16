@@ -6,6 +6,8 @@
 
 Calculation * Calculation::FromJson(QObject * parent, const QByteArray &json, QString & errorStr)
 {
+    LOG_DEBUG(QString("Creating calculation from JSON %1").arg((QString) json));
+
     Calculation * calculation = NULL;
 
     QJsonParseError error;
@@ -42,6 +44,7 @@ QString Calculation::ToJson(QJsonDocument::JsonFormat format) const
 {
     QJsonObject calc;
     calc.insert(CS_JSON_KEY_CALC_BIN, GetBin());
+    calc.insert(CS_JSON_KEY_FRAG_ID, GetId().toString());
     calc.insert(CS_JSON_KEY_CALC_PARAMS, QJsonObject::fromVariantMap(_params));
     QJsonDocument doc(calc);
     return doc.toJson(format);
