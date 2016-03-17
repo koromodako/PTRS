@@ -10,12 +10,12 @@ WaitingState::~WaitingState()
 {
 }
 
-void WaitingState::ProcessOK(const QStringList &args)
+void WaitingState::ProcessOK(const QByteArray &content)
 {
-    if (args.size() > 0)
+    if (content.size() > 0)
     {
-        _client->setId(args.first());
-        _client->SendCmd(READY, "");
+        _client->setId(content);
+        _client->Send(READY, _client->Id());
         _client->SetCurrentState();
     }
 }

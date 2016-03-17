@@ -25,9 +25,9 @@ void AbstractState::ProcessAbort()
 {
 }
 
-void AbstractState::ProcessDo(const QStringList &args)
+void AbstractState::ProcessDo(const QByteArray &content)
 {
-    Q_UNUSED(args)
+    Q_UNUSED(content)
 }
 
 void AbstractState::ProcessDone(const QJsonObject &args)
@@ -39,9 +39,9 @@ void AbstractState::ProcessHello()
 {
 }
 
-void AbstractState::ProcessOK(const QStringList &args)
+void AbstractState::ProcessOK(const QByteArray &content)
 {
-    Q_UNUSED(args)
+    Q_UNUSED(content)
 }
 
 void AbstractState::ProcessStop()
