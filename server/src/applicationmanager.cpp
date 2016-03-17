@@ -143,21 +143,21 @@ void ApplicationManager::Slot_shutdown()
 #if TERMINATED_EXPECTED_TOTAL == 1
     if(TERMINATED_EXPECTED_TOTAL - _terminated_ctr == 1)
     {   LOG_DEBUG("sig_response(CMD_SHUTDOWN) emitted.");
-        emit SIG_RESPONSE(CMD_SHUTDOWN, true, "STATUS command received !");
+        emit SIG_RESPONSE(CMD_SHUTDOWN, true, "SHUTDOWN command received !");
     }
 #endif
 }
 
 void ApplicationManager::Slot_terminated()
 {   LOG_DEBUG("Slot_terminated() called.");
-    _terminated_ctr++;
-    if(_terminated_ctr >= TERMINATED_EXPECTED_TOTAL)
+    _terminatedCtr++;
+    if(_terminatedCtr >= TERMINATED_EXPECTED_TOTAL)
     {   LOG_DEBUG("sig_terminated() emitted.");
         emit sig_terminated();
     }
-    else if(TERMINATED_EXPECTED_TOTAL - _terminated_ctr == 1)
+    else if(TERMINATED_EXPECTED_TOTAL - _terminatedCtr == 1)
     {   LOG_DEBUG("sig_response(CMD_SHUTDOWN) emitted.");
-        emit sig_response(CMD_SHUTDOWN, true, "STATUS command received !");
+        emit sig_response(CMD_SHUTDOWN, true, "SHUTDOWN command received !");
     }
     // emission du signal de terminaison quand tous les composants attendus ont notofié l'app manager de leur terminaison
 
@@ -169,10 +169,8 @@ void ApplicationManager::Slot_terminated()
 }
 
 ApplicationManager::ApplicationManager() :
-    _terminated_ctr(0)
+    _terminatedCtr(0)
 {
-    Logger::GetInstance().SetConsoleMutex(&_consoleMutex);
-    ConsoleHandler::getInstance().SetConsoleMutex(&_consoleMutex);
 }
 
 ApplicationManager::~ApplicationManager()
