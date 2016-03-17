@@ -3,7 +3,6 @@
 
 #include <QThread>
 #include <QTextStream>
-#include <QMutex>
 #include "src/const.h"
 #include "src/calculation/calculation.h"
 
@@ -16,11 +15,6 @@ class ConsoleHandler : public QObject
     Q_OBJECT
 public:
     ~ConsoleHandler(){}
-
-    /**
-     * @brief Defini le mutex à utiliser pour les entrées/sorties
-     */
-    void SetConsoleMutex(QMutex *mutex);
 
 protected:
     /**
@@ -144,7 +138,6 @@ private:
 private:
     QTextStream _out;       // flux de sortie <=> std::cout
     QTextStream _in;        // flux de d'entrée <=> std::cin
-    QMutex *_consoleMutex;
 };
 
 #endif // CONSOLEHANDLER_H
