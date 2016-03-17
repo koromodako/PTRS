@@ -26,6 +26,7 @@ Calculation * Calculation::FromJson(QObject * parent, const QByteArray &json, QS
             if(ok)
             {   calculation = new Calculation(doc.object().value(CS_JSON_KEY_CALC_BIN).toString(),
                                               doc.object().value(CS_JSON_KEY_CALC_PARAMS).toObject().toVariantMap(),
+                                              doc.object().value(CS_JSON_KEY_FRAG_ID).toString(),
                                               parent);
 
             }
@@ -97,11 +98,15 @@ void Calculation::Slot_crashed(QString error)
     emit sig_crashed();
 }
 
-Calculation::Calculation(const QString & bin, const QVariantMap &params, QObject * parent) :
+Calculation::Calculation(const QString & bin, const QVariantMap &params, const QString id, QObject * parent) :
     AbstractIdentifiable(parent),
     _state(BEING_SPLITTED),
     _bin(bin),
     _params(params),
     _fragments()
 {
+    if(!id.isEmpty())
+    {
+        SetId(QUuid(id));
+    }
 }
