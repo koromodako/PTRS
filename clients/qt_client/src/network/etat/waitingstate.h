@@ -25,7 +25,7 @@ public:
     /**
      * @brief Effectue la commande OK
      */
-    virtual void ProcessOK(const QStringList &args) override;
+    virtual void ProcessOK(const QByteArray &content) override;
 };
 
 #endif // WAITING_STATE_H

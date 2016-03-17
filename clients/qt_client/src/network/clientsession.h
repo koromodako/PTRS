@@ -8,6 +8,11 @@
 #include <QJsonObject>
 #include "src/network/etat/abstractstate.h"
 #include "src/plugins/calculationprocess.h"
+
+/// Ce type est celui utilisé pour stocker la taille d'un message et taille maximale associée
+typedef quint32 msg_size_t;
+#define MSG_SIZE_MAX UINT32_MAX
+
 /**
  * @brief Cette classe représente une session client, c'est à dire une connexion client active.
  */
@@ -43,7 +48,7 @@ public:
      * @param reqtype le type de la commande
      * @param args les arguments à transmettre au client
      */
-    void SendCmd(ReqType reqtype, const QString &args);
+    void Send(ReqType reqtype, const QString &content = "");
 
     /**
      * @brief Change l'état courant
@@ -107,7 +112,7 @@ private slots:
      * @param reqType le code de la requête récupéré
      * @param args les arguments de la requète
      */
-    void slot_processCmd(ReqType reqType, const QStringList &args);
+    void slot_processRequest(ReqType reqType, const QByteArray &content);
 
     /**
      * @brief Traite la reception des messages TCP du client
@@ -123,6 +128,7 @@ private:
     QString _id;
     QTcpSocket *_socket;
     QMap<QObject *, AbstractState *> _transitionsMap;
+    msg_size_t _blockSize;
 };
 
 inline int ClientSession::FragmentId() const

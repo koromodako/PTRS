@@ -8,10 +8,15 @@
 
 #include <QJsonObject>
 #include <QNetworkInterface>
+#include <QDataStream>
 
 static const unsigned broadcastPort = 45000;
 
-ClientSession::ClientSession()
+/// Ce type est celui utilisé pour stocker la commande associée à un message
+typedef quint8  req_t;
+
+ClientSession::ClientSession() :
+    _blockSize(0)
 {
     _broadcastSocket = new QUdpSocket(this);
     _socket = new QTcpSocket(this);
@@ -79,17 +84,20 @@ void ClientSession::initializeStateMachine()
 }
 
 
-void ClientSession::slot_processCmd(ReqType reqType, const QStringList &args)
+void ClientSession::slot_processRequest(ReqType reqType, const QByteArray &content)
 {
     switch (reqType)
     {
         case OK:
-            _currentState->ProcessOK(args);
+            LOG_DEBUG("processing OK request");
+            _currentState->ProcessOK(content);
             break;
         case DO:
-            _currentState->ProcessDo(args);
+            LOG_DEBUG("processing DO request");
+            _currentState->ProcessDo(content);
             break;
         case STOP:
+            LOG_DEBUG("processing STOP request");
             _currentState->ProcessStop();
             break;
         default:
@@ -100,18 +108,32 @@ void ClientSession::slot_processCmd(ReqType reqType, const QStringList &args)
 
 void ClientSession::slot_processReadyRead()
 {
-    if (_socket->bytesAvailable() <= 0)
-        return;
+    QDataStream in(_socket);
+    in.setVersion(QDataStream::Qt_5_5);
 
-    QByteArray d(_socket->readAll());
-    QList<QString> datagrams = QString(d).split("#@@#", QString::SkipEmptyParts);
-    foreach (QString datagram, datagrams)
-    {
-        QList<QString> args = datagram.split("##");
-
-        ReqType reqType = (ReqType)args.takeFirst().toInt();
-        slot_processCmd(reqType, args);
+    if(_blockSize == 0)
+    {   if(_socket->bytesAvailable() < (int)(sizeof(msg_size_t)))
+        {   return; // on a pas encore reçu suffisament d'octets pour connaitre la taille du message et la commande
+        }
+        // sinon on inscrit la taille du message dans l'attribut de la classe et la commande
+        in >> _blockSize;
+        LOG_DEBUG(QString("block size received : size=%1").arg(_blockSize));
     }
+
+    if(_socket->bytesAvailable() < _blockSize)
+        return; // on a pas encore reçu tout le message
+
+    // on commence par récupérer la commande
+    req_t req;
+    in >> req;
+    LOG_DEBUG(QString("request received : req=%1").arg(req));
+    // on récupère ensuite le contenu du message que l'on passe au slot de traitement
+    QByteArray content;
+    in >> content;
+    LOG_DEBUG(QString("content received : text=").append(content));
+    slot_processRequest((ReqType)req, content);
+    // on reset les variables commande et block size
+    _blockSize = 0;
 }
 
 void ClientSession::readBroadcastDatagram()
@@ -146,16 +168,29 @@ void ClientSession::readBroadcastDatagram()
     }
 }
 
-void ClientSession::SendCmd(ReqType reqType, const QString &args)
+void ClientSession::Send(ReqType reqType, const QString &content)
 {
-    QByteArray data = QByteArray::number(reqType) + "##";
-    data += _id;
-    if (args.size() > 0)
-        data += "##" + args.toUtf8();
-    data += "#@@#";
+    LOG_DEBUG(QString("Send(reqType='%1',content='%2') called").arg((int)reqType).arg(content));
+    // vérification de la taille du contenu à envoyer en octets
+    if( (content.toUtf8().size()+sizeof(req_t)) > MSG_SIZE_MAX)
+    {   LOG_ERROR("Message content too long to be sent !");
+        return;
+    }
 
-    _socket->write(data);
-    _socket->flush();
+    QByteArray block("");                           // on crée le bloc de données
+    QDataStream out(&block, QIODevice::WriteOnly);  // on crée un datastream pour normaliser le bloc
+    out.setVersion(QDataStream::Qt_5_5);            // on donne la version du datastream pour spécifier la normalisation
+
+    out << (msg_size_t)0;                                   // on reserve sizeof(msg_size_t) pour stocker la taille du message
+    out << (req_t)reqType;                                  // on écrit dans le champs requete
+    out << content.toUtf8();                                // on écrit le contenu après la requete
+    out.device()->seek(0);                                  // on déplace la tête d'écriture au début
+    out << (msg_size_t)(block.size() - (int)sizeof(msg_size_t)); // on écrit la taille du message (commande comprise)
+
+    LOG_DEBUG(QString("writing block into socket : block=").append(block.toHex()));
+
+    _socket->write(block);  // on écrit le bloc dans le socket
+    _socket->flush();       // on flush le socket
 }
 
 void ClientSession::SetCurrentState()

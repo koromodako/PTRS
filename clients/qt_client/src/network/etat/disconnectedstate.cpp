@@ -12,6 +12,6 @@ DisconnectedState::~DisconnectedState()
 
 void DisconnectedState::ProcessHello()
 {
-    _client->SendCmd(HELLO, "");
+    _client->Send(HELLO);
     _client->SetCurrentState();
 }
