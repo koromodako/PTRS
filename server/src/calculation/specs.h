@@ -9,6 +9,8 @@
 #define CS_OP_SPLIT "split"
 #define CS_OP_JOIN  "join"
 #define CS_OP_CALC  "calc"
-#define CS_EOF "EOF"
+#define CS_OP_UI    "ui"
+#define CS_EOF      "EOF"
+#define CS_CRLF     "\n"
 
 #endif // SPECS_H

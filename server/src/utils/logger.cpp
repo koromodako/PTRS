@@ -3,13 +3,11 @@
 #include <iostream>
 #include <QDateTime>
 #include <QStringList>
-#include <QMutexLocker>
 
 Logger Logger::_instance;
 
 void Logger::Log(Level lvl, QString message, QString line, QString file, bool endl) const
 {
-    QMutexLocker locker(_consoleMutex);
     QString log;
     if(lvl == LVL_NO_LVL)
     {   log = message;
@@ -42,12 +40,6 @@ void Logger::Log(Level lvl, QString message, QString line, QString file, bool en
     std::cerr << std::flush;
 }
 
-void Logger::SetConsoleMutex(QMutex *mutex)
-{
-    _consoleMutex = mutex;
-}
-
 Logger::Logger() : _config()
 {
-    _consoleMutex = NULL;
 }

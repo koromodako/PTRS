@@ -11,9 +11,9 @@ WorkingState::~WorkingState()
 {
 }
 
-void WorkingState::ProcessAbort(const QStringList &args)
+void WorkingState::ProcessAbort(const QByteArray &content)
 {
-    if (args.size() > 0 && args.first() == _client->GetId().toString())
+    if (content == _client->GetId().toString())
     {
         _client->_fragment = NULL;
         emit _client->sig_calculAborted("Client abort the calcul");
@@ -21,18 +21,20 @@ void WorkingState::ProcessAbort(const QStringList &args)
     }
 }
 
-void WorkingState::ProcessDone(const QStringList &args)
+#define QUUID_STRING_SIZE QUuid().toString().toUtf8().size()
+
+void WorkingState::ProcessDone(const QByteArray &content)
 {
-    if (args.size() > 1 && args.first() == _client->GetId().toString())
+    if (content.startsWith(_client->GetId().toString().toUtf8()))
     {
         _client->_fragment = NULL;
-        emit _client->sig_calculDone(args[1].toUtf8());
+        emit _client->sig_calculDone(content.mid(QUUID_STRING_SIZE));
         _client->setCurrentStateAfterSuccess();
     }
 }
 
 void WorkingState::ProcessStop()
 {
-    _client->sendCmd(STOP, "");
+    _client->send(STOP);
     _client->setCurrentStateAfterSuccess();
 }

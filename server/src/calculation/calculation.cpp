@@ -44,6 +44,7 @@ QString Calculation::ToJson(QJsonDocument::JsonFormat format) const
 {
     QJsonObject calc;
     calc.insert(CS_JSON_KEY_CALC_BIN, GetBin());
+    calc.insert(CS_JSON_KEY_FRAG_ID, GetId().toString());
     calc.insert(CS_JSON_KEY_CALC_PARAMS, QJsonObject::fromVariantMap(_params));
     QJsonDocument doc(calc);
     return doc.toJson(format);
@@ -102,13 +103,7 @@ void Calculation::Splitted(const QByteArray & json)
 
     QHash<QUuid,Calculation*>::const_iterator fragment;
     for(fragment = _fragments.constBegin() ; fragment != _fragments.constEnd() ; fragment++)
-        emit sig_scheduled(json, fragment.value());
-
-    // TODO: J'ai mis json car le découpage n'est pas fait, mais il faudra le json à envoyer
-    //       au client après découpage.
-
-    emit sig_scheduled(json, this); //TODO : A suppr quand le découpage sera géré
-
+        emit sig_scheduled(fragment.value()->ToJson(), fragment.value());
 }
 
 void Calculation::Joined(const QByteArray &json)

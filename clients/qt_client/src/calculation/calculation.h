@@ -127,7 +127,7 @@ signals:
 
 private:
     // non instanciable autrement qu'en fabrique et non copiable
-    Calculation(const QString &bin, const QVariantMap &params, QObject * parent = NULL);
+    Calculation(const QString &bin, const QVariantMap &params, const QString id = QString(), QObject * parent = NULL);
     Q_DISABLE_COPY(Calculation)
 
     // attributs

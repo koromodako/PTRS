@@ -13,14 +13,14 @@ WorkingState::~WorkingState()
 
 void WorkingState::ProcessAbort()
 {
-    _client->SendCmd(ABORT, "");
+    _client->Send(ABORT);
     _client->SetCurrentState();
 }
 
 void WorkingState::ProcessDone(const QJsonObject &args)
 {
     QJsonDocument doc(args);
-    _client->SendCmd(DONE, doc.toJson(QJsonDocument::Compact));
+    _client->Send(DONE, doc.toJson(QJsonDocument::Compact));
     _client->SetCurrentState();
 }
 

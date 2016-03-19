@@ -39,17 +39,17 @@ public:
     /**
      * @brief Effectue la commande ABORT
      */
-    virtual void ProcessAbort(const QStringList &args);
+    virtual void ProcessAbort(const QByteArray &content);
 
     /**
      * @brief Effectue la commande ABORT
      */
-    virtual void ProcessDo(const QString &args);
+    virtual void ProcessDo(const QByteArray &content);
 
     /**
      * @brief Effectue la commande DONE
      */
-    virtual void ProcessDone(const QStringList &args);
+    virtual void ProcessDone(const QByteArray &content);
 
     /**
      * @brief Effectue la commande HELLO
@@ -59,7 +59,7 @@ public:
     /**
      * @brief Effectue la commande READY
      */
-    virtual void ProcessReady(const QStringList &args);
+    virtual void ProcessReady(const QByteArray &content);
 
     /**
      * @brief Effectue la commande STOP
@@ -69,12 +69,12 @@ public:
     /**
      * @brief Effectue la commande UNABLE
      */
-    virtual void ProcessUnable(const QStringList &args);
+    virtual void ProcessUnable(const QByteArray &content);
 
     /**
      * @brief Effectue la commande WORKING
      */
-    virtual void ProcessWorking(const QStringList &);
+    virtual void ProcessWorking(const QByteArray &content);
 
 protected:
     ClientSession *_client;
