@@ -13,6 +13,11 @@ INCLUDEPATH += . \
                src/calculation \
                src/utils
 
+macx {
+    QMAKE_MAC_SDK = macosx10.11
+    QMAKE_CXXFLAGS  += -Wno-inconsistent-missing-override
+}
+
 # Input
 HEADERS += src/const.h \
            src/calculation/calculation.h \

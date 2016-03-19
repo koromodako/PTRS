@@ -44,7 +44,7 @@ public:
     /**
      * @brief Effectue la commande DO
      */
-    virtual void ProcessDo(const QStringList &args);
+    virtual void ProcessDo(const QByteArray &content);
 
     /**
      * @brief Effectue la commande DONE
@@ -54,7 +54,7 @@ public:
     /**
      * @brief Effectue la commande OK
      */
-    virtual void ProcessOK(const QStringList &args);
+    virtual void ProcessOK(const QByteArray &content);
 
     /**
      * @brief Effectue la commande HELLO

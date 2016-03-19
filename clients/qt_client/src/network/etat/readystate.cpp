@@ -16,19 +16,19 @@ ReadyState::~ReadyState()
 {
 }
 
-void ReadyState::ProcessDo(const QStringList &args)
+void ReadyState::ProcessDo(const QByteArray &content)
 {
-    if (args.size() > 0)
+    if (content.size() > 0)
     {
         //QJsonDocument jsonResponse = QJsonDocument::fromJson(args[0].toUtf8());
         QString error;
-        Calculation * calcToDo = Calculation::FromJson( &PluginManager::getInstance(), QByteArray(args[0].toUtf8()), error);
+        Calculation * calcToDo = Calculation::FromJson( &PluginManager::getInstance(), content, error);
         //TODO: Vérifier que le calcul est faisable et renvoyer UNABLE s'il ne l'est pas
         LOG_DEBUG("Launching calculation on plugin manager");
         PluginManager::getInstance().Calc(calcToDo);
         //emit _client->sig_requestCalculStart(jsonResponse.object());
         _client->SetCurrentState();
 
-        _client->SendCmd(WORKING, "");
+        _client->Send(WORKING);
     }
 }

@@ -25,12 +25,12 @@ public:
     /**
      * @brief Effectue la commande ABORT
      */
-    virtual void ProcessAbort(const QStringList &args) override;
+    virtual void ProcessAbort(const QByteArray &content) override;
 
     /**
      * @brief Effectue la commande DONE
      */
-    virtual void ProcessDone(const QStringList &args) override;
+    virtual void ProcessDone(const QByteArray &content) override;
 
     /**
      * @brief Effectue la commande STOP

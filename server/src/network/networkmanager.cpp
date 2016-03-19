@@ -39,6 +39,7 @@ void NetworkManager::addAvailableClient(ClientSession *client)
         return;
     if (_unavailableClients.remove(client) && client->Fragment() != NULL)
         _fragmentsPlace.remove(client->Fragment()->GetId());
+    LOG_DEBUG("Adding available client");
     _availableClients.insert(client);
 }
 

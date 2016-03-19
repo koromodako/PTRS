@@ -18,7 +18,7 @@ enum Command {
     CMD_SHUTDOWN,
     CMD_STATE
 };
-Q_DECLARE_METATYPE(Command);
+Q_DECLARE_METATYPE(Command)
 
 /**
  * @brief Cette enumeration décrit les différents niveaux de log possible
@@ -37,17 +37,17 @@ enum Level {
  * @brief Cette énumération décrit les différentes commandes échangables entre le client et le serveur
  */
 enum ReqType {
-    HELLO,
-    HELLO_FROM_SERVER,
-    READY,
-    WORKING,
-    UNABLE,
-    DONE,
-    ABORT,
-    OK,
-    KO,
-    DO,
-    STOP
+    HELLO               = 0x01,
+    HELLO_FROM_SERVER   = 0x02,
+    READY               = 0x03,
+    WORKING             = 0x04,
+    UNABLE              = 0x05,
+    DONE                = 0x06,
+    ABORT               = 0x07,
+    OK                  = 0x08,
+    KO                  = 0x09,
+    DO                  = 0x0A,
+    STOP                = 0x0B
 };
 
 

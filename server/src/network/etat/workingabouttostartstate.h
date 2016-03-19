@@ -25,12 +25,12 @@ public:
     /**
      * @brief Effectue la commande UNABLE
      */
-    virtual void ProcessUnable(const QStringList &args) override;
+    virtual void ProcessUnable(const QByteArray &content) override;
 
     /**
      * @brief Effectue la commande WORKING
      */
-    virtual void ProcessWorking(const QStringList &args) override;
+    virtual void ProcessWorking(const QByteArray &content) override;
 };
 
 #endif // WORKING_ABOUT_START_STATE_H

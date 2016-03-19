@@ -10,6 +10,8 @@
  */
 class AbstractIdentifiable : public QObject
 {
+    friend class Calculation;
+
 public:
     /**
      * @brief Retourne l'identifiant unique associé à l'objet
@@ -23,6 +25,8 @@ protected:
 
 private:
     QUuid _id; // identifiant
+
+    void SetId(QUuid id) { _id = id; }
 };
 
 #endif // ABSTRACTIDENTIFIABLE_H

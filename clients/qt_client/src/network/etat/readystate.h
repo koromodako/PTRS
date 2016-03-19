@@ -25,7 +25,7 @@ public:
     /**
      * @brief Effectue la commande DO
      */
-    virtual void ProcessDo(const QStringList &args) override;
+    virtual void ProcessDo(const QByteArray &content) override;
 };
 
 #endif // READY_STATE_H
