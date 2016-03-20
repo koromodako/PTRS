@@ -123,10 +123,9 @@ signals:
 
     /**
      * @brief Ce signal est émis lorsque le calcul est prêt à être distribué
-     * @param args argument à fournir au client pour démarrer son calcul
      * @param fragment fragment que le client devra calculer
      */
-    void sig_scheduled(const QString &args, const Calculation *fragment);
+    void sig_scheduled(const Calculation *fragment);
 
     /**
      * @brief Ce signal est émis lorsque le calcul est terminé (tous les fragments ont été fusionnés)

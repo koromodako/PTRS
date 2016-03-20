@@ -85,7 +85,7 @@ void NetworkManager::Slot_init()
     emit sig_started();
 }
 
-void NetworkManager::Slot_startCalcul(const QString &json, const Calculation *fragment)
+void NetworkManager::Slot_startCalcul(const Calculation *fragment)
 {
     QSet<ClientSession *>::iterator it = _availableClients.begin();
     if (it == _availableClients.end())
@@ -98,5 +98,5 @@ void NetworkManager::Slot_startCalcul(const QString &json, const Calculation *fr
     _availableClients.remove(*it);
     _fragmentsPlace.insert(fragment->GetId(), *it);
     _unavailableClients.insert(*it);
-    (*it)->StartCalcul(fragment, json);
+    (*it)->StartCalcul(fragment);
 }
