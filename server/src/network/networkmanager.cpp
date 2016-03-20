@@ -33,17 +33,20 @@ NetworkManager &NetworkManager::getInstance()
     return instance;
 }
 
-void NetworkManager::addAvailableClient(ClientSession *client)
+void NetworkManager::slot_addAvailableClient(ClientSession *client)
 {
     if (client == NULL)
         return;
-    if (_unavailableClients.remove(client) && client->Fragment() != NULL)
-        _fragmentsPlace.remove(client->Fragment()->GetId());
+    if (_unavailableClients.remove(client) && client->GetFragment() != NULL)
+        _fragmentsPlace.remove(client->GetFragment()->GetId());
+
     LOG_DEBUG("Adding available client");
     _availableClients.insert(client);
+    if (_waitingFragments.size() > 0)
+        Slot_startCalcul(_waitingFragments.dequeue());
 }
 
-void NetworkManager::addUnavailableClient(ClientSession *client)
+void NetworkManager::slot_addUnavailableClient(ClientSession *client)
 {
     if (client == NULL)
         return;
@@ -54,23 +57,23 @@ void NetworkManager::addUnavailableClient(ClientSession *client)
     if (_unavailableClients.remove(client))
     {
         found = true;
-        _fragmentsPlace.remove(client->Fragment()->GetId());
+        _fragmentsPlace.remove(client->GetFragment()->GetId());
     }
     _unavailableClients.insert(client);
     if (!found)
     {
-        connect(client, &ClientSession::sig_ready, this, &NetworkManager::addAvailableClient);
-        connect(client, &ClientSession::sig_working, this, &NetworkManager::addUnavailableClient);
+        connect(client, &ClientSession::sig_unableToCalculate, this, &NetworkManager::Slot_startCalcul);
+        connect(client, &ClientSession::sig_ready, this, &NetworkManager::slot_addAvailableClient);
+        connect(client, &ClientSession::sig_working, this, &NetworkManager::slot_addUnavailableClient);
         connect(client, &ClientSession::sig_disconnected, this, &NetworkManager::slot_deleteClient);
-
     }
 }
 
 void NetworkManager::slot_deleteClient(ClientSession *client)
 {
     _availableClients.remove(client);
-    if (_unavailableClients.remove(client) && client->Fragment() != NULL)
-        _fragmentsPlace.remove(client->Fragment()->GetId());
+    if (_unavailableClients.remove(client) && client->GetFragment() != NULL)
+        _fragmentsPlace.remove(client->GetFragment()->GetId());
     client->deleteLater();
 }
 
@@ -80,7 +83,7 @@ void NetworkManager::Slot_init()
 
     _TCPServer = new TCPServer(this);
     _UDPServer = new UDPServer(_TCPServer->serverPort(), this);
-    connect(_TCPServer, &TCPServer::sig_newConnection, this, &NetworkManager::addUnavailableClient);
+    connect(_TCPServer, &TCPServer::sig_newConnection, this, &NetworkManager::slot_addUnavailableClient);
 
     emit sig_started();
 }
@@ -88,15 +91,20 @@ void NetworkManager::Slot_init()
 void NetworkManager::Slot_startCalcul(const Calculation *fragment)
 {
     QSet<ClientSession *>::iterator it = _availableClients.begin();
+    bool add = false;
     if (it == _availableClients.end())
+        add = true;
+    else
     {
-        LOG_INFO("Aucun client n'est actuellement disponible pour le calcul.");
-        //TODO : Ajouter à une liste de calcul en attente
-        return;
+        _availableClients.remove(*it);
+        _fragmentsPlace.insert(fragment->GetId(), *it);
+        _unavailableClients.insert(*it);
+        add = !(*it)->StartCalcul(fragment);
     }
 
-    _availableClients.remove(*it);
-    _fragmentsPlace.insert(fragment->GetId(), *it);
-    _unavailableClients.insert(*it);
-    (*it)->StartCalcul(fragment);
+    if (add)
+    {
+        LOG_INFO("Mise en attente du calcul.");
+        _waitingFragments.enqueue(fragment);
+    }
 }

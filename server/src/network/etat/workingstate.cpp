@@ -1,6 +1,7 @@
 #include "workingstate.h"
 #include "src/network/clientsession.h"
 #include "src/network/networkmanager.h"
+#include "src/utils/logger.h"
 
 WorkingState::WorkingState(ClientSession *parent) : AbstractState(parent)
 {
@@ -21,14 +22,14 @@ void WorkingState::ProcessAbort(const QByteArray &content)
     }
 }
 
-#define QUUID_STRING_SIZE QUuid().toString().toUtf8().size()
-
 void WorkingState::ProcessDone(const QByteArray &content)
 {
+    LOG_DEBUG("expected : " + _client->GetId().toString().toUtf8());
+    LOG_DEBUG("receive : " + content);
     if (content.startsWith(_client->GetId().toString().toUtf8()))
     {
+        emit _client->sig_calculDone(content.mid(_client->GetId().toString().size()));
         _client->_fragment = NULL;
-        emit _client->sig_calculDone(content.mid(QUUID_STRING_SIZE));
         _client->setCurrentStateAfterSuccess();
     }
 }

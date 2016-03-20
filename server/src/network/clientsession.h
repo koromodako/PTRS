@@ -39,10 +39,16 @@ public:
     ~ClientSession();
 
     /**
+     * @brief Ajoute le plugin demandé par le calcul courrant à liste des
+     *        plugins que n'a pas le client
+     */
+    void AddMissingPlugin();
+
+    /**
      * @brief Retourne un pointeur vers le calcul actuellement fait par
      *        le client ou NULL
      */
-    inline const Calculation *Fragment() const;
+    inline const Calculation *GetFragment() const;
 
     /**
      * @brief Demande au client de démarrer le calcul donné
@@ -83,6 +89,13 @@ signals:
      * @param client Pointeur vers cette instance
      */
     void sig_ready(ClientSession *client);
+
+    /**
+     * @brief Emis quand le client ne peut pas calculer le calcul qui lui
+     *        a été donné.
+     * @param calculation Le calcul en question
+     */
+    void sig_unableToCalculate(const Calculation *calculation);
 
     /**
      * @brief Emis quand le client commence à faire un calcul.
@@ -143,11 +156,12 @@ private:
     QMap<QObject *, AbstractState *> _doneTransitionsMap;
     QMap<QObject *, AbstractState *> _errorTransitionsMap;
     const Calculation *_fragment;
+    QSet<QString> _missingPlugins;
     QTcpSocket *_socket;
     msg_size_t _blockSize;
 };
 
-inline const Calculation *ClientSession::Fragment() const
+inline const Calculation *ClientSession::GetFragment() const
 {
     return _fragment;
 }
