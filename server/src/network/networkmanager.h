@@ -61,6 +61,30 @@ signals:
      */
     void sig_started();
 
+    /**
+     * @brief Emis quand le nombre de client disponible est mis à jour
+     * @param nb le nombre de client disponible
+     */
+    void sig_availableClientCountUpdated(int nb);
+
+    /**
+     * @brief Emis quand un client se connect ou se déconnecte
+     * @param nb le nombre de client total
+     */
+    void sig_clientCountUpdated(int nb);
+
+    /**
+     * @brief Emis quand le calcul dans la file d'attente évolue
+     * @param nb le nombre de client travaillant
+     */
+    void sig_waitingCalculationCountUpdated(int nb);
+
+    /**
+     * @brief Emis quand le nombre de client travaillant évolue
+     * @param nb le nombre de client travaillant
+     */
+    void sig_workingClientCountUpdated(int nb);
+
 private:
     /**
      * @brief Constructeur de la classe
