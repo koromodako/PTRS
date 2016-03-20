@@ -1,7 +1,7 @@
 #ifndef PLUGINMANAGER_H
 #define PLUGINMANAGER_H
 
-#include "calculationprocess.h"
+#include "pluginprocess.h"
 #include <QStringList>
 #include <QDir>
 
@@ -11,7 +11,7 @@
 class PluginManager : public QObject
 {
     Q_OBJECT
-public:   
+public:
     /**
      * @brief Initiatlise le plugin manager en récupérant le chemin d'execution
      */
@@ -43,11 +43,6 @@ public:
      * @param calc
      */
     void Join(Calculation * calc);
-    /**
-     * @brief Lance le calcul
-     * @param calc
-     */
-    void Calc(Calculation * calc);
 
 private:
     /**
@@ -55,7 +50,7 @@ private:
      * @param program
      * @param args
      */
-    void startProcess(Calculation * calc, CalculationProcess::Operation op);
+    void startProcess(Calculation * calc, PluginProcess::Operation op);
 
 signals:
     /**
@@ -65,12 +60,24 @@ signals:
     void sig_terminated();
 
 public slots:
+
+    /**
+     * @brief Lance le calcul
+     * @param calc
+     */
+    void Slot_calc(Calculation * calc);
+
     /**
      * @brief Ce slot est appelé par l'application manager quand celui-ci souhaite terminer l'application.
      *          Il émet le signal sig_terminated() dès qu'il a terminé ses traitements
      * @see sig_terminated()
      */
     void Slot_terminate();
+
+    /**
+     * @brief Ce slot arrète le process en cours s'il y en a un
+     */
+    void Slot_stop();
 
 
 private: // singleton
@@ -80,10 +87,10 @@ private: // singleton
     static PluginManager & getInstance() { return _instance; }
     friend class ApplicationManager;
     friend class CalculationManager;
-    friend class ReadyState;
+    friend class ClientSession;
 
     QDir _plugins_dir;
-    CalculationProcessList _pending_processes;
+    PluginProcessList _processes;
 };
 
 #endif // PLUGINMANAGER_H

@@ -24,7 +24,6 @@ HEADERS += src/const.h \
            src/calculation/calculationmanager.h \
            src/calculation/specs.h \
            src/network/clientsession.h \
-           src/plugins/calculationprocess.h \
            src/plugins/pluginmanager.h \
            src/utils/abstractidentifiable.h \
            src/utils/logger.h \
@@ -35,13 +34,13 @@ HEADERS += src/const.h \
            src/network/etat/workingstate.h \
            src/network/networkmanager.h \
     src/applicationmanager.h \
-    src/console/consolehandler.h
+    src/console/consolehandler.h \
+    src/plugins/pluginprocess.h
 
 SOURCES += src/main.cpp \
            src/calculation/calculation.cpp \
            src/calculation/calculationmanager.cpp \
            src/network/clientsession.cpp \
-           src/plugins/calculationprocess.cpp \
            src/plugins/pluginmanager.cpp \
            src/utils/abstractidentifiable.cpp \
            src/utils/logger.cpp \
@@ -52,6 +51,7 @@ SOURCES += src/main.cpp \
            src/network/etat/workingstate.cpp \
             src/network/networkmanager.cpp \
     src/applicationmanager.cpp \
-    src/console/consolehandler.cpp
+    src/console/consolehandler.cpp \
+    src/plugins/pluginprocess.cpp
 
 QT += network
