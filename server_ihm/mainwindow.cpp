@@ -10,7 +10,10 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     // ---- Configuration UI
     ui->setupUi(this);
-    delete ui->mainToolBar;
+    QWidget *centralWidget = new QWidget;
+    QVBoxLayout *centralLayout = new QVBoxLayout;
+    centralLayout->setContentsMargins(0,15,0,0);
+    centralWidget->setLayout(centralLayout);
 
     // ---- Onglet clients
     WidgetClients * clients = new WidgetClients();
@@ -20,12 +23,14 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // ---- Configuration tabview
     QTabWidget * onglets = new QTabWidget(this);
-    onglets->addTab(calculs, "Calculs");
+    onglets->addTab(calculs, "Calculations");
     onglets->addTab(clients, "Clients");
+    centralLayout->addWidget(onglets);
 
     // ---- Configuration MainWindow
-    this->setCentralWidget(onglets);
-    this->setWindowTitle("PTRS - Serveur");
+    this->setCentralWidget(centralWidget);
+    this->setWindowTitle("PTRS - Server");
+    this->setMinimumSize(900, 500);
 }
 
 MainWindow::~MainWindow()
