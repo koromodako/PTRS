@@ -52,7 +52,7 @@ public slots:
      *                   éventuellement le calcul)
      * @param args les arguments de calcul à transmettre au client
      */
-    void Slot_startCalcul(const QString &json, const Calculation *fragment);
+    void Slot_startCalcul(const Calculation *fragment);
 
 signals:
     /**

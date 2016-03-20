@@ -51,7 +51,7 @@ public:
      * @param args les arguments de calcul à transmettre au client
      * @return true si le calcul à pu démarrer, false sinon (si un calcul est déja en cours)
      */
-    bool StartCalcul(const Calculation *fragment, const QString &json);
+    bool StartCalcul(const Calculation *fragment);
 
 public slots:
     /**

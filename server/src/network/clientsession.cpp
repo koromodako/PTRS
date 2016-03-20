@@ -167,7 +167,7 @@ void ClientSession::setCurrentStateAfterSuccess()
     setCurrentState(_doneTransitionsMap);
 }
 
-bool ClientSession::StartCalcul(const Calculation *fragment, const QString &json)
+bool ClientSession::StartCalcul(const Calculation *fragment)
 {
     //Impossible de commencer un autre calcul quand il y en a un en cours
     if (fragment == NULL || _fragment != NULL)
@@ -185,7 +185,7 @@ bool ClientSession::StartCalcul(const Calculation *fragment, const QString &json
     connect(fragment, &Calculation::sig_canceled, this, &ClientSession::Slot_stopCalcul);
 
     _fragment = fragment;
-    _currentState->ProcessDo(json.toUtf8());
+    _currentState->ProcessDo(fragment->ToJson().toUtf8());
     return true;
 }
 
