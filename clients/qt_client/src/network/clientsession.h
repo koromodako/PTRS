@@ -7,7 +7,7 @@
 #include <QTimer>
 #include <QJsonObject>
 #include "src/network/etat/abstractstate.h"
-#include "src/plugins/calculationprocess.h"
+#include "src/plugins/pluginprocess.h"
 
 /// Ce type est celui utilisé pour stocker la taille d'un message et taille maximale associée
 typedef quint32 msg_size_t;
@@ -68,15 +68,19 @@ public slots:
 
     /**
      * @brief Envoie le résultat du calcul au serveur
-     * @param args les résultats du calcul à transmettre au serveur
      */
-    void Slot_sendResultToServer(QJsonObject args);
+    void Slot_sendResultToServer();
+
+    /**
+     * @brief Démarre le calcul donné si aucun n'est déjà en cours
+     */
+    void Slot_startCalculation(Calculation *calculation);
 
 signals:
     /**
      * @brief Emis pour demander au thread de commencer le calcul
      */
-    void sig_requestCalculStart(QJsonObject args);
+    void sig_requestCalculStart(Calculation *calculation);
 
     /**
      * @brief Emis pour demander au thread d'arrêter le calcul
@@ -122,6 +126,7 @@ private slots:
 private:
     QTimer _broadcastTimer;
     QUdpSocket *_broadcastSocket;
+    Calculation *_currentCalculation;
     AbstractState *_currentState;
     AbstractState *_disconnectedState;
     int _fragmentId;

@@ -13,9 +13,9 @@ WorkingAboutToStartState::~WorkingAboutToStartState()
 
 void WorkingAboutToStartState::ProcessUnable(const QByteArray &content)
 {
-    //TODO: transmettre à networkManager pour qu'il transmette le calcul à un autre client
     if (content == _client->GetId().toString())
     {
+        _client->AddMissingPlugin();
         _client->_fragment = NULL;
         _client->setCurrentStateAfterError("Unable to calculate");
     }

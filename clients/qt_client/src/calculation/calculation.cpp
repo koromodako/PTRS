@@ -2,7 +2,7 @@
 #include "specs.h"
 #include "src/utils/logger.h"
 
-#include <QJsonObject>
+#include <QJsonArray>
 
 Calculation * Calculation::FromJson(QObject * parent, const QByteArray &json, QString & errorStr)
 {
@@ -72,14 +72,18 @@ void Calculation::Cancel()
 }
 
 
-void Calculation::Slot_computed(QString json)
+void Calculation::Slot_computed(const QByteArray &json)
 {
-    LOG_DEBUG(QString("Computed received json=%1").arg(json));
+    LOG_DEBUG(QString("Computed received json=%1").arg(QString(json)));
 
-    /// \todo implement here
-    ///
-    ///  QJsonDocument jsonResponse = QJsonDocument::fromJson(json);
-    ///  jsonResponse.object();
+    QJsonParseError jsonError;
+    QJsonDocument doc = QJsonDocument::fromJson(json, &jsonError);
+    if(jsonError.error != QJsonParseError::NoError)
+    {   LOG_ERROR("an error occured while parsing fragment result json block.");
+        _state = CRASHED;
+        return;
+    }
+    _result = doc.object();
 
     // mise à jour de l'état du calcul
     LOG_DEBUG("Entering state COMPUTED.");

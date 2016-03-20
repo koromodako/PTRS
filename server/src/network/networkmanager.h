@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QMap>
+#include <QQueue>
 #include <QJsonObject>
 #include "src/network/etat/abstractstate.h"
 #include "src/network/clientsession.h"
@@ -52,7 +53,7 @@ public slots:
      *                   éventuellement le calcul)
      * @param args les arguments de calcul à transmettre au client
      */
-    void Slot_startCalcul(const QString &json, const Calculation *fragment);
+    void Slot_startCalcul(const Calculation *fragment);
 
 signals:
     /**
@@ -81,7 +82,7 @@ private slots:
      *        de son ancienne liste
      * @param client le client à déplacer
      */
-    void addAvailableClient(ClientSession *client);
+    void slot_addAvailableClient(ClientSession *client);
 
     /**
      * @brief Ajoute le client à la liste des clients indisponibles
@@ -89,7 +90,7 @@ private slots:
      *        de son ancienne liste
      * @param client le client à ajouter/déplacer
      */
-    void addUnavailableClient(ClientSession *client);
+    void slot_addUnavailableClient(ClientSession *client);
 
     /**
      * @brief Supprime la session avec le client donné
@@ -102,6 +103,7 @@ private:
     TCPServer *_TCPServer;
     UDPServer *_UDPServer;
     QSet<ClientSession *> _unavailableClients;
+    QQueue<const Calculation *> _waitingFragments;
 
     Q_DISABLE_COPY(NetworkManager)
 };

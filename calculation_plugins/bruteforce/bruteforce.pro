@@ -3,6 +3,11 @@ QT -= gui
 
 CONFIG += c++11
 
+macx {
+    QMAKE_MAC_SDK = macosx10.11
+    QMAKE_CXXFLAGS  += -Wno-inconsistent-missing-override
+}
+
 TARGET = bruteforce
 CONFIG += console
 CONFIG -= app_bundle

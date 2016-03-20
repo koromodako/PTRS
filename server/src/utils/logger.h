@@ -2,6 +2,7 @@
 #define LOGGER_H
 
 #include <QString>
+#include <QMutex>
 #include "src/const.h"
 
 #define DEBUG
@@ -51,6 +52,7 @@ private: // singleton
     Logger();
     Q_DISABLE_COPY(Logger)
     static Logger _instance;
+    mutable QMutex _printMutex;
 
 private:
     LoggerConfiguration _config;

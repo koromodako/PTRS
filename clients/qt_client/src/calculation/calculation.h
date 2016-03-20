@@ -6,6 +6,7 @@
 #include <QHash>
 #include <QVariantMap>
 #include <QJsonDocument>
+#include <QJsonObject>
 
 /**
  * @brief Cette classe représente un calcul distribuable
@@ -56,6 +57,12 @@ public:
     inline QVariantMap GetParams() const { return _params; }
 
     /**
+     * @brief Retourne le résultat du calcul
+     * @return
+     */
+    inline const QJsonObject & GetResult() const { return _result; }
+
+    /**
      * @brief Méthode de fabrique pour construire un calcul à partir de sa représentation JSON
      * @param parent
      * @param json
@@ -89,7 +96,7 @@ public slots:
      * @brief Ce slot est appelée une fois le calcul effectué
      * @param json résultat en provenance du client
      */
-    void Slot_computed(QString json);
+    void Slot_computed(const QByteArray &json);
 
     /**
      * @brief Ce slot est appelée quand le calcul à crashé
@@ -135,6 +142,7 @@ private:
     QString _bin;
     QVariantMap _params;
     QHash<QUuid,Calculation*> _fragments;
+    QJsonObject _result;
 };
 
 #endif // CALCULATION_H

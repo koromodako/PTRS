@@ -28,6 +28,12 @@ ClientSession::~ClientSession()
     _socket->deleteLater();
 }
 
+void ClientSession::AddMissingPlugin()
+{
+    _missingPlugins.insert(_fragment->GetBin());
+    emit sig_unableToCalculate(_fragment);
+}
+
 void ClientSession::slot_disconnect()
 {
     _currentState->OnExit();
@@ -93,7 +99,7 @@ void ClientSession::slot_processRequest(ReqType reqType, const QByteArray & cont
 void ClientSession::slot_processReadyRead()
 {
     QDataStream in(_socket);
-    in.setVersion(QDataStream::Qt_5_5);
+    in.setVersion(QDataStream::Qt_5_3);
 
     if(_blockSize == 0)
     {   if(_socket->bytesAvailable() < (int)(sizeof(msg_size_t)))
@@ -131,7 +137,7 @@ void ClientSession::send(ReqType reqType, const QString & content)
 
     QByteArray block;                           // on crée le bloc de données
     QDataStream out(&block, QIODevice::WriteOnly);  // on crée un datastream pour normaliser le bloc
-    out.setVersion(QDataStream::Qt_5_5);            // on donne la version du datastream pour spécifier la normalisation
+    out.setVersion(QDataStream::Qt_5_3);            // on donne la version du datastream pour spécifier la normalisation
 
     out << (msg_size_t)0;                                   // on reserve sizeof(msg_size_t) pour stocker la taille du message
     out << (req_t)reqType;                                  // on écrit dans le champs requete
@@ -165,12 +171,15 @@ void ClientSession::setCurrentStateAfterError(const QString &error)
 void ClientSession::setCurrentStateAfterSuccess()
 {
     setCurrentState(_doneTransitionsMap);
+    LOG_INFO("New state : " + _currentState->objectName());
+
 }
 
-bool ClientSession::StartCalcul(const Calculation *fragment, const QString &json)
+bool ClientSession::StartCalcul(const Calculation *fragment)
 {
-    //Impossible de commencer un autre calcul quand il y en a un en cours
-    if (fragment == NULL || _fragment != NULL)
+    //Impossible de commencer un autre calcul quand il y en a un en cours ou
+    //que le client n'a pas le plugin nécessaire
+    if (fragment == NULL || _fragment != NULL || _missingPlugins.contains(fragment->GetBin()))
         return false;
 
     if (_fragment != NULL)
@@ -185,7 +194,7 @@ bool ClientSession::StartCalcul(const Calculation *fragment, const QString &json
     connect(fragment, &Calculation::sig_canceled, this, &ClientSession::Slot_stopCalcul);
 
     _fragment = fragment;
-    _currentState->ProcessDo(json.toUtf8());
+    _currentState->ProcessDo(fragment->ToJson().toUtf8());
     return true;
 }
 
