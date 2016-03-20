@@ -20,7 +20,5 @@ int main(int argc, char *argv[])
     QObject::connect(&(ApplicationManager::GetInstance()), SIGNAL(sig_terminated()),
                      qApp, SLOT(quit()));
 
-    //ClientSession session;
-
     return a.exec();
 }
