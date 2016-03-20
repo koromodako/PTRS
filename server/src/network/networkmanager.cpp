@@ -50,7 +50,7 @@ void NetworkManager::slot_addAvailableClient(ClientSession *client)
     if (_waitingFragments.size() > 0)
     {
         Slot_startCalcul(_waitingFragments.dequeue());
-        emit sig_waitingCalculationCountUpdated(_waitingFragments.count())
+        emit sig_waitingCalculationCountUpdated(_waitingFragments.count());
     }
 }
 
@@ -127,6 +127,6 @@ void NetworkManager::Slot_startCalcul(const Calculation *fragment)
     {
         LOG_INFO("Mise en attente du calcul.");
         _waitingFragments.enqueue(fragment);
-        emit sig_waitingCalculationCountUpdated(_waitingFragments.count())
+        emit sig_waitingCalculationCountUpdated(_waitingFragments.count());
     }
 }
