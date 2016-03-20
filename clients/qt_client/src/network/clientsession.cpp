@@ -18,8 +18,11 @@ typedef quint8  req_t;
 ClientSession::ClientSession() :
     _blockSize(0)
 {
+    _currentCalculation = NULL;
     _broadcastSocket = new QUdpSocket(this);
     _socket = new QTcpSocket(this);
+    connect(this, &ClientSession::sig_requestCalculStart, &PluginManager::getInstance(), &PluginManager::Slot_calc);
+    connect(this, &ClientSession::sig_requestCalculStop, &PluginManager::getInstance(), &PluginManager::Slot_stop);
     connect(_socket, &QTcpSocket::readyRead, this, &ClientSession::slot_processReadyRead);
     connect(_socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(slot_disconnect()));
     initializeStateMachine();
@@ -109,7 +112,7 @@ void ClientSession::slot_processRequest(ReqType reqType, const QByteArray &conte
 void ClientSession::slot_processReadyRead()
 {
     QDataStream in(_socket);
-    in.setVersion(QDataStream::Qt_5_5);
+    in.setVersion(QDataStream::Qt_5_3);
 
     if(_blockSize == 0)
     {   if(_socket->bytesAvailable() < (int)(sizeof(msg_size_t)))
@@ -179,7 +182,7 @@ void ClientSession::Send(ReqType reqType, const QString &content)
 
     QByteArray block("");                           // on crée le bloc de données
     QDataStream out(&block, QIODevice::WriteOnly);  // on crée un datastream pour normaliser le bloc
-    out.setVersion(QDataStream::Qt_5_5);            // on donne la version du datastream pour spécifier la normalisation
+    out.setVersion(QDataStream::Qt_5_3);            // on donne la version du datastream pour spécifier la normalisation
 
     out << (msg_size_t)0;                                   // on reserve sizeof(msg_size_t) pour stocker la taille du message
     out << (req_t)reqType;                                  // on écrit dans le champs requete
@@ -191,6 +194,21 @@ void ClientSession::Send(ReqType reqType, const QString &content)
 
     _socket->write(block);  // on écrit le bloc dans le socket
     _socket->flush();       // on flush le socket
+}
+
+void ClientSession::Slot_startCalculation(Calculation *calculation)
+{
+    if (_currentCalculation != NULL)
+    {
+        LOG_DEBUG("Un calcul est déjà en cours");
+        return;
+    }
+    _currentCalculation = calculation;
+    connect(_currentCalculation, &Calculation::sig_computed, this, &ClientSession::Slot_sendResultToServer);
+    connect(_currentCalculation, &Calculation::sig_canceled, this, &ClientSession::Slot_abortCalcul);
+    connect(_currentCalculation, &Calculation::sig_crashed, this, &ClientSession::Slot_abortCalcul);
+
+    emit sig_requestCalculStart(calculation);
 }
 
 void ClientSession::SetCurrentState()
@@ -209,7 +227,14 @@ void ClientSession::setId(const QString &id)
     _id = id;
 }
 
-void ClientSession::Slot_sendResultToServer(QJsonObject args)
+void ClientSession::Slot_sendResultToServer()
 {
-    _currentState->ProcessDone(args);
+    if (_currentCalculation == NULL)
+    {
+        LOG_DEBUG("Aucun calcul n'est en cours");
+        return;
+    }
+    _currentState->ProcessDone(_currentCalculation->GetResult());
+    _currentCalculation->deleteLater();
+    _currentCalculation = NULL;
 }

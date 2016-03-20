@@ -103,7 +103,7 @@ void Calculation::Splitted(const QByteArray & json)
 
     QHash<QUuid,Calculation*>::const_iterator fragment;
     for(fragment = _fragments.constBegin() ; fragment != _fragments.constEnd() ; fragment++)
-        emit sig_scheduled(fragment.value()->ToJson(), fragment.value());
+        emit sig_scheduled(fragment.value());
 }
 
 void Calculation::Joined(const QByteArray &json)
