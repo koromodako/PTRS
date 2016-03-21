@@ -16,8 +16,7 @@ void WorkingState::ProcessAbort(const QByteArray &content)
 {
     if (content == _client->GetId().toString())
     {
-        _client->_fragment = NULL;
-        emit _client->sig_calculAborted("Client abort the calcul");
+        _client->resetCurrentFragment();
         _client->setCurrentStateAfterError("CalculAborted");
     }
 }
@@ -29,7 +28,7 @@ void WorkingState::ProcessDone(const QByteArray &content)
     if (content.startsWith(_client->GetId().toString().toUtf8()))
     {
         emit _client->sig_calculDone(content.mid(_client->GetId().toString().size()));
-        _client->_fragment = NULL;
+        _client->resetCurrentFragment();
         _client->setCurrentStateAfterSuccess();
     }
 }
