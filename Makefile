@@ -5,9 +5,9 @@ SERVER_DIR=${BIN_DIR}
 CLIENT_DIR=${BIN_DIR}
 BUILD_TYPE=Debug
 BUILD_DIR=build/${BUILD_TYPE}/
-SERVER_BIN=../server/${BUILD_DIR}server
-CLIENT_BIN=../clients/qt_client/${BUILD_DIR}qt_client
-PLUGIN_BIN=../../calculation_plugins/bruteforce/${BUILD_DIR}bruteforce
+SERVER_BIN=server/${BUILD_DIR}server
+CLIENT_BIN=clients/qt_client/${BUILD_DIR}qt_client
+PLUGIN_BIN=calculation_plugins/bruteforce/${BUILD_DIR}bruteforce
 LOGS_DIR=${BIN_DIR}/logs/
 
 .PHONY: run-server run-client run-test-env
@@ -23,11 +23,11 @@ deploy:
 	${Q}if [ ! -d ${CLIENT_DIR} ]; then mkdir ${CLIENT_DIR}; fi
 	${Q}if [ ! -d ${LOGS_DIR} ]; then mkdir ${LOGS_DIR}; fi
 	${Q}echo "Export server..."
-	${Q}ln -s ${SERVER_BIN} ${SERVER_DIR}
+	${Q}cp ${SERVER_BIN} ${SERVER_DIR}
 	${Q}echo "Export qt_client..."
-	${Q}ln -s ${CLIENT_BIN} ${CLIENT_DIR}
+	${Q}cp ${CLIENT_BIN} ${CLIENT_DIR}
 	${Q}echo "Export bruteforce plugin..."
-	${Q}ln -s ${PLUGIN_BIN} ${PLUGINS_DIR}
+	${Q}cp ${PLUGIN_BIN} ${PLUGINS_DIR}
 	${Q}echo "--------------- ! done ! ----------------"
 
 run-server:
