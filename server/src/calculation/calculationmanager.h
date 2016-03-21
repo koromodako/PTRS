@@ -55,6 +55,13 @@ public:
 
 signals:
     /**
+     * @brief Emis quand un calcul est terminé
+     * @param idCalculation l'id du calcul
+     * @param result le résultat du calcul
+     */
+    void sig_calculationDone(QUuid idCalculation, const QJsonObject &result);
+
+    /**
      * @brief Emis quand l'avancement d'un calcul est mis à jour
      * @param idCalculation l'id du calcul dont l'avancement a progressé
      * @param value Avancement entre 0 et 100
@@ -73,13 +80,6 @@ signals:
      * @param idCalculation l'id du nouveau calcul
      */
     void sig_newCalculation(QUuid idCalculation);
-
-    /**
-     * @brief Emis quand un calcul est terminé
-     * @param idCalculation l'id du calcul
-     * @param result le résultat du calcul
-     */
-    void sig_calculationDone(QUuid idCalculation, const QJsonObject &result);
 
 
 protected:
