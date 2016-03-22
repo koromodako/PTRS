@@ -12,7 +12,16 @@ bool CalculationManager::Execute(Calculation *calculation)
     _calculations.insert(calculation->GetId(), calculation);
     // -- si le plugin existe
     if(PluginManager::getInstance().PluginExists(calculation->GetBin()))
-    {   // -- démarrer la procédure de fragmentation
+    {
+        emit sig_newCalculation(calculation->GetId());
+        connect (calculation, SIGNAL(sig_calculationProgressUpdated(QUuid, int)),
+                 this, SIGNAL(sig_calculationProgressUpdated(QUuid, int)));
+        connect (calculation, SIGNAL(sig_calculationStateUpdated(QUuid, Calculation::State)),
+                 this, SIGNAL(sig_calculationStateUpdated(QUuid, Calculation::State)));
+        connect (calculation, SIGNAL(sig_calculationDone(QUuid, const QJsonObject &)),
+                 this, SIGNAL(sig_calculationDone(QUuid, const QJsonObject &)));
+
+        // -- démarrer la procédure de fragmentation
         PluginManager::getInstance().Split(calculation);
         // -- on lève le flag
         ok = true;
@@ -41,9 +50,13 @@ bool CalculationManager::Cancel(QUuid id)
 
 QString CalculationManager::Result(QUuid id, QString filename) const
 {
-    /// TODO implement CalculationManager::Result(QUuid id, QString filename)
-    ///     Utiliser QProcess pour faire appel aux plugins
-    return QString("We are working on this functionality.");
+    CalculationHash::const_iterator it = _calculations.find(id);
+    if(it != _calculations.end())
+    {
+
+        return QJsonDocument(it.value()->GetResult()).toJson();
+    }
+    return "";
 }
 
 QString CalculationManager::Status() const
@@ -111,3 +124,4 @@ CalculationManager &CalculationManager::getInstance()
     static CalculationManager instance;
     return instance;
 }
+

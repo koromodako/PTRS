@@ -90,6 +90,7 @@ private: // singleton
     static PluginManager & getInstance() { return _instance; }
     friend class ApplicationManager;
     friend class CalculationManager;
+    friend class Calculation;
 
     QDir _plugins_dir;
     PluginProcessList _processes;

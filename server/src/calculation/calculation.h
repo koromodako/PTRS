@@ -17,12 +17,11 @@ public:
      */
     enum State {
         BEING_SPLITTED,
-        BEING_COMPUTED,
-        BEING_JOINED,
-        BEING_CANCELED,
         SCHEDULED,
-        COMPLETED,
+        BEING_COMPUTED,
         COMPUTED,
+        BEING_JOINED,
+        COMPLETED,
         CANCELED,
         CRASHED
     };
@@ -106,44 +105,65 @@ public slots:
      */
     void Slot_crashed(QString error);
 
+    /**
+     * @brief Ce slot met à jour l'avancement d'un calcul
+     * @param le nouvel avancement du calcul
+     */
+    void Slot_updateProgress(int progression);
+
 signals:
+    /**
+     * @brief Emis quand un calcul est terminé
+     * @param idCalculation l'id du calcul
+     * @param result le résultat du calcul
+     */
+    void sig_calculationDone(QUuid idCalculation, const QJsonObject &result);
+
+    /**
+     * @brief Emis quand l'avancement d'un calcul est mis à jour
+     * @param idCalculation l'id de ce calcul
+     * @param value Avancement entre 0 et 100
+     */
+    void sig_scheduled(const Fragment *fragment);
+
+    /**
+     * @brief Emis quand l'état d'un calcul est mis à jour
+     * @param idCalculation l'id de ce calcul
+     * @param state le nouvel état du calcul
+     */
+    void sig_stateUpdated(QUuid idCalculation, Calculation::State state);
+
     /**
      * @brief Ce signal est émis lorsque le calcul doit être annulé
      */
     void sig_canceled();
 
-    /**
-     * @brief Ce signal est émis lorsque le calcul est prêt à être distribué
-     * @param fragment fragment que le client devra calculer
-     */
-    void sig_scheduled(const Fragment *fragment);
-
-    /**
-     * @brief Ce signal est émis lorsque le calcul est terminé (tous les fragments ont été fusionnés)
-     */
-    void sig_completed();
-
-    /**
-     * @brief Ce signal est émis lorsque le calcul est terminé (dans le cas où le calcul est un fragment de calcul, coté client)
-     */
-    void sig_computed();
-
-    /**
-     * @brief Ce signal est émis lorsque le plugin du calcul crash
-     */
-    void sig_crashed();
+    void sig_progressUpdated(QUuid idFragment, int value);
 
 private:
+    /**
+     * @brief Modifie l'état actuel
+     */
+    void setCurrentState(Calculation::State state);
+
     // non instanciable autrement qu'en fabrique et non copiable
     Calculation(const QString &bin, const QVariantMap &params, QObject * parent = NULL);
     Q_DISABLE_COPY(Calculation)
+
+private slots:
+    /**
+     * @brief Mais à jour la progression du calcul quand la progression d'un des fragments a évolué
+     */
+    void slot_updateChildrenProgress();
+
+private:
 
     // attributs
     State _state;
     QString _bin;
     QVariantMap _params;
     QHash<QUuid,Fragment*> _fragments;
+    int _progress;
     QJsonObject _result;
 };
-
 #endif // CALCULATION_H

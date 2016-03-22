@@ -16,7 +16,7 @@ void WorkingAboutToStartState::ProcessUnable(const QByteArray &content)
     if (content == _client->GetId().toString())
     {
         _client->AddMissingPlugin();
-        _client->_fragment = NULL;
+        _client->resetCurrentFragment();
         _client->setCurrentStateAfterError("Unable to calculate");
     }
 }

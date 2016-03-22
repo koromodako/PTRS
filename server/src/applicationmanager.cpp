@@ -153,19 +153,18 @@ void ApplicationManager::Slot_terminated()
     _terminatedCtr++;
     if(_terminatedCtr >= TERMINATED_EXPECTED_TOTAL)
     {   LOG_DEBUG("sig_terminated() emitted.");
+
+        _networkThread.quit();
+        _networkThread.wait();
+        _consoleThread.quit();
+        _consoleThread.wait();
+        // emission du signal de terminaison quand tous les composants attendus ont notofié l'app manager de leur terminaison
         emit sig_terminated();
     }
     else if(TERMINATED_EXPECTED_TOTAL - _terminatedCtr == 1)
     {   LOG_DEBUG("sig_response(CMD_SHUTDOWN) emitted.");
         emit sig_response(CMD_SHUTDOWN, true, "SHUTDOWN command received !");
     }
-    // emission du signal de terminaison quand tous les composants attendus ont notofié l'app manager de leur terminaison
-
-    _networkThread.quit();
-    _networkThread.wait();
-
-    _consoleThread.quit();
-    _consoleThread.wait();
 }
 
 ApplicationManager::ApplicationManager() :
