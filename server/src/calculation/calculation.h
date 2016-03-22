@@ -48,12 +48,6 @@ public:
     inline const QString & GetBin() const { return _bin; }
 
     /**
-     * @brief Paramètres nécessaires à l'execution du calcul
-     * @return
-     */
-    inline const QVariantMap & GetParams() const { return _params; }
-
-    /**
      * @brief Retourne le résultat du calcul
      * @return
      */

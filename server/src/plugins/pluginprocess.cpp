@@ -2,17 +2,32 @@
 #include "src/calculation/specs.h"
 #include "src/utils/logger.h"
 
-PluginProcess::PluginProcess(QString absExecDir, Calculation *calc, Operation op, QObject *parent) :
+PluginProcess::PluginProcess(QString absExecDir, Calculation *calc, CalculationOperation op, QObject *parent) :
     QProcess(parent),
     _absExecDir(absExecDir),
     _calculation(calc),
+    _fragment(NULL),
     _op(op),
     _out(""),
     _err("")
 {
     // -- connexion du calcul aux évènements du processus
-    connect(this, SIGNAL(error(QProcess::ProcessError)),      SLOT(SLOT_ERROR(QProcess::ProcessError)));
-    connect(this, SIGNAL(finished(int,QProcess::ExitStatus)), SLOT(SLOT_FINISHED(int,QProcess::ExitStatus)));
+    connect(this, SIGNAL(error(QProcess::ProcessError)),      SLOT(Slot_error(QProcess::ProcessError)));
+    connect(this, SIGNAL(finished(int,QProcess::ExitStatus)), SLOT(Slot_calcFinished(int,QProcess::ExitStatus)));
+}
+
+PluginProcess::PluginProcess(QString absExecDir, Fragment *frag, QObject *parent) :
+    QProcess(parent),
+    _absExecDir(absExecDir),
+    _calculation(NULL),
+    _fragment(frag),
+    _op(),
+    _out(""),
+    _err("")
+{
+    // -- connexion du calcul aux évènements du processus
+    connect(this, SIGNAL(error(QProcess::ProcessError)),      SLOT(Slot_error(QProcess::ProcessError)));
+    connect(this, SIGNAL(finished(int,QProcess::ExitStatus)), SLOT(Slot_fragFinished(int,QProcess::ExitStatus)));
 }
 
 bool PluginProcess::Start()
@@ -46,7 +61,7 @@ bool PluginProcess::Start()
     return ok;
 }
 
-void PluginProcess::SLOT_ERROR(QProcess::ProcessError error)
+void PluginProcess::Slot_error(QProcess::ProcessError error)
 {   LOG_DEBUG(QString("SLOT_ERROR(%1) called.").arg(error));
     QString msg("");
     switch (error) {
@@ -72,7 +87,7 @@ void PluginProcess::SLOT_ERROR(QProcess::ProcessError error)
     _calculation->Slot_crashed(msg);
 }
 
-void PluginProcess::SLOT_FINISHED(int exitCode, QProcess::ExitStatus exitStatus)
+void PluginProcess::Slot_calcFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {   LOG_DEBUG(QString("SLOT_FINISHED(%1,%2) called.").arg(exitCode).arg(exitStatus));
     switch (exitStatus) {
     case QProcess::NormalExit:
@@ -83,9 +98,6 @@ void PluginProcess::SLOT_FINISHED(int exitCode, QProcess::ExitStatus exitStatus)
                 break;
             case JOIN:
                 _calculation->Joined(readAllStandardOutput());
-                break;
-            case CALC:
-                _calculation->Slot_computed(readAllStandardOutput());
                 break;
             case UI:
                 break; // là il ne se passe rien pour cette commande.
@@ -101,6 +113,28 @@ void PluginProcess::SLOT_FINISHED(int exitCode, QProcess::ExitStatus exitStatus)
         LOG_ERROR(QString("Process crashed (exit_code=%1).").arg(exitCode));
         // crash calculation
         _calculation->Slot_crashed(readAllStandardError());
+        break;
+    }
+}
+
+void PluginProcess::Slot_fragFinished(int exitCode, QProcess::ExitStatus exitStatus)
+{   LOG_DEBUG(QString("SLOT_FINISHED(%1,%2) called.").arg(exitCode).arg(exitStatus));
+    switch (exitStatus) {
+    case QProcess::NormalExit:
+        if(exitCode == 0)
+        {
+            _fragment->Slot_computed(readAllStandardOutput());
+        }
+        else
+        {   LOG_ERROR(QString("Process crashed (exit_code=%1).").arg(exitCode));
+            // crash calculation
+            _fragment->Slot_crashed(readAllStandardError());
+        }
+        break;
+    case QProcess::CrashExit:
+        LOG_ERROR(QString("Process crashed (exit_code=%1).").arg(exitCode));
+        // crash calculation
+        _fragment->Slot_crashed(readAllStandardError());
         break;
     }
 }
