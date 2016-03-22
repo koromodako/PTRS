@@ -91,6 +91,11 @@ signals:
     void sig_ready(ClientSession *client);
 
     /**
+     * @brief Emit quand un fragment de calcul est commencé
+     */
+    void sig_calculStarted();
+
+    /**
      * @brief Emis quand le client ne peut pas calculer le calcul qui lui
      *        a été donné.
      * @param calculation Le calcul en question
@@ -108,6 +113,11 @@ private:
      * @brief Initialise l'automate et les états
      */
     void initializeStateMachine();
+
+    /**
+     * @brief Resets the used fragment and disconnect from it.
+     */
+    void resetCurrentFragment();
 
     /**
      * @brief Envoie la commande donnée au Client

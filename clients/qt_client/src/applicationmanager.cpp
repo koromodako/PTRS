@@ -77,6 +77,8 @@ void ApplicationManager::Slot_terminated()
     _terminated_ctr++;
     if(_terminated_ctr >= TERMINATED_EXPECTED_TOTAL)
     {   LOG_DEBUG("sig_terminated() emitted.");
+        _consoleThread.quit();
+        _consoleThread.wait();
         emit sig_terminated();
     }
     else if(TERMINATED_EXPECTED_TOTAL - _terminated_ctr == 1)
@@ -84,9 +86,6 @@ void ApplicationManager::Slot_terminated()
         emit sig_response(CMD_SHUTDOWN, true, QString("SHUTDOWN command received !"));
     }
     // emission du signal de terminaison quand tous les composants attendus ont notofié l'app manager de leur terminaison
-
-    _consoleThread.quit();
-    _consoleThread.wait();
 }
 void ApplicationManager::Slot_connect()
 {

@@ -47,6 +47,12 @@ public:
      */
     static Fragment *FromJson(QObject *parent, const QByteArray &json, QString &errorStr);
 
+    /**
+    * @brief Retourne la progression du calcul
+    * @return un entier entre 0 et 100
+    */
+    inline int GetProgress() const { return _progress; }
+
 public slots:
     /**
      * @brief Ce slot est appelée une fois le calcul effectué
@@ -59,6 +65,13 @@ public slots:
      * @param error message d'erreur
      */
     void Slot_crashed(QString error);
+
+    void Slot_updateProgress(int progress);
+
+    /**
+     * @brief Cette méthode est appelée quand le calcul commence
+     */
+    void Slot_started();
 
 signals:
     /**
@@ -79,6 +92,17 @@ signals:
      */
     void sig_crashed();
 
+    void sig_progressUpdated(QUuid idFragment, int value);
+    /**
+     * @brief Emis quand l'état d'un calcul est mis à jour
+     * @param idCalculation l'id de ce calcul
+     * @param state le nouvel état du calcul
+     */
+    void sig_stateUpdated(QUuid idCalculation, Fragment::State state);
+
+private:
+    void setCurrentState(Fragment::State state);
+
 private:
     // non instanciable autrement qu'en fabrique et non copiable
     Fragment(const QString &bin, const QVariantMap &params, QObject *parent = NULL);
@@ -88,6 +112,7 @@ private:
     QString _bin;
     QVariantMap _params;
     State _state;
+    int _progress;
     QJsonObject _result;
 };
 

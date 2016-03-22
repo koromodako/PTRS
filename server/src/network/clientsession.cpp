@@ -126,6 +126,14 @@ void ClientSession::slot_processReadyRead()
     _blockSize = 0;
 }
 
+void ClientSession::resetCurrentFragment()
+{
+    disconnect(this, &ClientSession::sig_calculDone, _fragment, &Fragment::Slot_computed);
+    disconnect(this, &ClientSession::sig_calculStarted, _fragment, &Fragment::Slot_started);
+    disconnect(_fragment, &Fragment::sig_canceled, this, &ClientSession::Slot_stopCalcul);
+    _fragment = NULL;
+}
+
 void ClientSession::send(ReqType reqType, const QString & content)
 {
     LOG_DEBUG(QString("send(reqType='%1',content='%2') called").arg((int)reqType).arg(content));
@@ -156,6 +164,7 @@ void ClientSession::setCurrentState(const QMap<QObject *, AbstractState *> &tran
     QMap<QObject *, AbstractState *>::const_iterator it = transitionsMap.find(_currentState);
     if (it != transitionsMap.end())
     {
+        LOG_INFO("New state for " + GetId().toString() + " : " + it.value()->objectName());
         _currentState->OnExit();
         _currentState = it.value();
         _currentState->OnEntry();
@@ -171,8 +180,6 @@ void ClientSession::setCurrentStateAfterError(const QString &error)
 void ClientSession::setCurrentStateAfterSuccess()
 {
     setCurrentState(_doneTransitionsMap);
-    LOG_INFO("New state : " + _currentState->objectName());
-
 }
 
 bool ClientSession::StartCalcul(const Fragment *fragment)
@@ -188,12 +195,12 @@ bool ClientSession::StartCalcul(const Fragment *fragment)
         disconnect(this, &ClientSession::sig_calculDone, _fragment, &Fragment::Slot_computed);
         disconnect(_fragment, &Fragment::sig_canceled, this, &ClientSession::Slot_stopCalcul);
     }
-
     connect(this, &ClientSession::sig_calculAborted, fragment, &Fragment::Slot_crashed);
     connect(this, &ClientSession::sig_calculDone, fragment, &Fragment::Slot_computed);
     connect(fragment, &Fragment::sig_canceled, this, &ClientSession::Slot_stopCalcul);
 
     _fragment = fragment;
+    emit sig_calculStarted();
     _currentState->ProcessDo(fragment->ToJson().toUtf8());
     return true;
 }
@@ -203,5 +210,5 @@ void ClientSession::Slot_stopCalcul()
     if (_fragment == NULL)
         return;
     _currentState->ProcessStop();
-    _fragment = NULL;
+    resetCurrentFragment();
 }
