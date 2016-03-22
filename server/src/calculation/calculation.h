@@ -1,12 +1,9 @@
 #ifndef CALCULATION_H
 #define CALCULATION_H
 
+#include "fragment.h"
 #include "../const.h"
-#include "../utils/abstractidentifiable.h"
 #include <QHash>
-#include <QVariantMap>
-#include <QJsonDocument>
-#include <QJsonObject>
 
 /**
  * @brief Cette classe représente un calcul distribuable
@@ -125,7 +122,7 @@ signals:
      * @brief Ce signal est émis lorsque le calcul est prêt à être distribué
      * @param fragment fragment que le client devra calculer
      */
-    void sig_scheduled(const Calculation *fragment);
+    void sig_scheduled(const Fragment *fragment);
 
     /**
      * @brief Ce signal est émis lorsque le calcul est terminé (tous les fragments ont été fusionnés)
@@ -151,7 +148,7 @@ private:
     State _state;
     QString _bin;
     QVariantMap _params;
-    QHash<QUuid,Calculation*> _fragments;
+    QHash<QUuid,Fragment*> _fragments;
     QJsonObject _result;
 };
 

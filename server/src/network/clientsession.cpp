@@ -175,7 +175,7 @@ void ClientSession::setCurrentStateAfterSuccess()
 
 }
 
-bool ClientSession::StartCalcul(const Calculation *fragment)
+bool ClientSession::StartCalcul(const Fragment *fragment)
 {
     //Impossible de commencer un autre calcul quand il y en a un en cours ou
     //que le client n'a pas le plugin nécessaire
@@ -184,14 +184,14 @@ bool ClientSession::StartCalcul(const Calculation *fragment)
 
     if (_fragment != NULL)
     {
-        disconnect(this, &ClientSession::sig_calculAborted, _fragment, &Calculation::Slot_crashed);
-        disconnect(this, &ClientSession::sig_calculDone, _fragment, &Calculation::Slot_computed);
-        disconnect(_fragment, &Calculation::sig_canceled, this, &ClientSession::Slot_stopCalcul);
+        disconnect(this, &ClientSession::sig_calculAborted, _fragment, &Fragment::Slot_crashed);
+        disconnect(this, &ClientSession::sig_calculDone, _fragment, &Fragment::Slot_computed);
+        disconnect(_fragment, &Fragment::sig_canceled, this, &ClientSession::Slot_stopCalcul);
     }
 
-    connect(this, &ClientSession::sig_calculAborted, fragment, &Calculation::Slot_crashed);
-    connect(this, &ClientSession::sig_calculDone, fragment, &Calculation::Slot_computed);
-    connect(fragment, &Calculation::sig_canceled, this, &ClientSession::Slot_stopCalcul);
+    connect(this, &ClientSession::sig_calculAborted, fragment, &Fragment::Slot_crashed);
+    connect(this, &ClientSession::sig_calculDone, fragment, &Fragment::Slot_computed);
+    connect(fragment, &Fragment::sig_canceled, this, &ClientSession::Slot_stopCalcul);
 
     _fragment = fragment;
     _currentState->ProcessDo(fragment->ToJson().toUtf8());
