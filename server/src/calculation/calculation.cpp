@@ -54,7 +54,7 @@ QString Calculation::FragmentsResultsToJson(QJsonDocument::JsonFormat format) co
 {   QJsonArray array;
 
     // -- pour chaque fragment
-    QHash<QUuid,Calculation*>::const_iterator frag;
+    QHash<QUuid,Fragment*>::const_iterator frag;
     for(frag = _fragments.constBegin() ; frag != _fragments.constEnd() ; frag++)
     {
         array.append(frag.value()->GetResult());
@@ -85,7 +85,7 @@ void Calculation::Splitted(const QByteArray & json)
     foreach (QJsonValue fragment, fragments)
     {
         QString error;
-        Calculation * frag = Calculation::FromJson(this, QJsonDocument(fragment.toObject()).toJson(QJsonDocument::Compact), error);
+        Fragment * frag = Fragment::FromJson(this, QJsonDocument(fragment.toObject()).toJson(QJsonDocument::Compact), error);
         if(frag != NULL)
         {   _fragments.insert(frag->GetId(), frag);
         }
@@ -101,7 +101,7 @@ void Calculation::Splitted(const QByteArray & json)
     _state = SCHEDULED;
     LOG_DEBUG("SIG_SCHEDULED() emitted.");
 
-    QHash<QUuid,Calculation*>::const_iterator fragment;
+    QHash<QUuid,Fragment*>::const_iterator fragment;
     for(fragment = _fragments.constBegin() ; fragment != _fragments.constEnd() ; fragment++)
         emit sig_scheduled(fragment.value());
 }

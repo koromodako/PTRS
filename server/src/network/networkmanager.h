@@ -53,7 +53,7 @@ public slots:
      *                   éventuellement le calcul)
      * @param args les arguments de calcul à transmettre au client
      */
-    void Slot_startCalcul(const Calculation *fragment);
+    void Slot_startCalcul(const Fragment *fragment);
 
 signals:
     /**
@@ -98,6 +98,7 @@ private:
     static NetworkManager &getInstance();
     friend class ApplicationManager;
     friend class Calculation;
+    friend class Fragment;
 
 private slots:
     /**
@@ -127,7 +128,7 @@ private:
     TCPServer *_TCPServer;
     UDPServer *_UDPServer;
     QSet<ClientSession *> _unavailableClients;
-    QQueue<const Calculation *> _waitingFragments;
+    QQueue<const Fragment *> _waitingFragments;
 
     Q_DISABLE_COPY(NetworkManager)
 };
