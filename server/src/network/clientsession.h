@@ -76,7 +76,7 @@ signals:
      * @brief Emit quand un fragment à fini avec succès son calcul
      * @param json les résultat du calcul transmis par le client
      */
-    void sig_calculDone(const QByteArray &json);
+    void sig_calculDone(const QJsonObject &json);
 
     /**
      * @brief Emit quand le client s'est déconnecté

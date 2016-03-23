@@ -6,14 +6,21 @@
 #include "specs.h"
 #include "src/network/networkmanager.h"
 #include "../utils/logger.h"
+#include "calculation.h"
 
-Fragment::Fragment(const QString &bin, const QVariantMap &params, QObject * parent) :
+Fragment::Fragment(const QString &bin, const QVariantMap &params, Calculation * parent) :
     AbstractIdentifiable(parent),
     _bin(bin),
+    _calculation(parent),
     _params(params),
-    _state(BEING_COMPUTED),
     _progress(0)
 {
+
+}
+
+const Calculation * Fragment::GetCalculation() const
+{
+    return _calculation;
 }
 
 QString Fragment::ToJson(QJsonDocument::JsonFormat format) const
@@ -26,7 +33,7 @@ QString Fragment::ToJson(QJsonDocument::JsonFormat format) const
     return doc.toJson(format);
 }
 
-Fragment * Fragment::FromJson(QObject * parent, const QByteArray &json, QString & errorStr)
+Fragment * Fragment::FromJson(Calculation * parent, const QByteArray &json, QString & errorStr)
 {
     Fragment * fragment = NULL;
 
@@ -47,8 +54,6 @@ Fragment * Fragment::FromJson(QObject * parent, const QByteArray &json, QString 
             {   fragment = new Fragment(doc.object().value(CS_JSON_KEY_CALC_BIN).toString(),
                                               doc.object().value(CS_JSON_KEY_CALC_PARAMS).toObject().toVariantMap(),
                                               parent);
-                connect(fragment, &Fragment::sig_scheduled, &NetworkManager::getInstance(), &NetworkManager::Slot_startCalcul);
-
             }
         }
         else
@@ -61,51 +66,18 @@ Fragment * Fragment::FromJson(QObject * parent, const QByteArray &json, QString 
     return fragment;
 }
 
-void Fragment::Slot_computed(const QByteArray & json)
+void Fragment::Slot_computed(const QJsonObject &json)
 {
-    LOG_DEBUG(QString("Computed received json=%1").arg(QString(json)));
-
-    QJsonParseError jsonError;
-    QJsonDocument doc = QJsonDocument::fromJson(json, &jsonError);
-    if(jsonError.error != QJsonParseError::NoError)
-    {   LOG_ERROR("an error occured while parsing fragment result json block.");
-        setCurrentState(CRASHED);
-        return;
-    }
-    _result = doc.object();
+    _result = json;
 
     // mise à jour de l'état du calcul
     LOG_DEBUG("Entering state COMPUTED.");
-    setCurrentState(COMPUTED);
-    LOG_DEBUG("SIG_COMPUTED() emitted.");
-    emit sig_computed();
-}
-
-void Fragment::Slot_crashed(QString error)
-{
-    LOG_ERROR(QString("Fragment crashed due to the following reason : %1").arg(error.isEmpty() ? "<unknown_reason>" : error));
-    // mise à jour de l'état du calcul
-    LOG_DEBUG("Entering state CRASHED.");
-    setCurrentState(CRASHED);
-    LOG_DEBUG("SIG_CRASHED() emitted.");
-    emit sig_crashed();
+    Slot_updateProgress(100);
 }
 
 void Fragment::Slot_updateProgress(int progress)
 {
-    LOG_DEBUG("New progress for " + GetId().toString() + " : " + QString::number(progress));
+    LOG_DEBUG("New progress for fragment " + GetId().toString() + " : " + QString::number(progress));
+    emit sig_progressUpdated(_progress, progress);
     _progress = progress % 101;
-    emit sig_progressUpdated(GetId(), _progress);
-}
-
-void Fragment::Slot_started()
-{
-    LOG_DEBUG("Entering state BEING COMPUTED.");
-    setCurrentState(BEING_COMPUTED);
-}
-
-void Fragment::setCurrentState(Fragment::State state)
-{
-    _state = state;
-    emit sig_stateUpdated(GetId(), _state);
 }

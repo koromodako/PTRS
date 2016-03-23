@@ -6,19 +6,17 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 
+class Calculation;
 class Fragment : public AbstractIdentifiable
 {
     Q_OBJECT
 public:
-    enum State {
-        BEING_COMPUTED,
-        BEING_CANCELED,
-        SCHEDULED,
-        COMPLETED,
-        COMPUTED,
-        CANCELED,
-        CRASHED
-    };
+    /**
+     * @brief Retourne le calcul parent
+     * @return
+     */
+    const Calculation * GetCalculation() const;
+
     /**
      * @brief Retourne le résultat du fragment
      * @return
@@ -45,7 +43,7 @@ public:
      * @param errorStr
      * @return
      */
-    static Fragment *FromJson(QObject *parent, const QByteArray &json, QString &errorStr);
+    static Fragment *FromJson(Calculation *parent, const QByteArray &json, QString &errorStr);
 
     /**
     * @brief Retourne la progression du calcul
@@ -58,60 +56,34 @@ public slots:
      * @brief Ce slot est appelée une fois le calcul effectué
      * @param json résultat en provenance du client
      */
-    void Slot_computed(const QByteArray &json);
+    void Slot_computed(const QJsonObject &json);
 
     /**
-     * @brief Ce slot est appelée quand le calcul à crashé
-     * @param error message d'erreur
+     * @brief Ce slot met à jour l'avancement du calcul du fragment
+     * @param int nouvel avancemnt entre [0 et 100]
      */
-    void Slot_crashed(QString error);
-
     void Slot_updateProgress(int progress);
 
-    /**
-     * @brief Cette méthode est appelée quand le calcul commence
-     */
-    void Slot_started();
-
 signals:
-    /**
-     * @brief Ce signal est émis lorsque le calcul est prêt à être distribué
-     * @param fragment fragment que le client devra calculer
-     */
-    void sig_scheduled(const Fragment *fragment);
     /**
      * @brief Ce signal est émis lorsque le calcul doit être annulé
      */
     void sig_canceled();
     /**
-     * @brief Ce signal est émis lorsque le calcul est terminé (dans le cas où le calcul est un fragment de calcul, coté client)
+     * @brief Ce signal est émis quand l'avancement du fragment est mis à jour
      */
-    void sig_computed();
-    /**
-     * @brief Ce signal est émis lorsque le plugin du calcul crash
-     */
-    void sig_crashed();
+    void sig_progressUpdated(int oldValue, int newValue);
 
-    void sig_progressUpdated(QUuid idFragment, int value);
-    /**
-     * @brief Emis quand l'état d'un calcul est mis à jour
-     * @param idCalculation l'id de ce calcul
-     * @param state le nouvel état du calcul
-     */
-    void sig_stateUpdated(QUuid idCalculation, Fragment::State state);
-
-private:
-    void setCurrentState(Fragment::State state);
 
 private:
     // non instanciable autrement qu'en fabrique et non copiable
-    Fragment(const QString &bin, const QVariantMap &params, QObject *parent = NULL);
+    Fragment(const QString &bin, const QVariantMap &params, Calculation *parent = NULL);
     Q_DISABLE_COPY(Fragment)
 
 
     QString _bin;
+    Calculation *_calculation;
     QVariantMap _params;
-    State _state;
     int _progress;
     QJsonObject _result;
 };

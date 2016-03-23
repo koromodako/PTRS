@@ -107,7 +107,6 @@ void ClientSession::slot_processReadyRead()
         }
         // sinon on inscrit la taille du message dans l'attribut de la classe et la commande
         in >> _blockSize;
-        LOG_DEBUG(QString("block size received : size=%1").arg(_blockSize));
     }
 
     if(_socket->bytesAvailable() < _blockSize)
@@ -116,11 +115,9 @@ void ClientSession::slot_processReadyRead()
     // on commence par récupérer la commande
     req_t req;
     in >> req;
-    LOG_DEBUG(QString("request received : req=%1").arg(req));
     // on récupère ensuite le contenu du message que l'on passe au slot de traitement
     QByteArray content;
     in >> content;
-    LOG_DEBUG(QString("content received : text=").append(content));
     slot_processRequest((ReqType)req, content);
     // on reset les variables commande et block size
     _blockSize = 0;
@@ -129,14 +126,13 @@ void ClientSession::slot_processReadyRead()
 void ClientSession::resetCurrentFragment()
 {
     disconnect(this, &ClientSession::sig_calculDone, _fragment, &Fragment::Slot_computed);
-    disconnect(this, &ClientSession::sig_calculStarted, _fragment, &Fragment::Slot_started);
+    disconnect(this, &ClientSession::sig_calculStarted, _fragment->GetCalculation(), &Calculation::Slot_started);
     disconnect(_fragment, &Fragment::sig_canceled, this, &ClientSession::Slot_stopCalcul);
     _fragment = NULL;
 }
 
 void ClientSession::send(ReqType reqType, const QString & content)
 {
-    LOG_DEBUG(QString("send(reqType='%1',content='%2') called").arg((int)reqType).arg(content));
     // vérification de la taille du contenu à envoyer en octets
     if( (content.toUtf8().size()+sizeof(req_t)) > MSG_SIZE_MAX)
     {   LOG_ERROR("Message content too long to be sent !");
@@ -152,8 +148,6 @@ void ClientSession::send(ReqType reqType, const QString & content)
     out << content.toUtf8();                                // on écrit le contenu après la requete
     out.device()->seek(0);                                  // on déplace la tête d'écriture au début
     out << (msg_size_t)(block.size() - (int)sizeof(msg_size_t)); // on écrit la taille du message (commande comprise)
-
-    LOG_DEBUG(QString("writing block into socket : block=").append(block.toHex()));
 
     _socket->write(block);  // on écrit le bloc dans le socket
     _socket->flush();       // on flush le socket
@@ -189,13 +183,7 @@ bool ClientSession::StartCalcul(const Fragment *fragment)
     if (fragment == NULL || _fragment != NULL || _missingPlugins.contains(fragment->GetBin()))
         return false;
 
-    if (_fragment != NULL)
-    {
-        disconnect(this, &ClientSession::sig_calculAborted, _fragment, &Fragment::Slot_crashed);
-        disconnect(this, &ClientSession::sig_calculDone, _fragment, &Fragment::Slot_computed);
-        disconnect(_fragment, &Fragment::sig_canceled, this, &ClientSession::Slot_stopCalcul);
-    }
-    connect(this, &ClientSession::sig_calculAborted, fragment, &Fragment::Slot_crashed);
+    connect(this, &ClientSession::sig_calculStarted, fragment->GetCalculation(), &Calculation::Slot_started);
     connect(this, &ClientSession::sig_calculDone, fragment, &Fragment::Slot_computed);
     connect(fragment, &Fragment::sig_canceled, this, &ClientSession::Slot_stopCalcul);
 
