@@ -19,7 +19,6 @@ public:
         BEING_SPLITTED,
         SCHEDULED,
         BEING_COMPUTED,
-        COMPUTED,
         BEING_JOINED,
         COMPLETED,
         CANCELED,
@@ -81,6 +80,12 @@ public:
     void Cancel();
 
     /**
+     * @brief Cette méthode est appelée quand le calcul à crashé
+     * @param error message d'erreur
+     */
+    void Crashed(QString error);
+
+    /**
      * @brief Cette méthode est appelée une fois le calcul fragmenté
      * @param json
      */
@@ -94,22 +99,9 @@ public:
 
 public slots:
     /**
-     * @brief Ce slot est appelée une fois le calcul effectué
-     * @param json résultat en provenance du client
+     * @brief Cette méthode est appelée quand le calcul commence
      */
-    void Slot_computed(const QByteArray &json);
-
-    /**
-     * @brief Ce slot est appelée quand le calcul à crashé
-     * @param error message d'erreur
-     */
-    void Slot_crashed(QString error);
-
-    /**
-     * @brief Ce slot met à jour l'avancement d'un calcul
-     * @param le nouvel avancement du calcul
-     */
-    void Slot_updateProgress(int progression);
+    void Slot_started();
 
 signals:
     /**
@@ -134,10 +126,8 @@ signals:
     void sig_stateUpdated(QUuid idCalculation, Calculation::State state);
 
     /**
-     * @brief Ce signal est émis lorsque le calcul doit être annulé
+     * @brief Ce signal est émis quand l'avancement du calcul est mis à jour
      */
-    void sig_canceled();
-
     void sig_progressUpdated(QUuid idFragment, int value);
 
 private:
@@ -145,6 +135,12 @@ private:
      * @brief Modifie l'état actuel
      */
     void setCurrentState(Calculation::State state);
+
+    /**
+     * @brief Cette méthode met à jour l'avancement d'un calcul
+     * @param le nouvel avancement du calcul
+     */
+    void updateProgress(int progress);
 
     // non instanciable autrement qu'en fabrique et non copiable
     Calculation(const QString &bin, const QVariantMap &params, QObject * parent = NULL);
@@ -154,7 +150,7 @@ private slots:
     /**
      * @brief Mais à jour la progression du calcul quand la progression d'un des fragments a évolué
      */
-    void slot_updateChildrenProgress();
+    void slot_updateChildrenProgress(int oldChildProgress, int newChildProgress);
 
 private:
 

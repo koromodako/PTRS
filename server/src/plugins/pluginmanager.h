@@ -48,11 +48,6 @@ public:
      * @param calc
      */
     void Ui(Calculation * calc);
-    /**
-     * @brief Lance la procédure de calcul pour un fragment
-     * @param fragment
-     */
-    void Calc(Fragment * fragment);
 
 private:
     /**
@@ -61,11 +56,6 @@ private:
      * @param args
      */
     void startCalcProcess(Calculation * calc, PluginProcess::CalculationOperation op);
-    /**
-     * @brief Démarre un nouveau processus pour le fragment
-     * @param frag
-     */
-    void startFragProcess(Fragment * frag);
 
 signals:
     /**

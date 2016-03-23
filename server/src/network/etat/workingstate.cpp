@@ -23,13 +23,23 @@ void WorkingState::ProcessAbort(const QByteArray &content)
 
 void WorkingState::ProcessDone(const QByteArray &content)
 {
-    LOG_DEBUG("expected : " + _client->GetId().toString().toUtf8());
-    LOG_DEBUG("receive : " + content);
     if (content.startsWith(_client->GetId().toString().toUtf8()))
     {
-        emit _client->sig_calculDone(content.mid(_client->GetId().toString().size()));
-        _client->resetCurrentFragment();
-        _client->setCurrentStateAfterSuccess();
+        LOG_DEBUG(QString("Computed received json=%1").arg(QString(content.mid(_client->GetId().toString().size()))));
+
+        QJsonParseError jsonError;
+        QJsonDocument doc = QJsonDocument::fromJson(content.mid(_client->GetId().toString().size()), &jsonError);
+        if(jsonError.error != QJsonParseError::NoError)
+        {
+            _client->resetCurrentFragment();
+            _client->setCurrentStateAfterError("An error occured while parsing fragment result json block.");
+        }
+        else
+        {
+            emit _client->sig_calculDone(doc.object());
+            _client->resetCurrentFragment();
+            _client->setCurrentStateAfterSuccess();
+        }
     }
 }
 

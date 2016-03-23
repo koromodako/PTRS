@@ -64,11 +64,6 @@ void PluginManager::Ui(Calculation *calc)
     startCalcProcess(calc, PluginProcess::UI);
 }
 
-void PluginManager::Calc(Fragment *fragment)
-{   // -- lancement du processus associé
-    startFragProcess(fragment);
-}
-
 void PluginManager::startCalcProcess(Calculation * calc, PluginProcess::CalculationOperation op)
 {
     // -- création d'un nouveau processus
@@ -78,7 +73,7 @@ void PluginManager::startCalcProcess(Calculation * calc, PluginProcess::Calculat
     // -- lancement du processus
     if(!cp->Start())
     {   // on spécifie qu'il y a eu une erreur au niveau de l'execution (elle n'a pas eu lieu)
-        calc->Slot_crashed("Plugin type is script but no interpreter was found : process execution skipped !");
+        calc->Crashed("Plugin type is script but no interpreter was found : process execution skipped !");
         // interruption de la routine
         return;
     }
@@ -108,32 +103,6 @@ void PluginManager::startCalcProcess(Calculation * calc, PluginProcess::Calculat
         LOG_CRITICAL("Processus started without arguments : unhandled operation is the cause !");
         break;
     }
-    // -- on attend la fin du processus
-    cp->waitForFinished();
-}
-
-void PluginManager::startFragProcess(Fragment *frag)
-{
-    // -- création d'un nouveau processus
-    PluginProcess * cp = new PluginProcess(_plugins_dir.absolutePath(), frag);
-    // -- ajout du process à la liste
-    _processes.append(cp);
-    // -- lancement du processus
-    if(!cp->Start())
-    {   // on spécifie qu'il y a eu une erreur au niveau de l'execution (elle n'a pas eu lieu)
-        frag->Slot_crashed("Plugin type is script but no interpreter was found : process execution skipped !");
-        // interruption de la routine
-        return;
-    }
-    // -- on attend que le process se lance
-    cp->waitForStarted();
-    // -- write in process stdin
-    cp->write(CS_OP_CALC);
-    cp->write(CS_CRLF);
-    cp->write(frag->ToJson().toUtf8().data()); // ici calc est supposé être un fragment
-    cp->write(CS_CRLF);
-    cp->write(CS_EOF);
-    cp->write(CS_CRLF);
     // -- on attend la fin du processus
     cp->waitForFinished();
 }

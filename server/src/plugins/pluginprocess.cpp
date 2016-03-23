@@ -84,7 +84,7 @@ void PluginProcess::Slot_error(QProcess::ProcessError error)
         msg.append("unknown error.");
         break;
     }
-    _calculation->Slot_crashed(msg);
+    _calculation->Crashed(msg);
 }
 
 void PluginProcess::Slot_calcFinished(int exitCode, QProcess::ExitStatus exitStatus)
@@ -106,35 +106,13 @@ void PluginProcess::Slot_calcFinished(int exitCode, QProcess::ExitStatus exitSta
         else
         {   LOG_ERROR(QString("Process crashed (exit_code=%1).").arg(exitCode));
             // crash calculation
-            _calculation->Slot_crashed(readAllStandardError());
+            _calculation->Crashed(readAllStandardError());
         }
         break;
     case QProcess::CrashExit:
         LOG_ERROR(QString("Process crashed (exit_code=%1).").arg(exitCode));
         // crash calculation
-        _calculation->Slot_crashed(readAllStandardError());
-        break;
-    }
-}
-
-void PluginProcess::Slot_fragFinished(int exitCode, QProcess::ExitStatus exitStatus)
-{   LOG_DEBUG(QString("SLOT_FINISHED(%1,%2) called.").arg(exitCode).arg(exitStatus));
-    switch (exitStatus) {
-    case QProcess::NormalExit:
-        if(exitCode == 0)
-        {
-            _fragment->Slot_computed(readAllStandardOutput());
-        }
-        else
-        {   LOG_ERROR(QString("Process crashed (exit_code=%1).").arg(exitCode));
-            // crash calculation
-            _fragment->Slot_crashed(readAllStandardError());
-        }
-        break;
-    case QProcess::CrashExit:
-        LOG_ERROR(QString("Process crashed (exit_code=%1).").arg(exitCode));
-        // crash calculation
-        _fragment->Slot_crashed(readAllStandardError());
+        _calculation->Crashed(readAllStandardError());
         break;
     }
 }

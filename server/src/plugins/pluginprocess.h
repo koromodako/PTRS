@@ -49,14 +49,6 @@ private slots:
      *      Satut de fin du processus
      */
     void Slot_calcFinished(int exitCode, QProcess::ExitStatus exitStatus);
-    /**
-     * @brief Ce slot reçoit les notifications de fin d'execution du plugin pour un fragment
-     * @param exitCode
-     *      Code de fin du processus
-     * @param exitStatus
-     *      Satut de fin du processus
-     */
-    void Slot_fragFinished(int exitCode, QProcess::ExitStatus exitStatus);
 
 private:
     /**

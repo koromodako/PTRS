@@ -14,9 +14,9 @@ bool CalculationManager::Execute(Calculation *calculation)
     if(PluginManager::getInstance().PluginExists(calculation->GetBin()))
     {
         emit sig_newCalculation(calculation->GetId());
-        connect (calculation, SIGNAL(sig_calculationProgressUpdated(QUuid, int)),
+        connect (calculation, SIGNAL(sig_progressUpdated(QUuid, int)),
                  this, SIGNAL(sig_calculationProgressUpdated(QUuid, int)));
-        connect (calculation, SIGNAL(sig_calculationStateUpdated(QUuid, Calculation::State)),
+        connect (calculation, SIGNAL(sig_stateUpdated(QUuid, Calculation::State)),
                  this, SIGNAL(sig_calculationStateUpdated(QUuid, Calculation::State)));
         connect (calculation, SIGNAL(sig_calculationDone(QUuid, const QJsonObject &)),
                  this, SIGNAL(sig_calculationDone(QUuid, const QJsonObject &)));
@@ -30,7 +30,7 @@ bool CalculationManager::Execute(Calculation *calculation)
     {   // -- on log l'erreur
         LOG_ERROR("Call Execute on a missing plugin !");
         // -- on annule le calcul
-        calculation->Slot_crashed("Plugin missing !");
+        calculation->Crashed("Plugin missing !");
     }
     return ok;
 }
