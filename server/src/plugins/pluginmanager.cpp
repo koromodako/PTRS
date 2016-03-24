@@ -98,6 +98,10 @@ void PluginManager::startCalcProcess(Calculation * calc, PluginProcess::Calculat
         cp->write(CS_CRLF);
         break;
     case PluginProcess::UI: // utile côté serveur
+        cp->write(CS_OP_PARAM);
+        cp->write(CS_CRLF);
+        cp->write(CS_EOF);
+        cp->write(CS_CRLF);
         break;
     default:
         LOG_CRITICAL("Processus started without arguments : unhandled operation is the cause !");
