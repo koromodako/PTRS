@@ -4,7 +4,9 @@
 #
 #-------------------------------------------------
 
-QT       += core network
+QT       += core network gui
+
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = server
 TEMPLATE = app
@@ -35,7 +37,11 @@ SOURCES += \
     src/network/etat/workingabouttostartstate.cpp \
     src/network/etat/workingstate.cpp \
     src/plugins/pluginprocess.cpp \
-    src/calculation/fragment.cpp
+    src/calculation/fragment.cpp \
+    src/ui/addcalculationwindow.cpp \
+    src/ui/mainwindow.cpp \
+    src/ui/widgetcalculs.cpp \
+    src/ui/widgetclients.cpp
 
 HEADERS  += \
     src/console/consolehandler.h \
@@ -58,6 +64,11 @@ HEADERS  += \
     src/network/etat/workingstate.h \
     src/calculation/specs.h \
     src/plugins/pluginprocess.h \
-    src/calculation/fragment.h
+    src/calculation/fragment.h \
+    src/ui/addcalculationwindow.h \
+    src/ui/mainwindow.h \
+    src/ui/widgetcalculs.h \
+    src/ui/widgetclients.h
 
-FORMS    +=
+
+FORMS    += src/ui/mainwindow.ui

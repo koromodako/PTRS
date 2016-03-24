@@ -3,6 +3,8 @@
 #include "utils/logger.h"
 #include "console/consolehandler.h"
 #include "plugins/pluginmanager.h"
+#include "ui/mainwindow.h"
+
 ApplicationManager ApplicationManager::_instance;
 
 void ApplicationManager::Init()
@@ -33,6 +35,9 @@ void ApplicationManager::Init()
     // --- application_mgr --> plugin_mgr
     connect(this, SIGNAL(sig_terminateModule()),
             &(PluginManager::getInstance()), SLOT(Slot_terminate()));
+
+    // --- mainwindow --> application_manager
+    connect(MainWindow::GetInstance(), SIGNAL(Sig_close()), this, SLOT(Slot_shutdown()));
 
     LOG_INFO("Initialisation des composants...");
     // -- initialisation des composants
