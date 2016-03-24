@@ -1,4 +1,5 @@
 #include "widgetcalculs.h"
+#include "addcalculationwindow.h"
 #include <QtWidgets>
 
 WidgetCalculs::WidgetCalculs(QWidget *parent) : QWidget(parent)
@@ -39,10 +40,18 @@ WidgetCalculs::WidgetCalculs(QWidget *parent) : QWidget(parent)
     QPushButton * newCalc = new QPushButton("New Calculation");
     newCalc->setMaximumWidth(160);
     layout->addWidget(newCalc);
-        layout->setAlignment(newCalc, Qt::AlignRight);
+    layout->setAlignment(newCalc, Qt::AlignRight);
+
+    connect(newCalc, QPushButton::clicked, this, Slot_newcalculation);
 
     // Bouton ajouter
 
     this->setLayout(layout);
 
+}
+
+void WidgetCalculs::Slot_newcalculation()
+{
+    AddCalculationWindow *newCalculation = new AddCalculationWindow(this);
+    newCalculation->show();
 }

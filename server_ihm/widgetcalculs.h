@@ -15,6 +15,11 @@ public:
 signals:
 
 public slots:
+    /**
+     * @brief Slot déclenché par le bouton New Calculation
+     */
+    void Slot_newcalculation();
+
 };
 
 #endif // WIDGETCALCULS_H
