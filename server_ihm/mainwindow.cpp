@@ -10,8 +10,8 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     // ---- Configuration UI
     ui->setupUi(this);
-    QWidget *centralWidget = new QWidget;
-    QVBoxLayout *centralLayout = new QVBoxLayout;
+    QWidget *centralWidget = new QWidget(this);
+    QVBoxLayout *centralLayout = new QVBoxLayout(centralWidget);
     centralLayout->setContentsMargins(0,15,0,0);
     centralWidget->setLayout(centralLayout);
 
