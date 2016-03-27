@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "../userinterface.h"
 
 namespace Ui {
 class MainWindow;
@@ -16,20 +17,9 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    static MainWindow *GetInstance() { return _instance; }
-    static MainWindow *CreateInstance() {
-        _instance = new MainWindow;
-        return _instance;
-    }
-
     explicit MainWindow(QWidget *parent = 0);
-    ~MainWindow();
 
-signals:
-    /**
-     * @brief Signal envoyé quand la fenêtre est fermée.
-     */
-    void Sig_close();
+    ~MainWindow();
 
 protected:
     void closeEvent(QCloseEvent *event);
@@ -37,8 +27,6 @@ protected:
 private:
     Ui::MainWindow *ui;
     Q_DISABLE_COPY(MainWindow)
-
-    static MainWindow *_instance;
 };
 
 #endif // MAINWINDOW_H

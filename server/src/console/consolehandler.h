@@ -5,23 +5,25 @@
 #include <QTextStream>
 #include "src/const.h"
 #include "src/calculation/calculation.h"
+#include "../userinterface.h"
 
 /**
  * @brief Cette classe gère les interactions avec l'utilisateur en console.
  *  Elle s'exécute dans un thread en parallèle de la boucle d'évènement principale de Qt.
  */
-class ConsoleHandler : public QObject
+class ConsoleHandler : public UserInterface
 {
     Q_OBJECT
 public:
     ~ConsoleHandler(){}
 
-protected:
     /**
      * @brief Récupère l'instance unique de cette classe
      * @return
      */
     static ConsoleHandler & getInstance() { return _instance; }
+
+protected:
     friend class ApplicationManager;
 
 public slots:
@@ -40,42 +42,6 @@ public slots:
      *      Message de réponse construit par l'émetteur de cette dernière
      */
     void Slot_response(Command command, bool ok, QString message);
-
-signals:
-    /**
-     * @brief Ce signal est émis chaque fois que l'utilisateur demande l'exécution d'un calcul
-     * @param calculationOrderJSON
-     *      Bloc JSON de description du calcul à segmenter et répartir
-     */
-    void sig_exec(QByteArray calculationOrderJSON);
-    /**
-     * @brief Ce signal est émis chaque fois que l'utilisateur demande le statut des calculs enregistrés
-     */
-    void sig_status();
-    /**
-     * @brief Ce signal est émis chaque fois que l'utilisateur demande les résultat d'un calcul
-     * @param id
-     *      Identifiant du calcul dont l'utilisateur souhaite obtenir le résultat
-     */
-    void sig_result(QUuid id, QString filename = QString());
-    /**
-     * @brief Ce signal est émis chaque fois que l'utilisateur demande l'annulation d'un calcul
-     * @param id
-     *      Identifiant du calcul dont l'utilisateur souhaite obtenir le résultat
-     */
-    void sig_cancel(QUuid id);
-    /**
-     * @brief Ce signal est émis chaque fois que l'utilisateur demande l'état du serveur
-     */
-    void sig_state();
-    /**
-     * @brief Ce signal est émis lorsque l'utilisateur demande l'arrêt du serveur
-     */
-    void sig_shutdown();
-    /**
-     * @brief Ce signal est émis lorsque le thread de la console est sur le point de s'arrêter.
-     */
-    void sig_terminated();
 
 private:
     /**

@@ -6,6 +6,7 @@
 #include "src/const.h"
 #include "calculation/calculationmanager.h"
 #include "network/networkmanager.h"
+#include "userinterface.h"
 
 /*
  *  Cette valeur définit le nombre de module dont l'arrêt doit être validé avant
@@ -25,7 +26,7 @@ public:
     ~ApplicationManager();
     static ApplicationManager & GetInstance() { return _instance; }
 
-    void Init();
+    void Init(UserInterface *interface);
 
 public slots:
     /**

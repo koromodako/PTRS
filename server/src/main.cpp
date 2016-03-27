@@ -6,19 +6,29 @@
 #include "src/network/networkmanager.h"
 #include "src/const.h"
 
-#include "ui/mainwindow.h"
+#include "ui/mainwindowcontroller.h"
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    MainWindow::CreateInstance()->show();
+    UserInterface *interface;
+
+    if(argc == 2)
+    {
+        MainWindowController::CreateInstance();
+        interface = MainWindowController::GetInstance();
+    }
+    else
+    {
+        interface = &ConsoleHandler::getInstance();
+    }
 
     LOGGER_CONFIGURE(LVL_NO_LVL, LOG_FORMAT_DETAILED);
 
     qRegisterMetaType<Command>("Command");
 
-    ApplicationManager::GetInstance().Init();
+    ApplicationManager::GetInstance().Init(interface);
 
     QObject::connect(&(ApplicationManager::GetInstance()), SIGNAL(sig_terminated()),
                      qApp, SLOT(quit()));

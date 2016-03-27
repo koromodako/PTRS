@@ -21,7 +21,7 @@ bool PluginManager::Init()
         {   LOG_CRITICAL("Can't make plugins directory !");
         }
         if(!_plugins_dir.cd(PLUGINS_DIR))
-        {   LOG_CRITICAL(QString("Directory '%1' doesn't exists !").arg(_plugins_dir.absolutePath()));
+        {   LOG_CRITICAL(QString("Directory '%1' doesn't exist !").arg(_plugins_dir.absolutePath()));
         }
         else {ok = true;}
     }

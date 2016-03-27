@@ -7,7 +7,7 @@
 
 ApplicationManager ApplicationManager::_instance;
 
-void ApplicationManager::Init()
+void ApplicationManager::Init(UserInterface *interface)
 {
     ConsoleHandler::getInstance().moveToThread(&_consoleThread);
     NetworkManager::getInstance().moveToThread(&_networkThread);
@@ -15,29 +15,26 @@ void ApplicationManager::Init()
     LOG_INFO("Initialisation des connexions signaux/slots...");
 
     // -- initialisation des connexions pour la communication inter-threads
-    connect(&_consoleThread, &QThread::started, &ConsoleHandler::getInstance(), &ConsoleHandler::Slot_init);
+    connect(&_consoleThread, &QThread::started, interface, &UserInterface::Slot_init);
     connect(&_networkThread, &QThread::started, &NetworkManager::getInstance(), &NetworkManager::Slot_init);
     connect(&NetworkManager::getInstance(), SIGNAL(sig_started()), &_consoleThread, SLOT(start()));
 
     // --- console_handler --> application_manager
-    connect(&(ConsoleHandler::getInstance()), SIGNAL(sig_exec(QByteArray)),        SLOT(Slot_exec(QByteArray)));
-    connect(&(ConsoleHandler::getInstance()), SIGNAL(sig_status()),                SLOT(Slot_status()));
-    connect(&(ConsoleHandler::getInstance()), SIGNAL(sig_state()),                 SLOT(Slot_state()));
-    connect(&(ConsoleHandler::getInstance()), SIGNAL(sig_result(QUuid,QString)),   SLOT(Slot_result(QUuid,QString)));
-    connect(&(ConsoleHandler::getInstance()), SIGNAL(sig_cancel(QUuid)),           SLOT(Slot_cancel(QUuid)));
-    connect(&(ConsoleHandler::getInstance()), SIGNAL(sig_shutdown()),              SLOT(Slot_shutdown()));
-    connect(&(ConsoleHandler::getInstance()), SIGNAL(sig_terminated()),            SLOT(Slot_terminated()));
+    connect(interface, SIGNAL(sig_exec(QByteArray)),        SLOT(Slot_exec(QByteArray)));
+    connect(interface, SIGNAL(sig_status()),                SLOT(Slot_status()));
+    connect(interface, SIGNAL(sig_state()),                 SLOT(Slot_state()));
+    connect(interface, SIGNAL(sig_result(QUuid,QString)),   SLOT(Slot_result(QUuid,QString)));
+    connect(interface, SIGNAL(sig_cancel(QUuid)),           SLOT(Slot_cancel(QUuid)));
+    connect(interface, SIGNAL(sig_shutdown()),              SLOT(Slot_shutdown()));
+    connect(interface, SIGNAL(sig_terminated()),            SLOT(Slot_terminated()));
     // --- application_mgr --> console_handler
     connect(this, SIGNAL(sig_response(Command,bool,QString)),
-            &(ConsoleHandler::getInstance()), SLOT(Slot_response(Command,bool,QString)));
+            interface, SLOT(Slot_response(Command,bool,QString)));
     // --- plugin_mgr --> application_mgr
     connect(&(PluginManager::getInstance()), SIGNAL(sig_terminated()), SLOT(Slot_terminated()));
     // --- application_mgr --> plugin_mgr
     connect(this, SIGNAL(sig_terminateModule()),
             &(PluginManager::getInstance()), SLOT(Slot_terminate()));
-
-    // --- mainwindow --> application_manager
-    connect(MainWindow::GetInstance(), SIGNAL(Sig_close()), this, SLOT(Slot_shutdown()));
 
     LOG_INFO("Initialisation des composants...");
     // -- initialisation des composants

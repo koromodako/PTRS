@@ -2,9 +2,9 @@
 #include "ui_mainwindow.h"
 #include "widgetclients.h"
 #include "widgetcalculs.h"
-#include <QLayout>
+#include "mainwindowcontroller.h"
 
-MainWindow *MainWindow::_instance = NULL;
+#include <QLayout>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -42,5 +42,5 @@ MainWindow::~MainWindow()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    emit Sig_close();
+    MainWindowController::GetInstance()->windowClosed();
 }

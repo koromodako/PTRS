@@ -41,7 +41,9 @@ SOURCES += \
     src/ui/addcalculationwindow.cpp \
     src/ui/mainwindow.cpp \
     src/ui/widgetcalculs.cpp \
-    src/ui/widgetclients.cpp
+    src/ui/widgetclients.cpp \
+    src/userinterface.cpp \
+    src/ui/mainwindowcontroller.cpp
 
 HEADERS  += \
     src/console/consolehandler.h \
@@ -68,7 +70,9 @@ HEADERS  += \
     src/ui/addcalculationwindow.h \
     src/ui/mainwindow.h \
     src/ui/widgetcalculs.h \
-    src/ui/widgetclients.h
+    src/ui/widgetclients.h \
+    src/userinterface.h \
+    src/ui/mainwindowcontroller.h
 
 
 FORMS    += src/ui/mainwindow.ui
