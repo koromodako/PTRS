@@ -45,8 +45,7 @@ void AddCalculationWindow::updateOptions(QString selectedPlugin, QStringList ite
     listLayout->addWidget(pluginTitle, 0, 0);
     listLayout->addWidget(pluginList, 0, 1);
 
-    connect(pluginList, static_cast<void(QComboBox::*)(const QString &)>(&QComboBox::currentIndexChanged),
-        this, AddCalculationWindow::Slot_pickedAnotherPlugin);
+    connect(pluginList, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(Slot_pickedAnotherPlugin(QString)));
 
     QFrame* line = new QFrame(listParameters);
     line->setFrameShape(QFrame::HLine);
