@@ -1,4 +1,5 @@
 #include "addcalculationwindow.h"
+#include "../plugins/pluginmanager.h"
 #include <QGridLayout>
 #include <QWidget>
 #include <QLabel>
@@ -13,17 +14,14 @@
 AddCalculationWindow::AddCalculationWindow(QWidget *parent) : QMainWindow(parent)
 {
 
-    this->updateOptions("bruteforce",
-                        QStringList() << "Un" << "Deux" << "Trois",
-                        QStringList() << "int" << "string" << "double");
+    this->updateOptions("bruteforce");
 
     this->setWindowTitle("PTRS - New calculation");
 }
 
 void AddCalculationWindow::updateOptions(QString selectedPlugin, QStringList itemNames, QStringList itemTypes)
 {
-    QString pluginNames [] { "bruteforce", "mergesort" };
-    int pluginCount = 2;
+    QStringList pluginNames = PluginManager::getInstance().GetPluginsList();
 
     //liste de paramètres pour le plugin actuel
     QWidget *listParameters = new QWidget(this);
@@ -32,7 +30,7 @@ void AddCalculationWindow::updateOptions(QString selectedPlugin, QStringList ite
     int pluginIndex = 0;
 
     QComboBox *pluginList = new QComboBox(listParameters);
-    for(int i = 0; i < pluginCount; i++)
+    for(int i = 0; i < pluginNames.size(); i++)
     {
         pluginList->insertItem(i, pluginNames[i]);
         if(pluginNames[i] == selectedPlugin)
@@ -57,34 +55,43 @@ void AddCalculationWindow::updateOptions(QString selectedPlugin, QStringList ite
 
     listParameters->setLayout(listLayout);
 
-    for(int i = 0; i < itemNames.size(); i++)
+    if(itemNames.size() == 0)
     {
-        QLabel *name = new QLabel(itemNames[i], listParameters);
-        QWidget *value = NULL;
-        if(itemTypes[i] == "int")
-        {
-            QSpinBox *spin = new QSpinBox(listParameters);
-            spin->setRange(-SPIN_BOX_RANGE, SPIN_BOX_RANGE);
-            value = spin;
-        }
-        else if(itemTypes[i] == "double")
-        {
-            QDoubleSpinBox *spin = new QDoubleSpinBox(listParameters);
-            spin->setRange(-SPIN_BOX_RANGE, SPIN_BOX_RANGE);
-            spin->setSingleStep(DOUBLE_STEP);
-            value = spin;
-        }
-        else
-        {
-            value = new QLineEdit(listParameters);
-        }
+        QLabel *wait = new QLabel("Please wait...", listParameters);
 
-        listLayout->addWidget(name, i+2, 0);
-        listLayout->addWidget(value, i+2, 1);
+        listLayout->addWidget(wait, 2, 0, 1, -1);
     }
+    else
+    {
+        for(int i = 0; i < itemNames.size(); i++)
+        {
+            QLabel *name = new QLabel(itemNames[i], listParameters);
+            QWidget *value = NULL;
+            if(itemTypes[i] == "int")
+            {
+                QSpinBox *spin = new QSpinBox(listParameters);
+                spin->setRange(-SPIN_BOX_RANGE, SPIN_BOX_RANGE);
+                value = spin;
+            }
+            else if(itemTypes[i] == "double")
+            {
+                QDoubleSpinBox *spin = new QDoubleSpinBox(listParameters);
+                spin->setRange(-SPIN_BOX_RANGE, SPIN_BOX_RANGE);
+                spin->setSingleStep(DOUBLE_STEP);
+                value = spin;
+            }
+            else
+            {
+                value = new QLineEdit(listParameters);
+            }
 
-    QPushButton *calculate = new QPushButton("Calculate", listParameters);
-    listLayout->addWidget(calculate, 2 + itemNames.size(), 0, 1, -1);
+            listLayout->addWidget(name, i+2, 0);
+            listLayout->addWidget(value, i+2, 1);
+        }
+
+        QPushButton *calculate = new QPushButton("Calculate", listParameters);
+        listLayout->addWidget(calculate, 2 + itemNames.size(), 0, 1, -1);
+    }
 
     this->setCentralWidget(listParameters);
 }

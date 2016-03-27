@@ -81,6 +81,7 @@ private: // singleton
     friend class ApplicationManager;
     friend class CalculationManager;
     friend class Calculation;
+    friend class AddCalculationWindow;
 
     QDir _plugins_dir;
     PluginProcessList _processes;

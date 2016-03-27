@@ -23,7 +23,8 @@ private:
      */
     const double DOUBLE_STEP = 0.01;
 
-    void updateOptions(QString selectedPlugin, QStringList itemNames, QStringList itemTypes);
+    void updateOptions(QString selectedPlugin, QStringList itemNames = QStringList(),
+                       QStringList itemTypes = QStringList());
 
 signals:
 
