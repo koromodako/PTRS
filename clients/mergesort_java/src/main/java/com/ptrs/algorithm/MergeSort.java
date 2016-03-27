@@ -6,7 +6,7 @@ public class MergeSort {
 	 * Sort array src by using a mergesort algorithm. src will represent the sorted array after the execution of the method
 	 * @param src
 	 */
-	public static void mergeSort(int src[]) {
+	public static void mergeSort(int[] src) {
 		mergeSort(src, src, 0, src.length);
 	}
 	
@@ -18,7 +18,7 @@ public class MergeSort {
 	 * @param low The start index from which to sort the src array
 	 * @param high The end index to which the src array needs to be sorted
 	 */
-	public static void mergeSort(int src[], int dest[], int low, int high) {
+	public static void mergeSort(int[] src, int[] dest, int low, int high) {
 		int length = high - low;
 		int dummy1, dummy2;
 
@@ -67,12 +67,44 @@ public class MergeSort {
 	}
 	
 	/**
+	 * Merge two arrays that have already been sorted
+	 * @param firstHalf A sorted array
+	 * @param secondHalf A sorted array
+	 * @return
+	 */
+	public static int[] merge(int[] firstHalf, int[] secondHalf) {
+		int lastValueOfFirstHalf = firstHalf[firstHalf.length - 1];
+		int firstValueOfSecondHalf = secondHalf[0];
+		
+		if(lastValueOfFirstHalf <= firstValueOfSecondHalf) {
+			// TODO Returned merged array
+			int ar[] = {1};
+			return ar;
+		}
+		
+		// TODO Fix size with both lengths
+		int totalLength = firstHalf.length + secondHalf.length;
+		int[] mergedArray = new int[totalLength];
+		
+		for (int i = 0, iFH = 0, iSH = 0; i < totalLength; i++) {
+			if(iFH >= firstHalf.length || (iSH < secondHalf.length && firstHalf[iFH] > secondHalf[iSH])) {
+				mergedArray[i] = secondHalf[iSH++];
+			}
+			else {
+				mergedArray[i] = firstHalf[iFH++];
+			}
+		}
+		
+		return mergedArray;
+	}
+	
+	/**
 	 * Swap values at index i and j in array x
 	 * @param x
 	 * @param i
 	 * @param j
 	 */
-	private static void swap(int x[], int i, int j) {
+	private static void swap(int[] x, int i, int j) {
 		int t = x[i];
 		x[i] = x[j];
 		x[j] = t;
