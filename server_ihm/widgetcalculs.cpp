@@ -42,7 +42,7 @@ WidgetCalculs::WidgetCalculs(QWidget *parent) : QWidget(parent)
     layout->addWidget(newCalc);
     layout->setAlignment(newCalc, Qt::AlignRight);
 
-    connect(newCalc, QPushButton::clicked, this, Slot_newcalculation);
+    connect(newCalc, SIGNAL(clicked()), this, SLOT(Slot_newcalculation()));
 
     // Bouton ajouter
 
