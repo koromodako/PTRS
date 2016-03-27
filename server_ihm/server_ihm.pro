@@ -15,10 +15,12 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     widgetclients.cpp \
-    widgetcalculs.cpp
+    widgetcalculs.cpp \
+    addcalculationwindow.cpp
 
 HEADERS  += mainwindow.h \
     widgetclients.h \
-    widgetcalculs.h
+    widgetcalculs.h \
+    addcalculationwindow.h
 
 FORMS    += mainwindow.ui

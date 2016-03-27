@@ -1,12 +1,9 @@
 #ifndef CALCULATION_H
 #define CALCULATION_H
 
+#include "fragment.h"
 #include "../const.h"
-#include "../utils/abstractidentifiable.h"
 #include <QHash>
-#include <QVariantMap>
-#include <QJsonDocument>
-#include <QJsonObject>
 
 /**
  * @brief Cette classe représente un calcul distribuable
@@ -22,7 +19,6 @@ public:
         BEING_SPLITTED,
         SCHEDULED,
         BEING_COMPUTED,
-        COMPUTED,
         BEING_JOINED,
         COMPLETED,
         CANCELED,
@@ -48,12 +44,6 @@ public:
      * @return
      */
     inline const QString & GetBin() const { return _bin; }
-
-    /**
-     * @brief Paramètres nécessaires à l'execution du calcul
-     * @return
-     */
-    inline const QVariantMap & GetParams() const { return _params; }
 
     /**
      * @brief Retourne le résultat du calcul
@@ -90,10 +80,10 @@ public:
     void Cancel();
 
     /**
-    * @brief Retourne la progression du calcul
-    * @return un entier entre 0 et 100
-    */
-    inline int GetProgress() const;
+     * @brief Cette méthode est appelée quand le calcul à crashé
+     * @param error message d'erreur
+     */
+    void Crashed(QString error);
 
     /**
      * @brief Cette méthode est appelée une fois le calcul fragmenté
@@ -109,27 +99,9 @@ public:
 
 public slots:
     /**
-     * @brief Ce slot est appelée une fois le calcul effectué
-     * @param json résultat en provenance du client
-     */
-    void Slot_computed(const QByteArray &json);
-
-    /**
-     * @brief Ce slot est appelée quand le calcul à crashé
-     * @param error message d'erreur
-     */
-    void Slot_crashed(QString error);
-
-    /**
      * @brief Cette méthode est appelée quand le calcul commence
      */
     void Slot_started();
-
-    /**
-     * @brief Ce slot met à jour l'avancement d'un calcul
-     * @param le nouvel avancement du calcul
-     */
-    void Slot_updateProgress(int progression);
 
 signals:
     /**
@@ -144,31 +116,31 @@ signals:
      * @param idCalculation l'id de ce calcul
      * @param value Avancement entre 0 et 100
      */
-    void sig_calculationProgressUpdated(QUuid idCalculation, int value);
+    void sig_scheduled(const Fragment *fragment);
 
     /**
      * @brief Emis quand l'état d'un calcul est mis à jour
      * @param idCalculation l'id de ce calcul
      * @param state le nouvel état du calcul
      */
-    void sig_calculationStateUpdated(QUuid idCalculation, Calculation::State state);
+    void sig_stateUpdated(QUuid idCalculation, Calculation::State state);
 
     /**
-     * @brief Ce signal est émis lorsque le calcul doit être annulé
+     * @brief Ce signal est émis quand l'avancement du calcul est mis à jour
      */
-    void sig_canceled();
-
-    /**
-     * @brief Ce signal est émis lorsque le calcul est prêt à être distribué
-     * @param fragment fragment que le client devra calculer
-     */
-    void sig_scheduled(const Calculation *fragment);
+    void sig_progressUpdated(QUuid idFragment, int value);
 
 private:
     /**
      * @brief Modifie l'état actuel
      */
     void setCurrentState(Calculation::State state);
+
+    /**
+     * @brief Cette méthode met à jour l'avancement d'un calcul
+     * @param le nouvel avancement du calcul
+     */
+    void updateProgress(int progress);
 
     // non instanciable autrement qu'en fabrique et non copiable
     Calculation(const QString &bin, const QVariantMap &params, QObject * parent = NULL);
@@ -178,7 +150,7 @@ private slots:
     /**
      * @brief Mais à jour la progression du calcul quand la progression d'un des fragments a évolué
      */
-    void slot_updateChildrenProgress();
+    void slot_updateChildrenProgress(int oldChildProgress, int newChildProgress);
 
 private:
 
@@ -186,15 +158,8 @@ private:
     State _state;
     QString _bin;
     QVariantMap _params;
+    QHash<QUuid,Fragment*> _fragments;
     int _progress;
-    QHash<QUuid,Calculation*> _fragments;
     QJsonObject _result;
 };
-
-
-
-inline int Calculation::GetProgress() const
-{
-    return _progress;
-}
 #endif // CALCULATION_H

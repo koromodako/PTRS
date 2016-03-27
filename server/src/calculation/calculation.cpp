@@ -54,8 +54,7 @@ QString Calculation::ToJson(QJsonDocument::JsonFormat format) const
 QString Calculation::FragmentsResultsToJson(QJsonDocument::JsonFormat format) const
 {   QJsonArray array;
 
-
-    foreach(Calculation *c, _fragments)// -- pour chaque fragment
+    foreach(Fragment *c, _fragments)// -- pour chaque fragment
         array.append(c->GetResult());
 
     return QJsonDocument(array).toJson(format);
@@ -63,10 +62,14 @@ QString Calculation::FragmentsResultsToJson(QJsonDocument::JsonFormat format) co
 
 void Calculation::Cancel()
 {
-    LOG_DEBUG("Entering state BEING_CANCELED.");
+    LOG_DEBUG("Entering state CANCELED.");
     setCurrentState(CANCELED);
-    LOG_DEBUG("sig_canceled() emitted.");
-    emit sig_canceled();
+    updateProgress(100);
+
+    LOG_DEBUG("sig_canceled() emitted for all children.");
+    QHash<QUuid,Fragment*>::const_iterator fragment;
+    for(fragment = _fragments.constBegin() ; fragment != _fragments.constEnd() ; fragment++)
+        emit fragment.value()->sig_canceled();
 }
 
 void Calculation::Splitted(const QByteArray & json)
@@ -84,10 +87,10 @@ void Calculation::Splitted(const QByteArray & json)
     foreach (QJsonValue fragment, fragments)
     {
         QString error;
-        Calculation * frag = Calculation::FromJson(this, QJsonDocument(fragment.toObject()).toJson(QJsonDocument::Compact), error);
+        Fragment * frag = Fragment::FromJson(this, QJsonDocument(fragment.toObject()).toJson(QJsonDocument::Compact), error);
         if(frag != NULL)
         {   _fragments.insert(frag->GetId(), frag);
-            connect(frag, &Calculation::sig_calculationProgressUpdated, this, &Calculation::slot_updateChildrenProgress);
+            connect(frag, &Fragment::sig_progressUpdated, this, &Calculation::slot_updateChildrenProgress);
         }
         else
         {   LOG_ERROR("fragment creation failed !");
@@ -101,15 +104,9 @@ void Calculation::Splitted(const QByteArray & json)
     setCurrentState(SCHEDULED);
     LOG_DEBUG("SIG_SCHEDULED() emitted.");
 
-    QHash<QUuid,Calculation*>::const_iterator fragment;
+    QHash<QUuid,Fragment*>::const_iterator fragment;
     for(fragment = _fragments.constBegin() ; fragment != _fragments.constEnd() ; fragment++)
         emit sig_scheduled(fragment.value());
-}
-
-void Calculation::Slot_started()
-{
-    LOG_DEBUG("Entering state BEING COMPUTED.");
-    setCurrentState(BEING_COMPUTED);
 }
 
 void Calculation::Joined(const QByteArray &json)
@@ -121,6 +118,7 @@ void Calculation::Joined(const QByteArray &json)
     if(jsonError.error != QJsonParseError::NoError)
     {   LOG_ERROR("an error occured while parsing joined json block.");
         setCurrentState(CRASHED);
+        updateProgress(0);
         return;
     }
     _result = doc.object();
@@ -136,46 +134,28 @@ void Calculation::Joined(const QByteArray &json)
     emit sig_calculationDone(GetId(), GetResult());
 }
 
-void Calculation::Slot_computed(const QByteArray & json)
-{
-    LOG_DEBUG(QString("Computed received json=%1").arg(QString(json)));
-
-    QJsonParseError jsonError;
-    QJsonDocument doc = QJsonDocument::fromJson(json, &jsonError);
-    if(jsonError.error != QJsonParseError::NoError)
-    {   LOG_ERROR("an error occured while parsing fragment result json block.");
-        setCurrentState(CRASHED);
-        return;
-    }
-    _result = doc.object();
-
-    // mise à jour de l'état du calcul
-    LOG_DEBUG("Entering state COMPUTED.");
-
-    Slot_updateProgress(100);
-    setCurrentState(COMPUTED);
-}
-
-void Calculation::Slot_crashed(QString error)
+void Calculation::Crashed(QString error)
 {
     LOG_ERROR(QString("Calculation crashed due to the following reason : %1").arg(error.isEmpty() ? "<unknown_reason>" : error));
     // mise à jour de l'état du calcul
     LOG_DEBUG("Entering state CRASHED.");
-    Slot_updateProgress(0);
+    updateProgress(0);
     setCurrentState(CRASHED);
 }
 
-void Calculation::Slot_updateProgress(int progress)
+void Calculation::Slot_started()
 {
-    LOG_DEBUG("New progress for " + GetId().toString() + " : " + QString::number(progress));
-    _progress = progress % 101;
-    emit sig_calculationProgressUpdated(GetId(), _progress);
+    if (_state == SCHEDULED)
+    {
+        LOG_DEBUG("Entering state BEING COMPUTED.");
+        setCurrentState(BEING_COMPUTED);
+    }
 }
 
 void Calculation::setCurrentState(Calculation::State state)
 {
     _state = state;
-    emit sig_calculationStateUpdated(GetId(), _state);
+    emit sig_stateUpdated(GetId(), _state);
 }
 
 Calculation::Calculation(const QString & bin, const QVariantMap &params, QObject * parent) :
@@ -183,22 +163,26 @@ Calculation::Calculation(const QString & bin, const QVariantMap &params, QObject
     _state(BEING_SPLITTED),
     _bin(bin),
     _params(params),
-    _progress(0),
-    _fragments()
+    _fragments(),
+    _progress(0)
 {
 }
 
-void Calculation::slot_updateChildrenProgress()
+void Calculation::slot_updateChildrenProgress(int oldChildProgress, int newChildProgress)
 {
-    _progress = 0;
-    foreach(Calculation *c, _fragments)
-        _progress += c->GetProgress();
-    Slot_updateProgress (_progress / _fragments.size());
+    updateProgress(_progress - oldChildProgress + newChildProgress);
 
-    if (_progress == 100)//Si tous les fragments on terminé le calcul...
+    if (_progress/_fragments.size() >= 100)//Si tous les fragments on terminé le calcul...
     {
         LOG_DEBUG("Entering state BEING_JOINED.");
         setCurrentState(BEING_JOINED);
         PluginManager::getInstance().Join(this);
     }
+}
+
+void Calculation::updateProgress(int progress)
+{
+    LOG_DEBUG("New progress for " + GetId().toString() + " : " + QString::number(progress/_fragments.size()));
+    _progress = progress;
+    emit sig_progressUpdated(GetId(), _progress/_fragments.size());
 }
