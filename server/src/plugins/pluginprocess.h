@@ -12,10 +12,9 @@ public:
      * @brief Cette énumération définit les différentes opération qui peuvent être effectuées
      *          sur un calcul par un plugin
      */
-    enum Operation {
+    enum CalculationOperation {
         SPLIT,  ///< Opération de fragmentation d'un calcul
         JOIN,   ///< Opération d'aggrégation des résultats
-        CALC,   ///< Opération de calcul pour un fragment donné
         UI      ///< Opération de récupération de la description de l'interface utilisateur
     };
     /**
@@ -25,7 +24,8 @@ public:
      * @param op
      *      Opération réalisée par le plugin sur le calcul passé en paramètre
      */
-    PluginProcess(QString absExecDir, Calculation * calc, Operation op, QObject * parent = NULL);
+    PluginProcess(QString absExecDir, Calculation * calc, CalculationOperation op, QObject * parent = NULL);
+    PluginProcess(QString absExecDir, Fragment *calc, QObject *parent = NULL);
     ~PluginProcess(){} //do not delete calc here
     /**
      * @brief Démarre l'exécution du plugin
@@ -40,15 +40,15 @@ private slots:
      * @param error
      *      Code d'erreur renvoyé par le processus
      */
-    void SLOT_ERROR(QProcess::ProcessError error);
+    void Slot_error(QProcess::ProcessError error);
     /**
-     * @brief Ce slot reçoit les notifications de fin d'execution du plugin
+     * @brief Ce slot reçoit les notifications de fin d'execution du plugin pour un calcul
      * @param exitCode
      *      Code de fin du processus
      * @param exitStatus
      *      Satut de fin du processus
      */
-    void SLOT_FINISHED(int exitCode, QProcess::ExitStatus exitStatus);
+    void Slot_calcFinished(int exitCode, QProcess::ExitStatus exitStatus);
 
 private:
     /**
@@ -70,7 +70,8 @@ private:
 
     QString _absExecDir;
     Calculation * _calculation;
-    Operation _op;
+    Fragment * _fragment;
+    CalculationOperation _op;
     QString _out;
     QString _err;
 };

@@ -106,7 +106,7 @@ void NetworkManager::Slot_init()
     emit sig_started();
 }
 
-void NetworkManager::Slot_startCalcul(const Calculation *fragment)
+void NetworkManager::Slot_startCalcul(const Fragment *fragment)
 {
     QSet<ClientSession *>::iterator it = _availableClients.begin();
     bool add = false;

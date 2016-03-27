@@ -48,7 +48,7 @@ public:
      * @brief Retourne un pointeur vers le calcul actuellement fait par
      *        le client ou NULL
      */
-    inline const Calculation *GetFragment() const;
+    inline const Fragment *GetFragment() const;
 
     /**
      * @brief Demande au client de démarrer le calcul donné
@@ -57,7 +57,7 @@ public:
      * @param args les arguments de calcul à transmettre au client
      * @return true si le calcul à pu démarrer, false sinon (si un calcul est déja en cours)
      */
-    bool StartCalcul(const Calculation *fragment);
+    bool StartCalcul(const Fragment *fragment);
 
 public slots:
     /**
@@ -76,7 +76,7 @@ signals:
      * @brief Emit quand un fragment à fini avec succès son calcul
      * @param json les résultat du calcul transmis par le client
      */
-    void sig_calculDone(const QByteArray &json);
+    void sig_calculDone(const QJsonObject &json);
 
     /**
      * @brief Emit quand le client s'est déconnecté
@@ -100,7 +100,7 @@ signals:
      *        a été donné.
      * @param calculation Le calcul en question
      */
-    void sig_unableToCalculate(const Calculation *calculation);
+    void sig_unableToCalculate(const Fragment *calculation);
 
     /**
      * @brief Emis quand le client commence à faire un calcul.
@@ -165,13 +165,13 @@ private:
     AbstractState *_currentState;
     QMap<QObject *, AbstractState *> _doneTransitionsMap;
     QMap<QObject *, AbstractState *> _errorTransitionsMap;
-    const Calculation *_fragment;
+    const Fragment *_fragment;
     QSet<QString> _missingPlugins;
     QTcpSocket *_socket;
     msg_size_t _blockSize;
 };
 
-inline const Calculation *ClientSession::GetFragment() const
+inline const Fragment *ClientSession::GetFragment() const
 {
     return _fragment;
 }

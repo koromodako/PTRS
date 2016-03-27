@@ -43,6 +43,11 @@ public:
      * @param calc
      */
     void Join(Calculation * calc);
+    /**
+     * @brief Lance la procédure de récupération de l'interface utilisateur
+     * @param calc
+     */
+    void Ui(Calculation * calc);
 
 private:
     /**
@@ -50,7 +55,7 @@ private:
      * @param program
      * @param args
      */
-    void startProcess(Calculation * calc, PluginProcess::Operation op);
+    void startCalcProcess(Calculation * calc, PluginProcess::CalculationOperation op);
 
 signals:
     /**

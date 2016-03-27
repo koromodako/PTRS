@@ -51,15 +51,20 @@ QStringList PluginManager::GetPluginsList() const
 
 void PluginManager::Split(Calculation *calc)
 {   // -- lancement du processus associé
-    startProcess(calc, PluginProcess::SPLIT);
+    startCalcProcess(calc, PluginProcess::SPLIT);
 }
 
 void PluginManager::Join(Calculation *calc)
 {   // -- lancement du processus associé
-    startProcess(calc, PluginProcess::JOIN);
+    startCalcProcess(calc, PluginProcess::JOIN);
 }
 
-void PluginManager::startProcess(Calculation * calc, PluginProcess::Operation op)
+void PluginManager::Ui(Calculation *calc)
+{   // -- lancement du processus associé
+    startCalcProcess(calc, PluginProcess::UI);
+}
+
+void PluginManager::startCalcProcess(Calculation * calc, PluginProcess::CalculationOperation op)
 {
     // -- création d'un nouveau processus
     PluginProcess * cp = new PluginProcess(_plugins_dir.absolutePath(), calc, op);
@@ -68,7 +73,7 @@ void PluginManager::startProcess(Calculation * calc, PluginProcess::Operation op
     // -- lancement du processus
     if(!cp->Start())
     {   // on spécifie qu'il y a eu une erreur au niveau de l'execution (elle n'a pas eu lieu)
-        calc->Slot_crashed("Plugin type is script but no interpreter was found : process execution skipped !");
+        calc->Crashed("Plugin type is script but no interpreter was found : process execution skipped !");
         // interruption de la routine
         return;
     }
@@ -92,13 +97,12 @@ void PluginManager::startProcess(Calculation * calc, PluginProcess::Operation op
         cp->write(CS_EOF);
         cp->write(CS_CRLF);
         break;
-    case PluginProcess::CALC: // utile côté client
-        cp->write(CS_OP_CALC);
-        cp->write(CS_CRLF);
-        cp->write(calc->ToJson().toUtf8().data()); // ici calc est supposé être un fragment
+    case PluginProcess::UI: // utile côté serveur
+        cp->write(CS_OP_PARAM);
         cp->write(CS_CRLF);
         cp->write(CS_EOF);
         cp->write(CS_CRLF);
+        break;
     default:
         LOG_CRITICAL("Processus started without arguments : unhandled operation is the cause !");
         break;

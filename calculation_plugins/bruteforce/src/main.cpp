@@ -1,4 +1,5 @@
 #include "../../server/src/calculation/specs.h"
+#include "bruteforce_specs.h"
 #include "splitter.h"
 #include "joiner.h"
 #include "computer.h"
@@ -10,8 +11,14 @@
 #include <QTextStream>
 #include <stdio.h>
 
+#include <QJsonDocument>
+#include <QJsonArray>
+#include <QJsonValue>
+#include <QJsonObject>
+
 void success(std::string response);
 void fail(std::string msg);
+static QJsonValue getParam(QString name, QString type);
 
 int main(int argc, char *argv[])
 {
@@ -50,6 +57,22 @@ int main(int argc, char *argv[])
         {   fail(computer.error().toStdString());
         }
     }
+    else if(QString::compare(action, CS_OP_PARAM, Qt::CaseInsensitive) == 0)
+    {
+        QJsonDocument retDocument;
+
+        QJsonArray listParams;
+
+        listParams += getParam(PARAM_CHARSET, CS_TYPE_STRING);
+        listParams += getParam(PARAM_MIN_LEN, CS_TYPE_INT);
+        listParams += getParam(PARAM_MAX_LEN, CS_TYPE_INT);
+        listParams += getParam(PARAM_HASH_F, CS_TYPE_STRING);
+        listParams += getParam(PARAM_TARGET, CS_TYPE_STRING);
+
+        retDocument.setArray(listParams);
+
+        success(QString(retDocument.toJson(QJsonDocument::Compact)).toStdString());
+    }
     else
     {   fail("Unknown operation.");
     }
@@ -65,4 +88,13 @@ void success(std::string response)
 void fail(std::string msg)
 {   std::cerr << msg << std::endl;
     exit(EXIT_FAILURE);
+}
+
+static QJsonValue getParam(QString name, QString type)
+{
+    QJsonObject obj;
+    obj.insert(CS_PLUGINPARAMS_NAME, name);
+    obj.insert(CS_PLUGINPARAMS_TYPE, type);
+
+    return obj;
 }
