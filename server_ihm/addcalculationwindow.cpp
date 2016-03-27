@@ -22,7 +22,7 @@ AddCalculationWindow::AddCalculationWindow(QWidget *parent) : QMainWindow(parent
 
 void AddCalculationWindow::updateOptions(QString selectedPlugin, QStringList itemNames, QStringList itemTypes)
 {
-    QString pluginNames [] { "bruteforce", "mergesort" };
+    QString pluginNames [] = { "bruteforce", "mergesort" };
     int pluginCount = 2;
 
     //liste de paramètres pour le plugin actuel
@@ -47,8 +47,8 @@ void AddCalculationWindow::updateOptions(QString selectedPlugin, QStringList ite
     listLayout->addWidget(pluginTitle, 0, 0);
     listLayout->addWidget(pluginList, 0, 1);
 
-    connect(pluginList, static_cast<void(QComboBox::*)(const QString &)>(&QComboBox::currentIndexChanged),
-        this, AddCalculationWindow::Slot_pickedAnotherPlugin);
+    connect(pluginList, SIGNAL(static_cast<void(QComboBox::*)(const QString &)>(&QComboBox::currentIndexChanged())),
+        this, SLOT(AddCalculationWindow::Slot_pickedAnotherPlugin()));
 
     QFrame* line = new QFrame(listParameters);
     line->setFrameShape(QFrame::HLine);
