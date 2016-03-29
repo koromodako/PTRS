@@ -73,21 +73,24 @@ public class MergeSort {
 	 * @return
 	 */
 	public static int[] merge(int[] firstHalf, int[] secondHalf) {
-		int lastValueOfFirstHalf = firstHalf[firstHalf.length - 1];
+		int firstHalfLength = firstHalf.length;
+		int secondHalfLength = secondHalf.length;
+		
+		int lastValueOfFirstHalf = firstHalf[firstHalfLength - 1];
 		int firstValueOfSecondHalf = secondHalf[0];
 		
-		if(lastValueOfFirstHalf <= firstValueOfSecondHalf) {
-			// TODO Returned merged array
-			int ar[] = {1};
-			return ar;
-		}
-		
 		// TODO Fix size with both lengths
-		int totalLength = firstHalf.length + secondHalf.length;
+		int totalLength = firstHalfLength + secondHalfLength;
 		int[] mergedArray = new int[totalLength];
 		
+		if(lastValueOfFirstHalf <= firstValueOfSecondHalf) {
+			System.arraycopy(firstHalf, 0, mergedArray, 0, firstHalfLength);
+			System.arraycopy(secondHalf, 0, mergedArray, firstHalfLength, secondHalfLength);
+			return mergedArray;
+		}
+		
 		for (int i = 0, iFH = 0, iSH = 0; i < totalLength; i++) {
-			if(iFH >= firstHalf.length || (iSH < secondHalf.length && firstHalf[iFH] > secondHalf[iSH])) {
+			if(iFH >= firstHalfLength || (iSH < secondHalfLength && firstHalf[iFH] > secondHalf[iSH])) {
 				mergedArray[i] = secondHalf[iSH++];
 			}
 			else {

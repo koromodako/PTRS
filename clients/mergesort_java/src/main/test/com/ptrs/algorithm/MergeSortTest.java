@@ -4,6 +4,7 @@ import java.util.Random;
 
 import com.google.gson.Gson;
 import com.ptrs.operation.Calculator;
+import com.ptrs.operation.Merger;
 import com.ptrs.operation.Splitter;
 import com.ptrs.util.CalculationBlock;
 
@@ -15,7 +16,8 @@ public class MergeSortTest {
 //		sortedArrayTest();
 //		mergeArraysTest();
 //		splitTest();
-		mergeSortFromJsonTest();
+//		mergeSortFromJsonTest();
+		mergerTest();
 	}
 	
 	private static void smallArrayTest() {
@@ -89,6 +91,24 @@ public class MergeSortTest {
 		
 		String jsonResult = Calculator.mergeSortFromJson(json);
 		System.out.println(jsonResult);
+	}
+	
+	private static void mergerTest() {
+		Gson gson = new Gson();
+		int[] arr = {6,3,2,4,5, 6, 7, 8, 9, 10};
+		CalculationBlock cb = new CalculationBlock(1, arr, 11);
+		
+		String json = gson.toJson(cb);
+		System.out.println(json);
+		
+		String jsonResult = Calculator.mergeSortFromJson(json);
+		
+		jsonResult = "[" + jsonResult + "," + jsonResult + "]";
+		System.out.println(jsonResult);
+		
+		String mergedResult = Merger.mergeFromJson(jsonResult);
+		System.out.println(mergedResult);
+		
 	}
 		
 		
