@@ -4,6 +4,7 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 import com.ptrs.algorithm.MergeSort;
 import com.ptrs.util.CalculationBlock;
@@ -17,9 +18,28 @@ public class Calculator {
 		    .create();
 
 	public static String mergeSortFromJson(String json) {
-		JsonElement paramsJson = new JsonParser().parse(json).getAsJsonObject();
+		JsonElement jsonElement = null;
+		try {
+			jsonElement = new JsonParser().parse(json);
+		} 
+		catch (JsonParseException e) {
+			System.err.println("Misformed JSON, can't parse it : " + e.getMessage());
+			return null;
+		}
+		
+		if(jsonElement == null || !jsonElement.isJsonObject()) {
+			System.err.println("Misformed JSON, can't further proceed fragment : " + json);
+			return null;
+		}
+		
+		JsonElement paramsJson = jsonElement.getAsJsonObject();
 		
 		CalculationBlock calculationBlock = gson.fromJson(paramsJson, CalculationBlock.class);
+		
+		if(calculationBlock == null) {
+			return null;
+		}
+		
 		CalculationBlockParams cbParams = calculationBlock.getParams();
 		
 		int[] arrayToSort = cbParams.getValues();

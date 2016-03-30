@@ -7,6 +7,7 @@ import com.ptrs.operation.Calculator;
 import com.ptrs.operation.Merger;
 import com.ptrs.operation.Splitter;
 import com.ptrs.util.CalculationBlock;
+import com.ptrs.util.CalculationResultBlock;
 
 public class MergeSortTest {
 	
@@ -93,7 +94,7 @@ public class MergeSortTest {
 		System.out.println(jsonResult);
 	}
 	
-	private static void mergerTest() {
+	private static void mergerDuplicatesTest() {
 		Gson gson = new Gson();
 		int[] arr = {6,3,2,4,5, 6, 7, 8, 9, 10};
 		CalculationBlock cb = new CalculationBlock(1, arr, 11);
@@ -107,6 +108,22 @@ public class MergeSortTest {
 		System.out.println(jsonResult);
 		
 		String mergedResult = Merger.mergeFromJson(jsonResult);
+		System.out.println(mergedResult);
+		
+	}
+	
+	private static void mergerTest() {
+		Gson gson = new Gson();
+		int[] arr1 = {1, 2, 3, 4, 5, 6, 28};
+		int[] arr2 = {0, 7, 8, 9, 10, 11, 12};
+		
+		CalculationResultBlock crb = new CalculationResultBlock(1, arr1);
+		CalculationResultBlock crb2 = new CalculationResultBlock(2, arr2);
+		
+		String json = "[" + gson.toJson(crb) + ", " + gson.toJson(crb2) + "]";
+		System.out.println(json);
+		
+		String mergedResult = Merger.mergeFromJson(json);
 		System.out.println(mergedResult);
 		
 	}

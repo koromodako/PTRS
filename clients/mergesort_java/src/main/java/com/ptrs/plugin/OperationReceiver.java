@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import com.google.gson.JsonParseException;
 import com.ptrs.operation.Calculator;
 import com.ptrs.operation.Merger;
 import com.ptrs.operation.Splitter;
@@ -24,9 +25,14 @@ public class OperationReceiver {
 			    json += line;
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.err.println("An error occured while reading user's standard input : " + e.getMessage());
 		}
+		
+		if(action == null) {
+			System.err.println("Program exited before any command was given");
+			System.exit(1);
+		}
+		
 		String jsonResult = null;
 		switch(action) {
 			case ACTION_JOIN:
@@ -36,14 +42,19 @@ public class OperationReceiver {
 				jsonResult = Splitter.splitFromJson(json);
 				break;
 			case ACTION_COMPUTE:
-				jsonResult = Calculator.mergeSortFromJson(null);
+				jsonResult = Calculator.mergeSortFromJson(json);
 				break;
 			default:
-					
+				// Undefined action
+				System.err.println("Undefined action, exiting. List of actions are split, calc, and join.");
+				System.exit(1);
 		}
 		
 		if(jsonResult != null) {
 			System.out.println(jsonResult);
+		}
+		else {
+			System.exit(1);
 		}
 		
 		// Exit on success

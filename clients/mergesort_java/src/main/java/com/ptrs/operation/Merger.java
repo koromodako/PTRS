@@ -1,6 +1,5 @@
 package com.ptrs.operation;
 
-import java.util.Iterator;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
@@ -9,8 +8,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
-import com.ptrs.algorithm.MergeSort;
 import com.ptrs.util.CalculationResultBlock;
 
 public class Merger {
@@ -20,7 +19,21 @@ public class Merger {
 		    .create();
 	
 	public static String mergeFromJson(String json) {
-		JsonArray resultsArray = new JsonParser().parse(json).getAsJsonArray();
+		JsonElement jsonElement = null;
+		try {
+			jsonElement = new JsonParser().parse(json);
+		} 
+		catch (JsonParseException e) {
+			System.err.println("Misformed JSON, can't parse it : " + e.getMessage());
+			return null;
+		}
+		
+		if(jsonElement == null || !jsonElement.isJsonArray()) {
+			System.err.println("Misformed JSON, can't further proceed fragment : " + json);
+			return null;
+		}
+		
+		JsonArray resultsArray = jsonElement.getAsJsonArray();
 		
 		Queue<Entry> queue = new PriorityQueue<>();
 		
@@ -29,6 +42,10 @@ public class Merger {
 			JsonElement resultJson = resultsArray.get(i);
 			
 			CalculationResultBlock calculationResultBlock = gson.fromJson(resultJson, CalculationResultBlock.class);
+			if(calculationResultBlock == null) {
+				continue;
+			}
+			
 			int[] sortedArray = calculationResultBlock.getResult();
 			
 			if(sortedArray.length > 0) {
@@ -49,22 +66,17 @@ public class Merger {
 			if (entry.readNext()) {
 				queue.add(entry);
 			}
-			
 		}
 		
 		return gson.toJson(new CalculationResultBlock(0, finalSortedArray));
 	}
 	
-	private static int[] mergeTwoJsonElements(JsonElement firstResultJson, JsonElement secondResultJson) {
-		CalculationResultBlock calculationFirstResultBlock = gson.fromJson(firstResultJson, CalculationResultBlock.class);
-		int[] firstResult = calculationFirstResultBlock.getResult();
-		
-		CalculationResultBlock calculationSecondResultBlock = gson.fromJson(firstResultJson, CalculationResultBlock.class);
-		int[] secondResult = calculationSecondResultBlock.getResult();
-		
-		return MergeSort.merge(firstResult, secondResult);
-	}
-	
+	/**
+	 * Nested class to provide an abstraction for the min-heap implementation, represents an entry with an array and index associated
+	 * Enables the min-heap to go through the array a step at a time
+	 * @author jonathan
+	 *
+	 */
 	private static class Entry implements Comparable<Entry> {
 		private int[] array;
 		private int index;
@@ -92,7 +104,7 @@ public class Merger {
 		
 		@Override
 		public int compareTo(Entry entry) {
-			return this.array[index] - entry.array[index];
+			return this.array[index] - entry.getArrayValue();
 		}
 	}
 }
