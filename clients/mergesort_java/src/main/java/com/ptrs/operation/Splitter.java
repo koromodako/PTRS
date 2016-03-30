@@ -7,6 +7,7 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 import com.ptrs.json.PtrsConstants;
 import com.ptrs.util.CalculationBlock;
@@ -19,8 +20,26 @@ public class Splitter {
 		    .create();
 	
 	public static String splitFromJson(String json) {
-		JsonElement paramsJson = new JsonParser().parse(json).getAsJsonObject().get(PtrsConstants.CALC_PARAMS);
+		JsonElement jsonElement = null;
+		try {
+			jsonElement = new JsonParser().parse(json);
+		} 
+		catch (JsonParseException e) {
+			System.err.println("Misformed JSON, can't parse it : " + e.getMessage());
+			return null;
+		}
+		
+		if(jsonElement == null || !jsonElement.isJsonObject()) {
+			System.err.println("Misformed JSON, can't further proceed fragment : " + json);
+			return null;
+		}
+		
+		JsonElement paramsJson = jsonElement.getAsJsonObject().get(PtrsConstants.CALC_PARAMS);
 		CalculationBlockParams cbParams = gson.fromJson(paramsJson, CalculationBlockParams.class);
+		
+		if(cbParams == null) {
+			return null;
+		}
 		
 		int nbPartitions = cbParams.getPartitions();
 		if(nbPartitions == 0) {
