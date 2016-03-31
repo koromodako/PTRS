@@ -2,7 +2,7 @@
 #include "addcalculationwindow.h"
 #include <QtWidgets>
 
-WidgetCalculs::WidgetCalculs(QWidget *parent) : QWidget(parent)
+WidgetCalculs::WidgetCalculs(QWidget *parent) : QWidget(parent), addCalcWindow(NULL)
 {
 
     // --- Layout
@@ -52,6 +52,13 @@ WidgetCalculs::WidgetCalculs(QWidget *parent) : QWidget(parent)
 
 void WidgetCalculs::Slot_newcalculation()
 {
-    AddCalculationWindow *newCalculation = new AddCalculationWindow(this);
-    newCalculation->show();
+    if(addCalcWindow != NULL)
+    {
+        addCalcWindow->show();
+    }
+    else
+    {
+        addCalcWindow = new AddCalculationWindow(this);
+        addCalcWindow->show();
+    }
 }

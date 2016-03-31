@@ -30,6 +30,10 @@ signals:
 
 public slots:
     void Slot_pickedAnotherPlugin(QString name);
+
+private:
+    void fetchPluginParameters(QString name);
+
 };
 
 #endif // ADDCALCULATIONWINDOW_H

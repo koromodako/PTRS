@@ -1,5 +1,6 @@
 #include "addcalculationwindow.h"
 #include "../plugins/pluginmanager.h"
+#include "../utils/logger.h"
 #include <QGridLayout>
 #include <QWidget>
 #include <QLabel>
@@ -10,13 +11,31 @@
 #include <QVBoxLayout>
 #include <QFrame>
 #include <QPushButton>
+#include <QVariantMap>
+
+#include <QJsonArray>
+#include <QJsonObject>
+#include <QJsonDocument>
+#include <QJsonParseError>
+#include <QJsonValue>
+
+#include "../calculation/specs.h"
+
 
 AddCalculationWindow::AddCalculationWindow(QWidget *parent) : QMainWindow(parent)
 {
+    QStringList listPlugins = PluginManager::getInstance().GetPluginsList();
+    if(listPlugins.size() > 0)
+    {
+        this->updateOptions(listPlugins[0]);
+        this->fetchPluginParameters(listPlugins[0]);
 
-    this->updateOptions("bruteforce");
-
-    this->setWindowTitle("PTRS - New calculation");
+        this->setWindowTitle("PTRS - New calculation");
+    }
+    else
+    {
+        LOG_ERROR("No plugin to list!!");
+    }
 }
 
 void AddCalculationWindow::updateOptions(QString selectedPlugin, QStringList itemNames, QStringList itemTypes)
@@ -59,6 +78,8 @@ void AddCalculationWindow::updateOptions(QString selectedPlugin, QStringList ite
         QLabel *wait = new QLabel("Please wait...", listParameters);
 
         listLayout->addWidget(wait, 2, 0, 1, -1);
+
+        pluginList->setEnabled(false);
     }
     else
     {
@@ -97,16 +118,80 @@ void AddCalculationWindow::updateOptions(QString selectedPlugin, QStringList ite
 
 void AddCalculationWindow::Slot_pickedAnotherPlugin(QString name)
 {
-    if(name == "bruteforce")
+    fetchPluginParameters(name);
+}
+
+void AddCalculationWindow::fetchPluginParameters(QString name)
+{
+    //construire un calcul à partir de la fabrique
+    QJsonDocument document;
+    QJsonObject obj;
+    obj.insert(CS_JSON_KEY_CALC_BIN, name);
+    obj.insert(CS_JSON_KEY_CALC_PARAMS, QJsonObject());
+    document.setObject(obj);
+    QString error;
+    Calculation *calc = Calculation::FromJson(this, document.toJson(QJsonDocument::Compact), error);
+    if(!error.isEmpty())
     {
-        this->updateOptions(name,
-                            QStringList() << "Un" << "Deux" << "Trois",
-                            QStringList() << "int" << "string" << "double");
+        LOG_FATAL("Could not create calculation! Certainly a programming error");
+        LOG_FATAL(error);
+        return;
     }
-    else if(name == "mergesort")
+
+    //exécuter
+    QByteArray bytes = PluginManager::getInstance().Ui(calc);
+
+    QStringList itemNames;
+    QStringList itemTypes;
+
+
+    QJsonParseError jsonError;
+    QJsonDocument doc = QJsonDocument::fromJson(bytes, &jsonError);
+
+    QString errorStr;
+
+    if(!jsonError.error)
+    {   if(doc.isArray())
+        {   for(const QJsonValue field : doc.array())
+            {
+                if(field.isObject())
+                {
+                    QJsonObject oneObj = field.toObject();
+                    QJsonValue name = oneObj[CS_PLUGINPARAMS_NAME];
+                    QJsonValue type = oneObj[CS_PLUGINPARAMS_TYPE];
+
+                    if(!name.isString() || !type.isString())
+                    {
+                        errorStr = "A name or a type is missing or bad type in JSON object.";
+                        break;
+                    }
+                    else
+                    {
+                        itemNames << name.toString();
+                        itemTypes << type.toString();
+                    }
+                }
+                else
+                {
+                    errorStr = "One item in array is not an object.";
+                    break;
+                }
+            }
+        }
+        else
+        {   errorStr = "Given JSON block is not an array.";
+        }
+    }
+    else
+    {   errorStr = jsonError.errorString();
+    }
+
+    if(errorStr.isEmpty())
     {
-        this->updateOptions(name,
-                            QStringList() << "list",
-                            QStringList() << "string");
+        updateOptions(name, itemNames, itemTypes);
+    }
+    else
+    {
+        LOG_ERROR(errorStr);
     }
 }

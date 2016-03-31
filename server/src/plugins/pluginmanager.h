@@ -45,17 +45,19 @@ public:
     void Join(Calculation * calc);
     /**
      * @brief Lance la procédure de récupération de l'interface utilisateur
-     * @param calc
+     * @param calc "Calcul" donnant le plugin duquel nous devons récupérer des paramètres
+     * @return La sortie renvoyée par le plugin
      */
-    void Ui(Calculation * calc);
+    QByteArray Ui(Calculation * calc);
 
 private:
     /**
      * @brief Démarre un nouveau processus pour un calcul
      * @param program
      * @param args
+     * @return La sortie renvoyée par le plugin (utile pour ui)
      */
-    void startCalcProcess(Calculation * calc, PluginProcess::CalculationOperation op);
+    QByteArray startCalcProcess(Calculation * calc, PluginProcess::CalculationOperation op);
 
 signals:
     /**

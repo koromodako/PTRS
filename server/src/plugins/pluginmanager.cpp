@@ -59,12 +59,12 @@ void PluginManager::Join(Calculation *calc)
     startCalcProcess(calc, PluginProcess::JOIN);
 }
 
-void PluginManager::Ui(Calculation *calc)
+QByteArray PluginManager::Ui(Calculation *calc)
 {   // -- lancement du processus associé
-    startCalcProcess(calc, PluginProcess::UI);
+    return startCalcProcess(calc, PluginProcess::UI);
 }
 
-void PluginManager::startCalcProcess(Calculation * calc, PluginProcess::CalculationOperation op)
+QByteArray PluginManager::startCalcProcess(Calculation * calc, PluginProcess::CalculationOperation op)
 {
     // -- création d'un nouveau processus
     PluginProcess * cp = new PluginProcess(_plugins_dir.absolutePath(), calc, op);
@@ -75,7 +75,7 @@ void PluginManager::startCalcProcess(Calculation * calc, PluginProcess::Calculat
     {   // on spécifie qu'il y a eu une erreur au niveau de l'execution (elle n'a pas eu lieu)
         calc->Crashed("Plugin type is script but no interpreter was found : process execution skipped !");
         // interruption de la routine
-        return;
+        return QByteArray();
     }
     // -- on attend que le process se lance
     cp->waitForStarted();
@@ -109,6 +109,8 @@ void PluginManager::startCalcProcess(Calculation * calc, PluginProcess::Calculat
     }
     // -- on attend la fin du processus
     cp->waitForFinished();
+
+    return cp->readAllStandardOutput();
 }
 
 void PluginManager::Slot_terminate()

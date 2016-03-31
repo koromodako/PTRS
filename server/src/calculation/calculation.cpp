@@ -182,7 +182,10 @@ void Calculation::slot_updateChildrenProgress(int oldChildProgress, int newChild
 
 void Calculation::updateProgress(int progress)
 {
-    LOG_DEBUG("New progress for " + GetId().toString() + " : " + QString::number(progress/_fragments.size()));
-    _progress = progress;
-    emit sig_progressUpdated(GetId(), _progress/_fragments.size());
+    if(!_fragments.isEmpty())
+    {
+        LOG_DEBUG("New progress for " + GetId().toString() + " : " + QString::number(progress/_fragments.size()));
+        _progress = progress;
+        emit sig_progressUpdated(GetId(), _progress/_fragments.size());
+    }
 }
