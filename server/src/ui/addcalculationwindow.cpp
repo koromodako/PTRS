@@ -4,9 +4,6 @@
 #include <QGridLayout>
 #include <QWidget>
 #include <QLabel>
-#include <QSpinBox>
-#include <QLineEdit>
-#include <QDoubleSpinBox>
 #include <QComboBox>
 #include <QVBoxLayout>
 #include <QFrame>
@@ -38,8 +35,34 @@ AddCalculationWindow::AddCalculationWindow(QWidget *parent) : QMainWindow(parent
     }
 }
 
+void AddCalculationWindow::showAndReset()
+{
+    if(!isVisible())
+    {
+        for(auto i = intSelectors.begin(); i != intSelectors.end(); i++)
+        {
+            i.value()->setValue(0);
+        }
+        for(auto i = doubleSelectors.begin(); i != doubleSelectors.end(); i++)
+        {
+            i.value()->setValue(0);
+        }
+        for(auto i = stringSelectors.begin(); i != stringSelectors.end(); i++)
+        {
+            i.value()->setText(QString());
+        }
+        show();
+    }
+}
+
 void AddCalculationWindow::updateOptions(QString selectedPlugin, QStringList itemNames, QStringList itemTypes)
 {
+    currentCalculationName = selectedPlugin;
+
+    intSelectors.clear();
+    doubleSelectors.clear();
+    stringSelectors.clear();
+
     QStringList pluginNames = PluginManager::getInstance().GetPluginsList();
 
     //liste de paramètres pour le plugin actuel
@@ -92,6 +115,7 @@ void AddCalculationWindow::updateOptions(QString selectedPlugin, QStringList ite
                 QSpinBox *spin = new QSpinBox(listParameters);
                 spin->setRange(-SPIN_BOX_RANGE, SPIN_BOX_RANGE);
                 value = spin;
+                intSelectors.insert(intSelectors.begin(), itemNames[i], spin);
             }
             else if(itemTypes[i] == "double")
             {
@@ -99,10 +123,13 @@ void AddCalculationWindow::updateOptions(QString selectedPlugin, QStringList ite
                 spin->setRange(-SPIN_BOX_RANGE, SPIN_BOX_RANGE);
                 spin->setSingleStep(DOUBLE_STEP);
                 value = spin;
+                doubleSelectors.insert(doubleSelectors.begin(), itemNames[i], spin);
             }
             else
             {
-                value = new QLineEdit(listParameters);
+                QLineEdit *line = new QLineEdit(listParameters);
+                value = line;
+                stringSelectors.insert(stringSelectors.begin(), itemNames[i], line);
             }
 
             listLayout->addWidget(name, i+2, 0);
@@ -111,6 +138,8 @@ void AddCalculationWindow::updateOptions(QString selectedPlugin, QStringList ite
 
         QPushButton *calculate = new QPushButton("Calculate", listParameters);
         listLayout->addWidget(calculate, 2 + itemNames.size(), 0, 1, -1);
+
+        connect(calculate, SIGNAL(clicked()), this, SLOT(Slot_runCalculation()));
     }
 
     this->setCentralWidget(listParameters);
@@ -194,4 +223,32 @@ void AddCalculationWindow::fetchPluginParameters(QString name)
     {
         LOG_ERROR(errorStr);
     }
+}
+
+void AddCalculationWindow::Slot_runCalculation()
+{
+    QJsonDocument document;
+    QJsonObject mainObj;
+    mainObj.insert(CS_JSON_KEY_CALC_BIN, currentCalculationName);
+
+    QJsonObject params;
+    for(auto i = intSelectors.begin(); i != intSelectors.end(); i++)
+    {
+        params.insert(i.key(), i.value()->value());
+    }
+    for(auto i = doubleSelectors.begin(); i != doubleSelectors.end(); i++)
+    {
+        params.insert(i.key(), i.value()->value());
+    }
+    for(auto i = stringSelectors.begin(); i != stringSelectors.end(); i++)
+    {
+        params.insert(i.key(), i.value()->text());
+    }
+    mainObj.insert(CS_JSON_KEY_CALC_PARAMS, params);
+
+    document.setObject(mainObj);
+
+    MainWindowController::GetInstance()->sig_exec(document.toJson(QJsonDocument::Compact));
+
+    this->hide();
 }

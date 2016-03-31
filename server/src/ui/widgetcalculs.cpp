@@ -54,7 +54,7 @@ void WidgetCalculs::Slot_newcalculation()
 {
     if(addCalcWindow != NULL)
     {
-        addCalcWindow->show();
+        addCalcWindow->showAndReset();
     }
     else
     {
