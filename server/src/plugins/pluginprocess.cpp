@@ -45,7 +45,7 @@ bool PluginProcess::Start()
         break;
     case SCRIPT:
         if(! selectInterpreter().isNull() )
-        {   command.prepend(selectInterpreter()).prepend(" ");
+        {   command.prepend(selectInterpreter().append(" "));
         }
         else
         {   ok = false;
