@@ -6,7 +6,7 @@
 #include <QCoreApplication>
 #include <QFile>
 
-#define ENTRY_LIST_FILTER   QDir::Files | QDir::Executable
+#define ENTRY_LIST_FILTER   QDir::Files
 #define ENTRY_LIST_SORT     QDir::Name
 #define ENTRY_LIST()        _plugins_dir.entryList(ENTRY_LIST_FILTER, ENTRY_LIST_SORT)
 
