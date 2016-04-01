@@ -1,6 +1,9 @@
 #include "widgetcalculs.h"
+#include "../calculation/calculationmanager.h"
 #include "addcalculationwindow.h"
-#include <QtWidgets>
+#include "../utils/logger.h"
+#include <iostream>
+
 
 WidgetCalculs::WidgetCalculs(QWidget *parent) : QWidget(parent), addCalcWindow(NULL)
 {
@@ -9,10 +12,11 @@ WidgetCalculs::WidgetCalculs(QWidget *parent) : QWidget(parent), addCalcWindow(N
     QVBoxLayout *layout = new QVBoxLayout();
 
     // --- Initialisation du tableau
-    QTableWidget * tableWidget = new QTableWidget(5, 6, this);
+    tableWidget = new QTableWidget(0, 6, this);
     tableWidget->setSelectionMode(QAbstractItemView::NoSelection);
-    tableWidget->horizontalHeader()->setSectionResizeMode (QHeaderView::Fixed);
+    //tableWidget->horizontalHeader()->setSectionResizeMode (QHeaderView::Fixed);
     tableWidget->verticalHeader()->setVisible(false);
+    tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
     // Taille des colonnes
     tableWidget->setColumnWidth(0, 90);
@@ -36,21 +40,23 @@ WidgetCalculs::WidgetCalculs(QWidget *parent) : QWidget(parent), addCalcWindow(N
     tableWidget->setHorizontalHeaderItem(5, titreActionButtons);
     layout->addWidget(tableWidget);
 
-    // Test bouton
+    // Bouton Ajout Calcul
     QPushButton * newCalc = new QPushButton("New Calculation");
     newCalc->setMaximumWidth(160);
     layout->addWidget(newCalc);
     layout->setAlignment(newCalc, Qt::AlignRight);
 
-    connect(newCalc, SIGNAL(clicked()), this, SLOT(Slot_newcalculation()));
+    // Signaux
+    connect(newCalc, SIGNAL(clicked()), this, SLOT(Slot_AddNewCalculation()));
+    connect(&CalculationManager::getInstance(), SIGNAL(sig_newCalculation(QUuid)), this, SLOT(Slot_NewCalculation(QUuid)));
 
-    // Bouton ajouter
+    // Layout
 
     this->setLayout(layout);
 
 }
 
-void WidgetCalculs::Slot_newcalculation()
+void WidgetCalculs::Slot_AddNewCalculation()
 {
     if(addCalcWindow != NULL)
     {
@@ -61,4 +67,13 @@ void WidgetCalculs::Slot_newcalculation()
         addCalcWindow = new AddCalculationWindow(this);
         addCalcWindow->show();
     }
+}
+
+void WidgetCalculs::Slot_NewCalculation(QUuid id)
+{
+    LOG_DEBUG("Slot_NewCalculation called (QUid : " + id.toString() + ")");
+
+    tableWidget->insertRow(tableWidget->rowCount());
+    QTableWidgetItem * idTab = new QTableWidgetItem(id.toString().remove(0,1).remove(id.toString().length() - 2, 1));
+    tableWidget->setItem(tableWidget->rowCount() - 1, 0, idTab);
 }

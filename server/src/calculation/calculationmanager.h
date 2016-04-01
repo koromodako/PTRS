@@ -91,6 +91,8 @@ protected:
 
     // only application manager class can access this instance
     friend class ApplicationManager;
+    // UI needs access to connect to signals
+    friend class WidgetCalculs;
 
 private: // singleton
     CalculationManager(); // interdiction d'instancier en dehors de cette classe
