@@ -131,10 +131,10 @@ void ClientSession::resetCurrentFragment()
     _fragment = NULL;
 }
 
-void ClientSession::send(ReqType reqType, const QString & content)
+void ClientSession::send(ReqType reqType, const QByteArray & content)
 {
     // vérification de la taille du contenu à envoyer en octets
-    if( (content.toUtf8().size()+sizeof(req_t)) > MSG_SIZE_MAX)
+    if( (content.size()+sizeof(req_t)) > MSG_SIZE_MAX)
     {   LOG_ERROR("Message content too long to be sent !");
         return;
     }
@@ -145,7 +145,7 @@ void ClientSession::send(ReqType reqType, const QString & content)
 
     out << (msg_size_t)0;                                   // on reserve sizeof(msg_size_t) pour stocker la taille du message
     out << (req_t)reqType;                                  // on écrit dans le champs requete
-    out << content.toUtf8();                                // on écrit le contenu après la requete
+    out << content;                                // on écrit le contenu après la requete
     out.device()->seek(0);                                  // on déplace la tête d'écriture au début
     out << (msg_size_t)(block.size() - (int)sizeof(msg_size_t)); // on écrit la taille du message (commande comprise)
 

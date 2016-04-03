@@ -7,7 +7,6 @@ BUILD_TYPE=Debug
 BUILD_DIR=build/${BUILD_TYPE}/
 SERVER_BIN=server/${BUILD_DIR}server
 CLIENT_BIN=clients/qt_client/${BUILD_DIR}qt_client
-PLUGIN_BIN=calculation_plugins/bruteforce/${BUILD_DIR}bruteforce
 LOGS_DIR=${BIN_DIR}/logs/
 
 .PHONY: run-server run-client run-test-env
@@ -27,7 +26,9 @@ deploy:
 	${Q}echo "Export qt_client..."
 	${Q}cp ${CLIENT_BIN} ${CLIENT_DIR}
 	${Q}echo "Export bruteforce plugin..."
-	${Q}cp ${PLUGIN_BIN} ${PLUGINS_DIR}
+	${Q}cp calculation_plugins/bruteforce/${BUILD_DIR}bruteforce ${PLUGINS_DIR}
+	${Q}echo "Export mergesort plugin..."
+	${Q}cp calculation_plugins/ptrs-mergesort.jar ${PLUGINS_DIR}
 	${Q}echo "--------------- ! done ! ----------------"
 
 run-server:

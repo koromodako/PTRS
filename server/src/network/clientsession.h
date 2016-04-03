@@ -124,7 +124,7 @@ private:
      * @param reqtype le type de la commande
      * @param args les arguments à transmettre au client
      */
-    void send(ReqType reqtype, const QString &content = "");
+    void send(ReqType reqtype, const QByteArray &content = QByteArray());
 
     /**
      * @brief Effectue la transition de l'automate avec la liste des transitions données

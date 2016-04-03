@@ -103,6 +103,10 @@ void ClientSession::slot_processRequest(ReqType reqType, const QByteArray &conte
             LOG_DEBUG("processing STOP request");
             _currentState->ProcessStop();
             break;
+        case BIN:
+            LOG_DEBUG("processing BIN request");
+            _currentState->ProcessBin(content);
+            break;
         default:
             qDebug() << "Impossible de traiter cette requète : " << QString::number(reqType);
             break;
