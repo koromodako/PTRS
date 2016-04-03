@@ -30,6 +30,11 @@ void AbstractState::ProcessDo(const QByteArray &content)
     Q_UNUSED(content)
 }
 
+void AbstractState::ProcessBin(const QByteArray &content)
+{
+    Q_UNUSED(content)
+}
+
 void AbstractState::ProcessDone(const QJsonObject &args)
 {
     Q_UNUSED(args)

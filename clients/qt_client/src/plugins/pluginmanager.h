@@ -43,6 +43,11 @@ public:
      * @param calc
      */
     void Join(Calculation * calc);
+    /**
+     * @brief Retourne l'architecture de la machine
+     * @return
+     */
+    bool WritePlugin(QString fname, const QByteArray & data);
 
 private:
     /**
@@ -88,6 +93,7 @@ private: // singleton
     friend class ApplicationManager;
     friend class CalculationManager;
     friend class ClientSession;
+    friend class ReadyState;
 
     QDir _plugins_dir;
     PluginProcessList _processes;
