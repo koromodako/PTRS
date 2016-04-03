@@ -44,7 +44,8 @@ enum ReqType {
     OK                  = 0x08,
     KO                  = 0x09,
     DO                  = 0x0A,
-    STOP                = 0x0B
+    STOP                = 0x0B,
+    BIN                 = 0x0C
 };
 
 

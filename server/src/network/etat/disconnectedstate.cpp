@@ -12,6 +12,6 @@ DisconnectedState::~DisconnectedState()
 
 void DisconnectedState::ProcessHello()
 {
-    _client->send(OK, _client->GetId().toString());
+    _client->send(OK, _client->GetId().toString().toUtf8());
     _client->setCurrentStateAfterSuccess();
 }

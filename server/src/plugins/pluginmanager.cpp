@@ -6,7 +6,7 @@
 #include <QCoreApplication>
 #include <QFile>
 
-#define ENTRY_LIST_FILTER   QDir::Files | QDir::Executable
+#define ENTRY_LIST_FILTER   QDir::Files
 #define ENTRY_LIST_SORT     QDir::Name
 #define ENTRY_LIST()        _plugins_dir.entryList(ENTRY_LIST_FILTER, ENTRY_LIST_SORT)
 
@@ -62,6 +62,32 @@ void PluginManager::Join(Calculation *calc)
 void PluginManager::Ui(Calculation *calc)
 {   // -- lancement du processus associé
     startCalcProcess(calc, PluginProcess::UI);
+}
+
+const QByteArray *PluginManager::GetPluginData(const QString & arch, const QString & os, QString bin)
+{
+    QByteArray * data = NULL;
+    bool loadData(false);
+    switch (PluginProcess::DetectType(bin)) {
+    case PluginProcess::JAR:
+        loadData = true;
+        break;
+    case PluginProcess::SCRIPT:
+        loadData = true;
+        break;
+    case PluginProcess::BINARY:
+        loadData = (arch == QHOST_ARCH && os == QHOST_OS);
+        break;
+    }
+    if(loadData && PluginExists(bin))
+    {   QFile f(bin.prepend('/').prepend(_plugins_dir.absolutePath()));
+        if(f.open(QIODevice::ReadOnly))
+        {
+            data = new QByteArray(f.readAll()); // bytearray must be delete by caller !
+            f.close();
+        }
+    }
+    return data;
 }
 
 void PluginManager::startCalcProcess(Calculation * calc, PluginProcess::CalculationOperation op)
