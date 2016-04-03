@@ -19,6 +19,7 @@ public class OperationReceiver {
 	private static final String ACTION_SPLIT = "split";
 	private static final String ACTION_COMPUTE = "calc";
 	private static final String ACTION_GET_PARAMS = "get_params";
+	private static final String END_OF_FILE = "EOF";
 	
 	private static final Gson gson = new GsonBuilder()
 		    .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
@@ -30,7 +31,11 @@ public class OperationReceiver {
 		String line = null, action = null, json = "";
 		try {
 			action = reader.readLine();
-			while ((line = reader.readLine()) != null) {
+			if(action.equals(END_OF_FILE)) {
+				System.out.println("Requested to end communication with EOF");
+				System.exit(0);
+			}
+			while (!(line = reader.readLine()).equals(END_OF_FILE)) {
 			    json += line;
 			}
 		} catch (IOException e) {
