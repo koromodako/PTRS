@@ -12,10 +12,10 @@ import com.ptrs.util.CalculationResultBlock;
 public class MergeSortTest {
 	
 	public static void main(String[] args) {
-		//smallArrayTest();
+//		smallArrayTest();
 //		smallArrayTest2();
 		bigArrayTest();
-		//sortedArrayTest();
+//		sortedArrayTest();
 //		mergeArraysTest();
 //		splitTest();
 //		mergeSortFromJsonTest();
@@ -32,7 +32,7 @@ public class MergeSortTest {
 	}
 	
 	private static void bigArrayTest() {
-		int numberOfEntries = 100000;
+		int numberOfEntries = 100000000;
 		int[] arr = new int[numberOfEntries];
 		Random randomNumbers = new Random();
 		for (int i = 0; i < numberOfEntries; i++) {
@@ -55,7 +55,7 @@ public class MergeSortTest {
 	
 	private static void smallArrayTest2() {
 		int[] arr = {6,3,2,4,5, 1, 7, 6, 8, 9, 10};
-		MergeSort.mergeSort(arr, arr, 0, arr.length);
+		MergeSort.mergeSort(arr);
 		
 		for(int i = 0; i < arr.length; i++) {
 			System.out.print(arr[i] + ",");
