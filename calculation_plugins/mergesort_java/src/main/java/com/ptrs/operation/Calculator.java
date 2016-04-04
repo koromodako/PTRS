@@ -29,6 +29,9 @@ public class Calculator {
 		
 		if(jsonElement == null || !jsonElement.isJsonObject()) {
 			System.err.println("Misformed JSON, can't further proceed fragment : " + json);
+			if(jsonElement.isJsonArray()) {
+				System.err.println("Fragment needs to be a single JSON object, not an array");
+			}
 			return null;
 		}
 		

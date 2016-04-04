@@ -13,16 +13,17 @@ public class MergeSortTest {
 	
 	public static void main(String[] args) {
 		//smallArrayTest();
-		//bigArrayTest();
-//		sortedArrayTest();
+//		smallArrayTest2();
+		bigArrayTest();
+		//sortedArrayTest();
 //		mergeArraysTest();
 //		splitTest();
 //		mergeSortFromJsonTest();
-		mergerTest();
+		//mergerTest();
 	}
 	
 	private static void smallArrayTest() {
-		int[] arr = {6,3,2,4,5, 6, 7, 8, 9, 10};
+		int[] arr = {6,3,2,4,5, 7, 6, 7, 8, 9, 10};
 		MergeSort.mergeSort(arr, arr, 0, arr.length);
 		
 		for(int i = 0; i < arr.length; i++) {
@@ -31,7 +32,7 @@ public class MergeSortTest {
 	}
 	
 	private static void bigArrayTest() {
-		int numberOfEntries = 60000000;
+		int numberOfEntries = 100000;
 		int[] arr = new int[numberOfEntries];
 		Random randomNumbers = new Random();
 		for (int i = 0; i < numberOfEntries; i++) {
@@ -49,6 +50,15 @@ public class MergeSortTest {
 		
 		for(int i = 0; i < sorted.length; i++) {
 			System.out.print(sorted[i] + ",");
+		}
+	}
+	
+	private static void smallArrayTest2() {
+		int[] arr = {6,3,2,4,5, 1, 7, 6, 8, 9, 10};
+		MergeSort.mergeSort(arr, arr, 0, arr.length);
+		
+		for(int i = 0; i < arr.length; i++) {
+			System.out.print(arr[i] + ",");
 		}
 	}
 	

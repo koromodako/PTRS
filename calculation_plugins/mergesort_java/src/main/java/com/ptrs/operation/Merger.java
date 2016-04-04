@@ -42,7 +42,8 @@ public class Merger {
 			JsonElement resultJson = resultsArray.get(i);
 			
 			CalculationResultBlock calculationResultBlock = gson.fromJson(resultJson, CalculationResultBlock.class);
-			if(calculationResultBlock == null) {
+			if(calculationResultBlock == null || calculationResultBlock.getResult() == null) {
+				System.err.println("Unexpected structure for the calculcation result block, skipping fragment");
 				continue;
 			}
 			
