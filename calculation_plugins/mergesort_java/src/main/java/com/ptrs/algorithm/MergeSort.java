@@ -7,12 +7,14 @@ public class MergeSort {
 	 * @param src
 	 */
 	public static void mergeSort(int[] src) {
-		mergeSort(src, src, 0, src.length);
+		int[] srcOrigin = new int[src.length];
+		System.arraycopy(src, 0, srcOrigin, 0, src.length);
+		mergeSort(srcOrigin, src, 0, src.length);
 	}
 	
 	/**
 	 * Sort array src into dest, within the range starting at low included and finishing at high excluded [low, high[. 
-	 * General usage is to pass in the same array as src and dest.
+	 * Don't provide the same array for src and dest, the result will not be consistent
 	 * @param src The source array that needs to be sorted
 	 * @param dest The resulting array sorted with the mergesort algorithm
 	 * @param low The start index from which to sort the src array
@@ -50,22 +52,18 @@ public class MergeSort {
 			System.arraycopy(src, low, dest, low, length);
 			return;
 		}
-		
-		int srcLength = src.length;
-		int[] srcOrigin = new int[srcLength];
-		System.arraycopy(src, 0, srcOrigin, 0, srcLength);
 
 		// Merge sorted halves (now in src) into dest by browsing through both halves
 		for (int i = low, p = low, q = mid; i < high; i++) {
 			if (q < high && p < mid) {
-				dummy1 = srcOrigin[p];
-				dummy2 = srcOrigin[q];
+				dummy1 = src[p];
+				dummy2 = src[q];
 			}
 			if (q >= high || p < mid && dummy1 <= dummy2) {
-				dest[i] = srcOrigin[p++];
+				dest[i] = src[p++];
 			}
 			else {
-				dest[i] = srcOrigin[q++];
+				dest[i] = src[q++];
 			}
 		}
 	}
