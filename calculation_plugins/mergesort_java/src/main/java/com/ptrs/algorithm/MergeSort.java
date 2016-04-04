@@ -50,18 +50,22 @@ public class MergeSort {
 			System.arraycopy(src, low, dest, low, length);
 			return;
 		}
+		
+		int srcLength = src.length;
+		int[] srcOrigin = new int[srcLength];
+		System.arraycopy(src, 0, srcOrigin, 0, srcLength);
 
 		// Merge sorted halves (now in src) into dest by browsing through both halves
 		for (int i = low, p = low, q = mid; i < high; i++) {
 			if (q < high && p < mid) {
-				dummy1 = src[p];
-				dummy2 = src[q];
+				dummy1 = srcOrigin[p];
+				dummy2 = srcOrigin[q];
 			}
 			if (q >= high || p < mid && dummy1 <= dummy2) {
-				dest[i] = src[p++];
+				dest[i] = srcOrigin[p++];
 			}
 			else {
-				dest[i] = src[q++];
+				dest[i] = srcOrigin[q++];
 			}
 		}
 	}

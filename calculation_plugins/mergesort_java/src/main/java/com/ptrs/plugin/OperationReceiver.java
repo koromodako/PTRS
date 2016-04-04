@@ -4,26 +4,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import com.google.gson.FieldNamingPolicy;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
 import com.ptrs.operation.Calculator;
 import com.ptrs.operation.Merger;
 import com.ptrs.operation.Splitter;
-import com.ptrs.util.CalculationBlockParams;
 
 public class OperationReceiver {
 	
-	private static final String ACTION_JOIN = "join";
-	private static final String ACTION_SPLIT = "split";
-	private static final String ACTION_COMPUTE = "calc";
-	private static final String ACTION_GET_PARAMS = "get_params";
 	private static final String END_OF_FILE = "EOF";
-	
-	private static final Gson gson = new GsonBuilder()
-		    .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-		    .create();
 
 	public static void main(String[] args) {
 		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
@@ -48,18 +35,19 @@ public class OperationReceiver {
 		}
 		
 		String jsonResult = null;
+		action = action.toLowerCase();
 		switch(action) {
-			case ACTION_JOIN:
+			case Action.JOIN:
 				jsonResult = Merger.mergeFromJson(json);
 				break;
-			case ACTION_SPLIT:
+			case Action.SPLIT:
 				jsonResult = Splitter.splitFromJson(json);
 				break;
-			case ACTION_COMPUTE:
+			case Action.COMPUTE:
 				jsonResult = Calculator.mergeSortFromJson(json);
 				break;
-			case ACTION_GET_PARAMS:
-				jsonResult = getAcceptedParameters();
+			case Action.GET_PARAMS:
+				jsonResult = Action.getAcceptedParameters();
 				break;
 			default:
 				// Undefined action
@@ -76,13 +64,5 @@ public class OperationReceiver {
 		
 		// Exit on success
 		System.exit(0);
-	}
-	
-	private static String getAcceptedParameters() {
-		JsonObject jsonObject = new JsonObject();
-		jsonObject.addProperty(CalculationBlockParams.PARAM_VALUES, CalculationBlockParams.PARAM_TYPE_VALUES);
-		jsonObject.addProperty(CalculationBlockParams.PARAM_PARTITIONS, CalculationBlockParams.PARAM_TYPE_PARTITIONS);
-		
-		return gson.toJson(jsonObject);
 	}
 }
