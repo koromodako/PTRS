@@ -16,6 +16,12 @@ public:
      */
     ~NetworkManager();
 
+    /**
+     * @brief Retourne la ClientSession actuelle
+     * @return
+     */
+    inline ClientSession* GetClientSession() { return _clientSession;}
+
 public slots:
     /**
      * Initialise le manager et démarre les serveurs UDP et TCP
