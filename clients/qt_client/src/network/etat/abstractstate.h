@@ -47,6 +47,11 @@ public:
     virtual void ProcessDo(const QByteArray &content);
 
     /**
+     * @brief Effectue la commande BIN
+     */
+    virtual void ProcessBin(const QByteArray &content);
+
+    /**
      * @brief Effectue la commande DONE
      */
     virtual void ProcessDone(const QJsonObject &args);

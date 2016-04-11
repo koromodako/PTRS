@@ -64,6 +64,32 @@ QByteArray PluginManager::Ui(Calculation *calc)
     return startCalcProcess(calc, PluginProcess::UI);
 }
 
+const QByteArray *PluginManager::GetPluginData(const QString & arch, const QString & os, QString bin)
+{
+    QByteArray * data = NULL;
+    bool loadData(false);
+    switch (PluginProcess::DetectType(bin)) {
+    case PluginProcess::JAR:
+        loadData = true;
+        break;
+    case PluginProcess::SCRIPT:
+        loadData = true;
+        break;
+    case PluginProcess::BINARY:
+        loadData = (arch == QHOST_ARCH && os == QHOST_OS);
+        break;
+    }
+    if(loadData && PluginExists(bin))
+    {   QFile f(bin.prepend('/').prepend(_plugins_dir.absolutePath()));
+        if(f.open(QIODevice::ReadOnly))
+        {
+            data = new QByteArray(f.readAll()); // bytearray must be delete by caller !
+            f.close();
+        }
+    }
+    return data;
+}
+
 QByteArray PluginManager::startCalcProcess(Calculation * calc, PluginProcess::CalculationOperation op)
 {
     // -- création d'un nouveau processus

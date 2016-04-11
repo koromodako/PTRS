@@ -1,7 +1,15 @@
-Bruteforce JSON block normal
+// ----------------------- BRUTEFORCE PLUGIN COMMANDS
+
+# Bruteforce legal JSON block :
 
 EXEC {"bin":"bruteforce","params":{"charset":"abcdefghijklmnopqrstuvwxyz","min_len":2,"max_len":4,"hash_func":"sha256","target":"b2ab54fd83e5770a4f755bd8d556a8b0815ad072db3cd9bae4a86827b995edee"}}
 
-Bruteforce incomplete JSON block
+# Bruteforce incomplete JSON block :
 
 {"bin":"bruteforce","params":{"charset":"abcdefghijklmnopqrstuvwxyz","min_len":2}}
+
+// ------------------------ MERGESORT PLUGIN COMMANDS
+
+# Mergesort legal JSON block :
+
+EXEC {"bin":"ptrs-mergesort.jar","params":{"values":[5,3,4,6,2,7,1,9,8,16,230,65,43],"partitions":1}}

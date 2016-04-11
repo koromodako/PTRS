@@ -50,6 +50,19 @@ public:
      */
     QByteArray Ui(Calculation * calc);
 
+    /**
+     * @brief Retourne le fichier sous forme d'un tableau d'octets pouvant être écrit dans le socket
+     * @param arch
+     *      Architecture du client
+     * @param os
+     *      OS du client
+     * @param bin
+     *      Nom du binaire
+     * @warning la méthode appelante est chargée de libérer le tableau d'octets
+     * @return
+     */
+    const QByteArray * GetPluginData(const QString &arch, const QString &os, QString bin);
+
 private:
     /**
      * @brief Démarre un nouveau processus pour un calcul
@@ -84,6 +97,7 @@ private: // singleton
     friend class CalculationManager;
     friend class Calculation;
     friend class AddCalculationWindow;
+    friend class WorkingAboutToStartState;
 
     QDir _plugins_dir;
     PluginProcessList _processes;

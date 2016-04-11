@@ -74,5 +74,15 @@ HEADERS  += \
     src/userinterface.h \
     src/ui/mainwindowcontroller.h
 
-
 FORMS    += src/ui/mainwindow.ui
+
+# retrieve host & build information
+DEFINES += QHOST_ARCH=\\\"$$QMAKE_HOST.arch\\\"
+DEFINES += QHOST_OS=\\\"$$QMAKE_HOST.os\\\"
+DEFINES += QHOST_CPU_COUNT=\\\"$$QMAKE_HOST.cpu_count\\\"
+DEFINES += QHOST_NAME=\\\"$$QMAKE_HOST.name\\\"
+DEFINES += QHOST_VERSION=\\\"$$QMAKE_HOST.version\\\"
+DEFINES += QHOST_VERSION_STRING=\\\"$$QMAKE_HOST.version_string\\\"
+DEFINES += QGIT_LAST_COMMIT=\\\"$$system(git rev-list HEAD | head -n 1)\\\"
+DEFINES += QGIT_DIRTY=$$system(git status --porcelain | wc -l)
+DEFINES += QGIT_BRANCH=\\\"$$system(git rev-parse --abbrev-ref HEAD)\\\"

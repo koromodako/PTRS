@@ -2,6 +2,10 @@
 #include "src/calculation/specs.h"
 #include "src/utils/logger.h"
 
+#define JAR_EXT "jar"
+#define SCRIPT_EXT() QStringList({"py","sh"})
+#define SCRIPT_INTERPRETER() QStringList({"python", "bash"})
+
 PluginProcess::PluginProcess(QString absExecDir, Calculation *calc, CalculationOperation op, QObject *parent) :
     QProcess(parent),
     _absExecDir(absExecDir),
@@ -38,7 +42,7 @@ bool PluginProcess::Start()
     command.append('/').append(_calculation->GetBin());
     // en fonction du type on effectue des opérations supplémentaires
     bool ok = true;
-    switch (detectType()) {
+    switch (DetectType(_calculation->GetBin())) {
     case BINARY: break;
     case JAR:
         command.prepend("java -jar ");
@@ -59,6 +63,21 @@ bool PluginProcess::Start()
     }
     // -- retour du statut
     return ok;
+}
+
+PluginProcess::Type PluginProcess::DetectType(const QString & bin)
+{
+    Type type = BINARY;
+    QStringList parts = bin.split('.', QString::SkipEmptyParts);
+    if(!parts.isEmpty())
+    {   if(parts.last() == JAR_EXT)
+        {   type = JAR;
+        }
+        else if(SCRIPT_EXT().contains(parts.last()))
+        {   type = SCRIPT;
+        }
+    }
+    return type;
 }
 
 void PluginProcess::Slot_error(QProcess::ProcessError error)
@@ -115,25 +134,6 @@ void PluginProcess::Slot_calcFinished(int exitCode, QProcess::ExitStatus exitSta
         _calculation->Crashed(readAllStandardError());
         break;
     }
-}
-
-#define JAR_EXT "jar"
-#define SCRIPT_EXT() QStringList({"py","sh"})
-#define SCRIPT_INTERPRETER() QStringList({"python", "bash"})
-
-PluginProcess::Type PluginProcess::detectType()
-{
-    Type type = BINARY;
-    QStringList parts = _calculation->GetBin().split('.', QString::SkipEmptyParts);
-    if(!parts.isEmpty())
-    {   if(parts.last() == JAR_EXT)
-        {   type = JAR;
-        }
-        else if(SCRIPT_EXT().contains(parts.last()))
-        {   type = SCRIPT;
-        }
-    }
-    return type;
 }
 
 QString PluginProcess::selectInterpreter()

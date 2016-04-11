@@ -18,6 +18,15 @@ public:
         UI      ///< Opération de récupération de la description de l'interface utilisateur
     };
     /**
+     * @brief Cette énumération définit les différents types de plugins supportés
+     *      Le type inconnu n'existe pas, le type par défault utilisé est BINARY
+     */
+    enum Type {
+        BINARY,     ///< Binaire compilé
+        JAR,        ///< Archive JAR java
+        SCRIPT      ///< Fichier script avec interpréteur sans #!/bin/... sinon considéré comme binaire
+    };
+    /**
      * @brief Construit une nouvelle instance de processus sur un calcul
      * @param calc
      *      Calcul auquel le processus est lié
@@ -32,6 +41,12 @@ public:
      * @return retourne faux si aucun n'interpréteur n'a été trouvé pour le type script, sinon retourne toujours vrai
      */
     bool Start();
+    /**
+     * @brief Détecte le type de plugin (binaire compilé, JAR, script)
+     *          Pour l'instant on se contente de regarder l'extension
+     * @return le type de plugin
+     */
+    static Type DetectType(const QString & bin);
 
 private slots:
     /**
@@ -51,21 +66,6 @@ private slots:
     void Slot_calcFinished(int exitCode, QProcess::ExitStatus exitStatus);
 
 private:
-    /**
-     * @brief Cette énumération définit les différents types de plugins supportés
-     *      Le type inconnu n'existe pas, le type par défault utilisé est BINARY
-     */
-    enum Type {
-        BINARY,     ///< Binaire compilé
-        JAR,        ///< Archive JAR java
-        SCRIPT      ///< Fichier script avec interpréteur sans #!/bin/... sinon considéré comme binaire
-    };
-    /**
-     * @brief Détecte le type de plugin (binaire compilé, JAR, script)
-     *          Pour l'instant on se contente de regarder l'extension
-     * @return le type de plugin
-     */
-    Type detectType();
     QString selectInterpreter();
 
     QString _absExecDir;

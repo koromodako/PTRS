@@ -29,6 +29,9 @@ public class Calculator {
 		
 		if(jsonElement == null || !jsonElement.isJsonObject()) {
 			System.err.println("Misformed JSON, can't further proceed fragment : " + json);
+			if(jsonElement.isJsonArray()) {
+				System.err.println("Fragment needs to be a single JSON object, not an array");
+			}
 			return null;
 		}
 		
@@ -36,7 +39,8 @@ public class Calculator {
 		
 		CalculationBlock calculationBlock = gson.fromJson(paramsJson, CalculationBlock.class);
 		
-		if(calculationBlock == null) {
+		if(calculationBlock == null || calculationBlock.getParams() == null) {
+			System.err.println("Unexpected structure for the calculcation block, can't further proceed fragment");
 			return null;
 		}
 		

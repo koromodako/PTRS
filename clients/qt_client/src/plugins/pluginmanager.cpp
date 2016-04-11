@@ -6,7 +6,7 @@
 #include <QCoreApplication>
 #include <QFile>
 
-#define ENTRY_LIST_FILTER   QDir::Files | QDir::Executable
+#define ENTRY_LIST_FILTER   QDir::Files
 #define ENTRY_LIST_SORT     QDir::Name
 #define ENTRY_LIST()        _plugins_dir.entryList(ENTRY_LIST_FILTER, ENTRY_LIST_SORT)
 
@@ -57,6 +57,19 @@ void PluginManager::Split(Calculation *calc)
 void PluginManager::Join(Calculation *calc)
 {   // -- lancement du processus associé
     startProcess(calc, PluginProcess::JOIN);
+}
+
+bool PluginManager::WritePlugin(QString fname, const QByteArray &data)
+{
+    QFile f(fname.prepend('/').prepend(_plugins_dir.absolutePath()));
+    if(!f.open(QIODevice::WriteOnly))
+    {
+        LOG_ERROR("Can't create plugin file.");
+        return false;
+    }
+    f.write(data);
+    f.close();
+    return true;
 }
 
 void PluginManager::Slot_calc(Calculation *calc)
