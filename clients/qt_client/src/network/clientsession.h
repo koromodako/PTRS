@@ -60,6 +60,12 @@ public:
      */
     void setId(const QString &id);
 
+    /**
+     * @brief Retourne le calcul en cours
+     * @return
+     */
+    inline Calculation* GetCurrentCalculation() {return _currentCalculation;}
+
 public slots:
     /**
      * @brief Prévient le serveur que le calcul a annulé
