@@ -2,7 +2,6 @@
 #include "../calculation/calculationmanager.h"
 #include "addcalculationwindow.h"
 #include "../utils/logger.h"
-#include <iostream>
 
 
 WidgetCalculs::WidgetCalculs(QWidget *parent) : QWidget(parent), addCalcWindow(NULL)
@@ -49,9 +48,10 @@ WidgetCalculs::WidgetCalculs(QWidget *parent) : QWidget(parent), addCalcWindow(N
     // Signaux
     connect(newCalc, SIGNAL(clicked()), this, SLOT(Slot_AddNewCalculation()));
     connect(&CalculationManager::getInstance(), SIGNAL(sig_newCalculation(QUuid)), this, SLOT(Slot_NewCalculation(QUuid)));
+    connect(&CalculationManager::getInstance(), SIGNAL(sig_calculationStateUpdated(QUuid, Calculation::State)),
+            this, SLOT(Slot_StateUpdated(QUuid, Calculation::State)));
 
     // Layout
-
     this->setLayout(layout);
 
 }
@@ -73,7 +73,21 @@ void WidgetCalculs::Slot_NewCalculation(QUuid id)
 {
     LOG_DEBUG("Slot_NewCalculation called (QUid : " + id.toString() + ")");
 
+    memorisationPositions.insert(id, tableWidget->rowCount());
     tableWidget->insertRow(tableWidget->rowCount());
     QTableWidgetItem * idTab = new QTableWidgetItem(id.toString().remove(0,1).remove(id.toString().length() - 2, 1));
     tableWidget->setItem(tableWidget->rowCount() - 1, 0, idTab);
+}
+
+void WidgetCalculs::Slot_StateUpdated(QUuid id, Calculation::State state)
+{
+    const QMetaObject &mo = Calculation::staticMetaObject;
+    int index = mo.indexOfEnumerator("State");
+    QMetaEnum stateEnum = mo.enumerator(index);
+    QString stateString = QString(stateEnum.valueToKey(state));
+
+    LOG_DEBUG("Updating calculation state (id : " + id.toString() + ", row : "
+              + QString::number(memorisationPositions.value(id)) + ", state : " + stateString);
+    QTableWidgetItem * stateTab = new QTableWidgetItem(stateString);
+    tableWidget->setItem(memorisationPositions.value(id), 2, stateTab);
 }

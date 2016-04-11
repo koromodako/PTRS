@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QtWidgets>
 #include "addcalculationwindow.h"
+#include "../calculation/calculation.h"
 
 /**
  * @brief Cette classe représente le widget affichant l'état des calculs demandés
@@ -28,10 +29,16 @@ public slots:
      */
     void Slot_NewCalculation(QUuid id);
 
+    /**
+     * @brief Slot déclenché lors de la mise à jour de l'état d'un calcul
+     */
+    void Slot_StateUpdated(QUuid id, Calculation::State state);
+
 private:
     AddCalculationWindow *addCalcWindow;
 
     QTableWidget * tableWidget;
+    QHash<QUuid, int> memorisationPositions; // Permet de faire la correspondance entre un QUuid et une ligne
 
 };
 

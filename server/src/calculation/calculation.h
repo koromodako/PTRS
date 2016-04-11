@@ -11,6 +11,7 @@
 class Calculation : public AbstractIdentifiable
 {
     Q_OBJECT
+    Q_ENUMS(State)
 public:
     /**
      * @brief Cette énumération décrit les différents états que peut prendre un calcul
