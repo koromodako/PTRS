@@ -37,13 +37,15 @@ public class Splitter {
 		JsonElement paramsJson = jsonElement.getAsJsonObject().get(PtrsConstants.CALC_PARAMS);
 		CalculationBlockParams cbParams = gson.fromJson(paramsJson, CalculationBlockParams.class);
 		
-		if(cbParams == null) {
+		if(cbParams == null || cbParams.getValues() == null) {
+			System.err.println("Unexpected structure for the calculcation block to split, can't further proceed fragment");
 			return null;
 		}
 		
 		int nbPartitions = cbParams.getPartitions();
 		if(nbPartitions == 0) {
 			// TODO Get number of nodes in the cluster
+			nbPartitions = 1;
 		}
 		
 		int[] valuesToSplit = cbParams.getValues();
