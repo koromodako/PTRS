@@ -4,6 +4,7 @@
 #include "console/consolehandler.h"
 #include "plugins/pluginmanager.h"
 #include "network/clientsession.h"
+#include "network/networkmanager.h"
 ApplicationManager ApplicationManager::_instance;
 
 void ApplicationManager::Init()
@@ -54,7 +55,28 @@ void ApplicationManager::Slot_state()
     else
     {   report += "  - no plugin available, this client is useless.\n";
     }
-    report += "\n not implemented yet";
+    ClientSession* cs = NetworkManager::getInstance().GetClientSession();
+    if( cs != NULL)
+    {
+        report += "\n"
+                "STATE: CONNECTED \n"
+                "ID: %1\n";
+        report.arg(cs->Id());
+        if(cs->FragmentId() != -1)
+        {
+            report += "\n"
+                    "CURRENT CALCULATION TYPE: %1\n"
+                    "CURRENT CALCULATION ID: %2\n"
+                    "CURRENT FRAGMENT ID: %3\n";
+            report.arg(cs->GetCurrentCalculation()->GetBin(), cs->GetCurrentCalculation()->GetId().toString(), QString(cs->FragmentId()));
+        }
+    }
+    else
+    {
+        report += "\n"
+                "STATE: NOT CONNECTED\n";
+    }
+
     LOG_DEBUG("sig_response(CMD_STATE) emitted.");
     emit sig_response(CMD_STATE, true, report);
 }
