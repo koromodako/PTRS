@@ -39,7 +39,8 @@ public class Calculator {
 		
 		CalculationBlock calculationBlock = gson.fromJson(paramsJson, CalculationBlock.class);
 		
-		if(calculationBlock == null) {
+		if(calculationBlock == null || calculationBlock.getParams() == null) {
+			System.err.println("Unexpected structure for the calculcation block, can't further proceed fragment");
 			return null;
 		}
 		
