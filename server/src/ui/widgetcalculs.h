@@ -34,11 +34,19 @@ public slots:
      */
     void Slot_StateUpdated(QUuid id, Calculation::State state);
 
+    /**
+     * @brief Slot déclenché lors du progrès d'un calcul
+     */
+    void Slot_ProgressUpdated(QUuid id, int value);
+
+
 private:
     AddCalculationWindow *addCalcWindow;
 
     QTableWidget * tableWidget;
     QHash<QUuid, int> memorisationPositions; // Permet de faire la correspondance entre un QUuid et une ligne
+
+    enum Colonnes {C_ID, C_NOM, C_STATUT, C_PROGRES, C_CLIENTS, C_ANNULER, C_RESULTAT};
 
 };
 
