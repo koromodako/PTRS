@@ -55,7 +55,7 @@ private:
     QHash<QPushButton *, bool> memButtonClicked;
     /** --------------------------- **/
 
-    enum Colonnes {C_ID, C_NOM, C_STATUT, C_PROGRES, C_CLIENTS, C_ANNULER, C_RESULTAT};
+    enum Colonnes {C_ID, C_NOM, C_STATUT, C_PROGRES, C_CLIENTS, C_RESULTAT, C_ANNULER};
 
 };
 

@@ -9,7 +9,7 @@ WidgetCalculs::WidgetCalculs(QWidget *parent) : QWidget(parent), addCalcWindow(N
 {
 
     // --- Layout
-    QVBoxLayout *layout = new QVBoxLayout();
+    QVBoxLayout *layout = new QVBoxLayout(this);
 
     // --- Initialisation du tableau
     tableWidget = new QTableWidget(0, 7, this);
@@ -43,7 +43,7 @@ WidgetCalculs::WidgetCalculs(QWidget *parent) : QWidget(parent), addCalcWindow(N
     layout->addWidget(tableWidget);
 
     // Bouton Ajout Calcul
-    QPushButton * newCalc = new QPushButton("New Calculation");
+    QPushButton * newCalc = new QPushButton("New Calculation", this);
     newCalc->setMaximumWidth(160);
     layout->addWidget(newCalc);
     layout->setAlignment(newCalc, Qt::AlignRight);
@@ -80,17 +80,23 @@ void WidgetCalculs::Slot_NewCalculation(QUuid id)
 
     memIdToRow.insert(id, tableWidget->rowCount());
     tableWidget->insertRow(tableWidget->rowCount());
+    int ligneInsertion = tableWidget->rowCount() - 1;
+
     QTableWidgetItem * idTab = new QTableWidgetItem(id.toString().remove(0,1).remove(id.toString().length() - 2, 1));
     idTab->setTextAlignment(Qt::AlignCenter);
-    tableWidget->setItem(tableWidget->rowCount() - 1, C_ID, idTab);
+    tableWidget->setItem(ligneInsertion, C_ID, idTab);
 
-    tableWidget->setCellWidget(tableWidget->rowCount() - 1, C_PROGRES, new QProgressBar());
+    tableWidget->setCellWidget(ligneInsertion, C_PROGRES, new QProgressBar());
 
-    QPushButton * annuler = new QPushButton("Cancel");
+    QPushButton * annuler = new QPushButton("Cancel", this);
     memButtonToId.insert(annuler, id);
     memButtonClicked.insert(annuler, false);
     connect(annuler, SIGNAL(clicked()), this, SLOT(Slot_CancelClicked()));
-    tableWidget->setCellWidget(tableWidget->rowCount() - 1, C_ANNULER, annuler);
+    tableWidget->setCellWidget(ligneInsertion, C_ANNULER, annuler);
+
+    QPushButton * resultat = new QPushButton("Results", this);
+    resultat->setEnabled(false);
+    tableWidget->setCellWidget(ligneInsertion, C_RESULTAT, resultat);
 }
 
 void WidgetCalculs::Slot_StateUpdated(QUuid id, Calculation::State state)
@@ -113,7 +119,7 @@ void WidgetCalculs::Slot_ProgressUpdated(QUuid id, int value)
 {
     LOG_DEBUG("Updating progress (QUid : " + id.toString() + ", progress : " + value  + ")");
 
-    QProgressBar * progres = new QProgressBar();
+    QProgressBar * progres = new QProgressBar(this);
     progres->setValue(value);
     tableWidget->setCellWidget(memIdToRow.value(id), C_PROGRES, progres);
 }
