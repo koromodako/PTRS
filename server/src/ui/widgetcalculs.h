@@ -39,12 +39,21 @@ public slots:
      */
     void Slot_ProgressUpdated(QUuid id, int value);
 
+    /**
+     * @brief Slot déclenché lors d'un appui sur le bouton d'annulation du calcul
+     */
+    void Slot_CancelClicked();
 
 private:
     AddCalculationWindow *addCalcWindow;
 
     QTableWidget * tableWidget;
-    QHash<QUuid, int> memorisationPositions; // Permet de faire la correspondance entre un QUuid et une ligne
+
+    /** Faute de meilleure solution **/
+    QHash<QUuid, int> memIdToRow;
+    QHash<QPushButton *, QUuid> memButtonToId;
+    QHash<QPushButton *, bool> memButtonClicked;
+    /** --------------------------- **/
 
     enum Colonnes {C_ID, C_NOM, C_STATUT, C_PROGRES, C_CLIENTS, C_ANNULER, C_RESULTAT};
 

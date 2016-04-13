@@ -2,6 +2,7 @@
 #include "../calculation/calculationmanager.h"
 #include "addcalculationwindow.h"
 #include "../utils/logger.h"
+#include "../ui/mainwindowcontroller.h"
 
 
 WidgetCalculs::WidgetCalculs(QWidget *parent) : QWidget(parent), addCalcWindow(NULL)
@@ -77,7 +78,7 @@ void WidgetCalculs::Slot_NewCalculation(QUuid id)
 {
     LOG_DEBUG("New calculation added (QUid : " + id.toString() + ")");
 
-    memorisationPositions.insert(id, tableWidget->rowCount());
+    memIdToRow.insert(id, tableWidget->rowCount());
     tableWidget->insertRow(tableWidget->rowCount());
     QTableWidgetItem * idTab = new QTableWidgetItem(id.toString().remove(0,1).remove(id.toString().length() - 2, 1));
     idTab->setTextAlignment(Qt::AlignCenter);
@@ -86,6 +87,9 @@ void WidgetCalculs::Slot_NewCalculation(QUuid id)
     tableWidget->setCellWidget(tableWidget->rowCount() - 1, C_PROGRES, new QProgressBar());
 
     QPushButton * annuler = new QPushButton("Cancel");
+    memButtonToId.insert(annuler, id);
+    memButtonClicked.insert(annuler, false);
+    connect(annuler, SIGNAL(clicked()), this, SLOT(Slot_CancelClicked()));
     tableWidget->setCellWidget(tableWidget->rowCount() - 1, C_ANNULER, annuler);
 }
 
@@ -97,12 +101,12 @@ void WidgetCalculs::Slot_StateUpdated(QUuid id, Calculation::State state)
     QString stateString = QString(stateEnum.valueToKey(state));
 
     LOG_DEBUG("Updating calculation state (id : " + id.toString() + ", row : "
-              + QString::number(memorisationPositions.value(id)) + ", state : " + stateString);
+              + QString::number(memIdToRow.value(id)) + ", state : " + stateString);
 
     QTableWidgetItem * stateTab = new QTableWidgetItem();
     stateTab->setText(stateString);
     stateTab->setTextAlignment(Qt::AlignCenter);
-    tableWidget->setItem(memorisationPositions.value(id), C_STATUT, stateTab);
+    tableWidget->setItem(memIdToRow.value(id), C_STATUT, stateTab);
 }
 
 void WidgetCalculs::Slot_ProgressUpdated(QUuid id, int value)
@@ -111,7 +115,27 @@ void WidgetCalculs::Slot_ProgressUpdated(QUuid id, int value)
 
     QProgressBar * progres = new QProgressBar();
     progres->setValue(value);
-    tableWidget->setCellWidget(memorisationPositions.value(id), C_PROGRES, progres);
+    tableWidget->setCellWidget(memIdToRow.value(id), C_PROGRES, progres);
 }
 
+void WidgetCalculs::Slot_CancelClicked()
+{
+    MainWindowController::GetInstance()->CancelCalculation(memButtonToId.value((QPushButton *) sender()));
 
+    if(! memButtonClicked.value((QPushButton *) sender()))
+    {
+        memButtonClicked[(QPushButton *) sender()] = true;
+        ((QPushButton *) sender())->setText("Supprimer");
+    }
+    else
+    {
+        tableWidget->removeRow(memIdToRow.value(memButtonToId.value((QPushButton *) sender())));
+
+        QUuid id;
+        for(int i=0; i<tableWidget->rowCount(); i++)
+        {
+            id = memButtonToId.value((QPushButton *) tableWidget->cellWidget(i, C_ANNULER));
+            memIdToRow[id] = i;
+        }
+    }
+}

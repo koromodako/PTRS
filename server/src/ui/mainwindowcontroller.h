@@ -21,6 +21,8 @@ public:
 
     virtual ~MainWindowController(){}
 
+    void CancelCalculation(QUuid id) { emit sig_cancel(id);}
+
 public slots:
     /**
      * Affiche le message de bienvenue et demande à l'utilisateur quoi faire
