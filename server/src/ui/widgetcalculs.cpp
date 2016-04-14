@@ -135,8 +135,7 @@ void WidgetCalculs::Slot_CancelClicked()
 
     if(! memCancelClicked.value((QPushButton *) sender()))
     {
-        memCancelClicked[(QPushButton *) sender()] = true;
-        ((QPushButton *) sender())->setText("Supprimer");
+        ChangeCancelToDelete(memIdToRow.value(memCancelToId.value((QPushButton *) sender())));
     }
     else
     {
@@ -156,6 +155,8 @@ void WidgetCalculs::Slot_CalculationDone(QUuid id, QJsonObject resultat)
     LOG_DEBUG("Receiving result for calculation (QUid : " + id.toString() + ")");
     memResults.insert(id, resultat);
     tableWidget->cellWidget(memIdToRow.value(id), C_RESULTAT)->setEnabled(true);
+    ChangeCancelToDelete(memIdToRow.value(id));
+
 }
 
 void WidgetCalculs::Slot_ShowResults()
@@ -169,6 +170,13 @@ void WidgetCalculs::Slot_ShowResults()
     LOG_DEBUG(jsonDocument.toJson(QJsonDocument::Indented));
     resultsMessage->setText(jsonDocument.toJson(QJsonDocument::Indented));
     resultsMessage->show();
+}
+
+void WidgetCalculs::ChangeCancelToDelete(int row)
+{
+    QPushButton * button = (QPushButton *) tableWidget->cellWidget(row, C_ANNULER);
+    memCancelClicked[button] = true;
+    button->setText("Delete");
 }
 
 

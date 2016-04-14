@@ -69,6 +69,8 @@ private:
 
     enum Colonnes {C_ID, C_NOM, C_STATUT, C_PROGRES, C_CLIENTS, C_RESULTAT, C_ANNULER};
 
+    void ChangeCancelToDelete(int row);
+
 };
 
 #endif // WIDGETCALCULS_H
