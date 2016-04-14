@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core network gui
+QT       += core network gui widgets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -43,7 +43,10 @@ SOURCES += \
     src/ui/widgetcalculs.cpp \
     src/ui/widgetclients.cpp \
     src/userinterface.cpp \
-    src/ui/mainwindowcontroller.cpp
+    src/ui/mainwindowcontroller.cpp \
+	src/ui/graph/edge.cpp \
+    src/ui/graph/node.cpp \
+    src/ui/graph/graphwidget.cpp
 
 HEADERS  += \
     src/console/consolehandler.h \
@@ -72,7 +75,11 @@ HEADERS  += \
     src/ui/widgetcalculs.h \
     src/ui/widgetclients.h \
     src/userinterface.h \
-    src/ui/mainwindowcontroller.h
+    src/ui/mainwindowcontroller.h \
+	src/ui/graph/edge.h \
+    src/ui/graph/node.h \
+    src/ui/graph/graphwidget.h
+
 
 FORMS    += src/ui/mainwindow.ui
 
