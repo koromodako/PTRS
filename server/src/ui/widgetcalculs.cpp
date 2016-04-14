@@ -1,4 +1,5 @@
 #include "widgetcalculs.h"
+#include "../calculation/specs.h"
 #include "../calculation/calculationmanager.h"
 #include "addcalculationwindow.h"
 #include "../utils/logger.h"
@@ -55,7 +56,8 @@ WidgetCalculs::WidgetCalculs(QWidget *parent) : QWidget(parent), addCalcWindow(N
             this, SLOT(Slot_StateUpdated(QUuid, Calculation::State)));
     connect(&CalculationManager::getInstance(), SIGNAL(sig_calculationProgressUpdated(QUuid,int)), this,
                                                        SLOT(Slot_ProgressUpdated(QUuid,int)));
-
+    connect(&CalculationManager::getInstance(), SIGNAL(sig_calculationDone(QUuid, QJsonObject)), this,
+                                                       SLOT(Slot_CalculationDone(QUuid, QJsonObject)));
     // Layout
     this->setLayout(layout);
 
@@ -89,14 +91,17 @@ void WidgetCalculs::Slot_NewCalculation(QUuid id)
     tableWidget->setCellWidget(ligneInsertion, C_PROGRES, new QProgressBar());
 
     QPushButton * annuler = new QPushButton("Cancel", this);
-    memButtonToId.insert(annuler, id);
-    memButtonClicked.insert(annuler, false);
-    connect(annuler, SIGNAL(clicked()), this, SLOT(Slot_CancelClicked()));
+    memCancelToId.insert(annuler, id);
+    memCancelClicked.insert(annuler, false);
     tableWidget->setCellWidget(ligneInsertion, C_ANNULER, annuler);
+    connect(annuler, SIGNAL(clicked()), this, SLOT(Slot_CancelClicked()));
 
     QPushButton * resultat = new QPushButton("Results", this);
+    memResultButtonToId.insert(resultat, id);
     resultat->setEnabled(false);
     tableWidget->setCellWidget(ligneInsertion, C_RESULTAT, resultat);
+    connect(resultat, SIGNAL(clicked()), this, SLOT(Slot_ShowResults()));
+
 }
 
 void WidgetCalculs::Slot_StateUpdated(QUuid id, Calculation::State state)
@@ -126,22 +131,44 @@ void WidgetCalculs::Slot_ProgressUpdated(QUuid id, int value)
 
 void WidgetCalculs::Slot_CancelClicked()
 {
-    MainWindowController::GetInstance()->CancelCalculation(memButtonToId.value((QPushButton *) sender()));
+    MainWindowController::GetInstance()->CancelCalculation(memCancelToId.value((QPushButton *) sender()));
 
-    if(! memButtonClicked.value((QPushButton *) sender()))
+    if(! memCancelClicked.value((QPushButton *) sender()))
     {
-        memButtonClicked[(QPushButton *) sender()] = true;
+        memCancelClicked[(QPushButton *) sender()] = true;
         ((QPushButton *) sender())->setText("Supprimer");
     }
     else
     {
-        tableWidget->removeRow(memIdToRow.value(memButtonToId.value((QPushButton *) sender())));
+        tableWidget->removeRow(memIdToRow.value(memCancelToId.value((QPushButton *) sender())));
 
         QUuid id;
         for(int i=0; i<tableWidget->rowCount(); i++)
         {
-            id = memButtonToId.value((QPushButton *) tableWidget->cellWidget(i, C_ANNULER));
+            id = memCancelToId.value((QPushButton *) tableWidget->cellWidget(i, C_ANNULER));
             memIdToRow[id] = i;
         }
     }
 }
+
+void WidgetCalculs::Slot_CalculationDone(QUuid id, QJsonObject resultat)
+{
+    LOG_DEBUG("Receiving result for calculation (QUid : " + id.toString() + ")");
+    memResults.insert(id, resultat);
+    tableWidget->cellWidget(memIdToRow.value(id), C_RESULTAT)->setEnabled(true);
+}
+
+void WidgetCalculs::Slot_ShowResults()
+{
+    QJsonObject jsonObject(memResults.value(memResultButtonToId.value((QPushButton *) sender())));
+    QJsonObject::iterator it = jsonObject.find(CS_JSON_KEY_FRAG_ID);
+    if(it != jsonObject.end()) jsonObject.erase(it);
+
+    QJsonDocument jsonDocument(jsonObject);
+    QMessageBox * resultsMessage = new QMessageBox(this);
+    LOG_DEBUG(jsonDocument.toJson(QJsonDocument::Indented));
+    resultsMessage->setText(jsonDocument.toJson(QJsonDocument::Indented));
+    resultsMessage->show();
+}
+
+

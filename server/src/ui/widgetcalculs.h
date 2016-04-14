@@ -44,6 +44,16 @@ public slots:
      */
     void Slot_CancelClicked();
 
+    /**
+     * @brief Slot déclenché lors de la fin d'un calcul
+     */
+    void Slot_CalculationDone(QUuid, QJsonObject);
+
+    /**
+     * @brief Slot déclenché lors d'un appui sur un bouton résultat
+     */
+    void Slot_ShowResults();
+
 private:
     AddCalculationWindow *addCalcWindow;
 
@@ -51,9 +61,11 @@ private:
 
     /** Faute de meilleure solution **/
     QHash<QUuid, int> memIdToRow;
-    QHash<QPushButton *, QUuid> memButtonToId;
-    QHash<QPushButton *, bool> memButtonClicked;
+    QHash<QPushButton *, QUuid> memCancelToId;
+    QHash<QPushButton *, bool> memCancelClicked;
+    QHash<QPushButton *, QUuid> memResultButtonToId;
     /** --------------------------- **/
+    QHash<QUuid, QJsonObject> memResults;
 
     enum Colonnes {C_ID, C_NOM, C_STATUT, C_PROGRES, C_CLIENTS, C_RESULTAT, C_ANNULER};
 
