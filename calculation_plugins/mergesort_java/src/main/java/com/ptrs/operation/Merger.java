@@ -69,7 +69,7 @@ public class Merger {
 			}
 		}
 		
-		return gson.toJson(new CalculationResultBlock(0, finalSortedArray));
+		return gson.toJson(new CalculationResultBlock("0", finalSortedArray));
 	}
 	
 	/**

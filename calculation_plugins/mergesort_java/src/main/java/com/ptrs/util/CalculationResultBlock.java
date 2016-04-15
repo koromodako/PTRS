@@ -2,20 +2,20 @@ package com.ptrs.util;
 
 public class CalculationResultBlock {
 	
-	private int fragmentId;
+	private String fragmentId;
 	private int[] result;
 	
-	public CalculationResultBlock(int fragmentId, int[] result) {
+	public CalculationResultBlock(String fragmentId, int[] result) {
 		super();
 		this.fragmentId = fragmentId;
 		this.result = result;
 	}
 
-	public int getFragmentId() {
+	public String getFragmentId() {
 		return fragmentId;
 	}
 
-	public void setFragmentId(int fragmentId) {
+	public void setFragmentId(String fragmentId) {
 		this.fragmentId = fragmentId;
 	}
 

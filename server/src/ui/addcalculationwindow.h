@@ -41,6 +41,7 @@ private:
     QMap<QString, QSpinBox *> intSelectors;
     QMap<QString, QDoubleSpinBox *> doubleSelectors;
     QMap<QString, QLineEdit *> stringSelectors;
+    QMap<QString, QLineEdit *> arraySelectors;
     QString currentCalculationName;
 
 signals:

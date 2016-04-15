@@ -51,6 +51,10 @@ void AddCalculationWindow::showAndReset()
         {
             i.value()->setText(QString());
         }
+        for(auto i = arraySelectors.begin(); i != arraySelectors.end(); i++)
+        {
+            i.value()->setText(QString());
+        }
         show();
     }
 }
@@ -62,6 +66,7 @@ void AddCalculationWindow::updateOptions(QString selectedPlugin, QStringList ite
     intSelectors.clear();
     doubleSelectors.clear();
     stringSelectors.clear();
+    arraySelectors.clear();
 
     QStringList pluginNames = PluginManager::getInstance().GetPluginsList();
 
@@ -129,7 +134,14 @@ void AddCalculationWindow::updateOptions(QString selectedPlugin, QStringList ite
             {
                 QLineEdit *line = new QLineEdit(listParameters);
                 value = line;
-                stringSelectors.insert(stringSelectors.begin(), itemNames[i], line);
+                if(itemTypes[i] == "array")
+                {
+                    arraySelectors.insert(arraySelectors.begin(), itemNames[i], line);
+                }
+                else
+                {
+                    stringSelectors.insert(stringSelectors.begin(), itemNames[i], line);
+                }
             }
 
             listLayout->addWidget(name, i+2, 0);
@@ -243,6 +255,28 @@ void AddCalculationWindow::Slot_runCalculation()
     for(auto i = stringSelectors.begin(); i != stringSelectors.end(); i++)
     {
         params.insert(i.key(), i.value()->text());
+    }
+    for(auto i = arraySelectors.begin(); i != arraySelectors.end(); i++)
+    {
+        //try to convert content to JSON
+        QString arrayString = i.value()->text();
+
+        QJsonParseError *error = NULL;
+        QJsonDocument doc = QJsonDocument::fromJson(arrayString.toUtf8(), error);
+
+        if(error != NULL)
+        {
+            LOG_INFO("Error while parsing user JSON: " + error->errorString() + ", abort!");
+            return;
+        }
+
+        if(!doc.isArray())
+        {
+            LOG_INFO("Provided JSON is not an array, abort!");
+            return;
+        }
+
+        params.insert(i.key(), doc.array());
     }
     mainObj.insert(CS_JSON_KEY_CALC_PARAMS, params);
 

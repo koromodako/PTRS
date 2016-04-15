@@ -74,7 +74,7 @@ public class Splitter {
 			int[] partitionedArray = new int[nbValues];
 			System.arraycopy(valuesToSplit, partitionPosition, partitionedArray, 0, nbValues);
 			
-			CalculationBlock calculationBlock = new CalculationBlock(i, new CalculationBlockParams(partitionedArray));
+			CalculationBlock calculationBlock = new CalculationBlock(""+i, new CalculationBlockParams(partitionedArray));
 			calculationBlocks.add(calculationBlock);
 		}
 		
