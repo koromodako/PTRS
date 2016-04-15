@@ -36,7 +36,7 @@ private:
     const double DOUBLE_STEP = 0.01;
 
     void updateOptions(QString selectedPlugin, QStringList itemNames = QStringList(),
-                       QStringList itemTypes = QStringList());
+                       QStringList itemTypes = QStringList(), QJsonArray *parameters = NULL);
 
     QMap<QString, QSpinBox *> intSelectors;
     QMap<QString, QDoubleSpinBox *> doubleSelectors;

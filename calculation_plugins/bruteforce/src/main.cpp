@@ -18,7 +18,8 @@
 
 void success(std::string response);
 void fail(std::string msg);
-static QJsonValue getParam(QString name, QString type);
+static QJsonValue getParam(QString name, QString type, QString regex, QString tooltip);
+static QJsonValue getParam(QString name, QString type, int minimum);
 
 int main(int argc, char *argv[])
 {
@@ -63,11 +64,11 @@ int main(int argc, char *argv[])
 
         QJsonArray listParams;
 
-        listParams += getParam(PARAM_CHARSET, CS_TYPE_STRING);
-        listParams += getParam(PARAM_MIN_LEN, CS_TYPE_INT);
-        listParams += getParam(PARAM_MAX_LEN, CS_TYPE_INT);
-        listParams += getParam(PARAM_HASH_F, CS_TYPE_STRING);
-        listParams += getParam(PARAM_TARGET, CS_TYPE_STRING);
+        listParams += getParam(PARAM_CHARSET, CS_TYPE_STRING, REGEX_NOT_EMPTY, TOOLTIP_NOT_EMPTY);
+        listParams += getParam(PARAM_MIN_LEN, CS_TYPE_INT, 1);
+        listParams += getParam(PARAM_MAX_LEN, CS_TYPE_INT, 1);
+        listParams += getParam(PARAM_HASH_F, CS_TYPE_STRING, REGEX_HASH_FUNCTIONS, TOOLTIP_HASH_FUNCTIONS);
+        listParams += getParam(PARAM_TARGET, CS_TYPE_STRING, REGEX_NOT_EMPTY, TOOLTIP_NOT_EMPTY);
 
         retDocument.setArray(listParams);
 
@@ -90,11 +91,23 @@ void fail(std::string msg)
     exit(EXIT_FAILURE);
 }
 
-static QJsonValue getParam(QString name, QString type)
+static QJsonValue getParam(QString name, QString type, QString regex, QString tooltip)
 {
     QJsonObject obj;
     obj.insert(CS_PLUGINPARAMS_NAME, name);
     obj.insert(CS_PLUGINPARAMS_TYPE, type);
+    obj.insert(CS_PLUGINPARAMS_REGEX, regex);
+    obj.insert(CS_PLUGINPARAMS_TOOLTIP, tooltip);
+
+    return obj;
+}
+
+static QJsonValue getParam(QString name, QString type, int minimum)
+{
+    QJsonObject obj;
+    obj.insert(CS_PLUGINPARAMS_NAME, name);
+    obj.insert(CS_PLUGINPARAMS_TYPE, type);
+    obj.insert(CS_PLUGINPARAMS_MIN, 1);
 
     return obj;
 }

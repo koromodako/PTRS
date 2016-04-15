@@ -16,9 +16,15 @@
 
 #define CS_PLUGINPARAMS_NAME "name"
 #define CS_PLUGINPARAMS_TYPE "type"
+#define CS_PLUGINPARAMS_REGEX "regex"
+#define CS_PLUGINPARAMS_TOOLTIP "tooltip"
+#define CS_PLUGINPARAMS_MIN "min"
+#define CS_PLUGINPARAMS_MAX "max"
+#define CS_PLUGINPARAMS_STEP "step"
 
 #define CS_TYPE_STRING "string"
 #define CS_TYPE_INT    "int"
 #define CS_TYPE_DOUBLE "double"
+#define CS_TYPE_ARRAY  "array"
 
 #endif // SPECS_H
