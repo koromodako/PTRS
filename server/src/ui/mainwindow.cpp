@@ -1,7 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "widgetclients.h"
 #include "widgetcalculs.h"
+#include "graph/graphwidget.h"
 #include "mainwindowcontroller.h"
 
 #include <QLayout>
@@ -18,7 +18,7 @@ MainWindow::MainWindow(QWidget *parent) :
     centralWidget->setLayout(centralLayout);
 
     // ---- Onglet clients
-    WidgetClients * clients = new WidgetClients();
+    GraphWidget * clients = new GraphWidget();
 
     // ---- Onglet résultats
     WidgetCalculs * calculs = new WidgetCalculs();

@@ -10,6 +10,8 @@
 #include <QPushButton>
 #include <QVariantMap>
 
+#include <QMessageBox>
+
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QJsonDocument>
@@ -18,7 +20,6 @@
 
 #include "../calculation/specs.h"
 #include "widgetcalculs.h"
-
 
 AddCalculationWindow::AddCalculationWindow(QWidget *parent) : QMainWindow(parent)
 {
@@ -54,17 +55,22 @@ void AddCalculationWindow::showAndReset()
         {
             i.value()->setText(QString());
         }
+        for(auto i = arraySelectors.begin(); i != arraySelectors.end(); i++)
+        {
+            i.value()->setText(QString());
+        }
         show();
     }
 }
 
-void AddCalculationWindow::updateOptions(QString selectedPlugin, QStringList itemNames, QStringList itemTypes)
+void AddCalculationWindow::updateOptions(QString selectedPlugin, QStringList itemNames, QStringList itemTypes, QJsonArray *parameters)
 {
     currentCalculationName = selectedPlugin;
 
     intSelectors.clear();
     doubleSelectors.clear();
     stringSelectors.clear();
+    arraySelectors.clear();
 
     QStringList pluginNames = PluginManager::getInstance().GetPluginsList();
 
@@ -113,26 +119,89 @@ void AddCalculationWindow::updateOptions(QString selectedPlugin, QStringList ite
         {
             QLabel *name = new QLabel(itemNames[i], listParameters);
             QWidget *value = NULL;
+
+            QJsonObject valueParams = (*parameters)[i].toObject();
+
             if(itemTypes[i] == "int")
             {
                 QSpinBox *spin = new QSpinBox(listParameters);
-                spin->setRange(-SPIN_BOX_RANGE, SPIN_BOX_RANGE);
+
+                int min = -SPIN_BOX_RANGE;
+                int max = SPIN_BOX_RANGE;
+                int step = 1;
+                if(valueParams[CS_PLUGINPARAMS_MIN].isDouble()) //int is recognized as a double
+                {
+                    min = valueParams[CS_PLUGINPARAMS_MIN].toInt();
+                }
+                if(valueParams[CS_PLUGINPARAMS_MAX].isDouble())
+                {
+                    max = valueParams[CS_PLUGINPARAMS_MAX].toInt();
+                }
+                if(valueParams[CS_PLUGINPARAMS_STEP].isDouble())
+                {
+                    step = valueParams[CS_PLUGINPARAMS_STEP].toInt();
+                }
+
+                spin->setRange(min, max);
+                spin->setSingleStep(step);
                 value = spin;
                 intSelectors.insert(intSelectors.begin(), itemNames[i], spin);
             }
             else if(itemTypes[i] == "double")
             {
                 QDoubleSpinBox *spin = new QDoubleSpinBox(listParameters);
-                spin->setRange(-SPIN_BOX_RANGE, SPIN_BOX_RANGE);
-                spin->setSingleStep(DOUBLE_STEP);
+
+                double min = -SPIN_BOX_RANGE;
+                double max = SPIN_BOX_RANGE;
+                double step = DOUBLE_STEP;
+                if(valueParams[CS_PLUGINPARAMS_MIN].isDouble()) //int is recognized as a double
+                {
+                    min = valueParams[CS_PLUGINPARAMS_MIN].toDouble();
+                }
+                if(valueParams[CS_PLUGINPARAMS_MAX].isDouble())
+                {
+                    max = valueParams[CS_PLUGINPARAMS_MAX].toDouble();
+                }
+                if(valueParams[CS_PLUGINPARAMS_STEP].isDouble())
+                {
+                    step = valueParams[CS_PLUGINPARAMS_STEP].toDouble();
+                }
+
+                spin->setRange(min, max);
+                spin->setSingleStep(step);
                 value = spin;
                 doubleSelectors.insert(doubleSelectors.begin(), itemNames[i], spin);
             }
             else
             {
                 QLineEdit *line = new QLineEdit(listParameters);
+
+                if(valueParams[CS_PLUGINPARAMS_REGEX].isString())
+                {
+                    line->setObjectName(valueParams[CS_PLUGINPARAMS_REGEX].toString());
+                    if(valueParams[CS_PLUGINPARAMS_TOOLTIP].isString())
+                    {
+                        line->setToolTip(valueParams[CS_PLUGINPARAMS_TOOLTIP].toString());
+                    }
+                    else
+                    {
+                        line->setToolTip("Must match the regular expression "+line->objectName());
+                    }
+                }
+                else
+                {
+                    line->setToolTip(""); //accept all
+                }
+
                 value = line;
-                stringSelectors.insert(stringSelectors.begin(), itemNames[i], line);
+                if(itemTypes[i] == "array")
+                {
+                    arraySelectors.insert(arraySelectors.begin(), itemNames[i], line);
+                }
+                else
+                {
+                    stringSelectors.insert(stringSelectors.begin(), itemNames[i], line);
+                }
             }
 
             listLayout->addWidget(name, i+2, 0);
@@ -220,7 +289,8 @@ void AddCalculationWindow::fetchPluginParameters(QString name)
 
     if(errorStr.isEmpty())
     {
-        updateOptions(name, itemNames, itemTypes);
+        QJsonArray array = doc.array();
+        updateOptions(name, itemNames, itemTypes, &array);
     }
     else
     {
@@ -245,7 +315,67 @@ void AddCalculationWindow::Slot_runCalculation()
     }
     for(auto i = stringSelectors.begin(); i != stringSelectors.end(); i++)
     {
-        params.insert(i.key(), i.value()->text());
+        QString value = i.value()->text();
+        QString regex = i.value()->objectName();
+
+        QRegExp matcher(regex);
+        if(regex.isEmpty() || matcher.exactMatch(value))
+        {
+            params.insert(i.key(), value);
+        }
+        else
+        {
+            LOG_INFO(value+" does not match regex "+regex+"!");
+
+            QMessageBox *box = new QMessageBox (this);
+            box->setText("Error: bad parameter \""+value+"\" for "+i.key()+".\n"+i.value()->toolTip());
+            box->show();
+
+            return;
+        }
+    }
+    for(auto i = arraySelectors.begin(); i != arraySelectors.end(); i++)
+    {
+        QString value = i.value()->text();
+        QString regex = i.value()->objectName();
+
+        QRegExp matcher(regex);
+        if(regex.isEmpty() || matcher.exactMatch(value))
+        {
+            //try to convert content to JSON
+            QJsonParseError *error = NULL;
+            QJsonDocument doc = QJsonDocument::fromJson(value.toUtf8(), error);
+
+            if(error != NULL)
+            {
+                LOG_INFO("Error while parsing user JSON: " + error->errorString() + ", abort!");
+                QMessageBox *box = new QMessageBox (this);
+                box->setText("Error: bad parameter \""+value+"\" for "+i.key()+". It should be a JSON array.");
+                box->show();
+                return;
+            }
+
+            if(!doc.isArray())
+            {
+                QMessageBox *box = new QMessageBox (this);
+                box->setText("Error: bad parameter \""+value+"\" for "+i.key()+". It should be a JSON array.");
+                box->show();
+
+                return;
+            }
+
+            params.insert(i.key(), doc.array());
+        }
+        else
+        {
+            LOG_INFO(value+" does not match regex "+regex+"!");
+
+            QMessageBox *box = new QMessageBox (this);
+            box->setText("Error: bad parameter \""+value+"\" for "+i.key()+".\n"+i.value()->toolTip());
+            box->show();
+
+            return;
+        }
     }
     mainObj.insert(CS_JSON_KEY_CALC_PARAMS, params);
 
