@@ -42,6 +42,7 @@ private:
     QMap<QString, QDoubleSpinBox *> doubleSelectors;
     QMap<QString, QLineEdit *> stringSelectors;
     QString currentCalculationName;
+    QWidget * widgetCalculs;
 
 signals:
 

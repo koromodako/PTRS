@@ -17,10 +17,13 @@
 #include <QJsonValue>
 
 #include "../calculation/specs.h"
+#include "widgetcalculs.h"
 
 
 AddCalculationWindow::AddCalculationWindow(QWidget *parent) : QMainWindow(parent)
 {
+    widgetCalculs = parent;
+
     QStringList listPlugins = PluginManager::getInstance().GetPluginsList();
     if(listPlugins.size() > 0)
     {

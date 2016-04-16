@@ -5,7 +5,7 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 
-bool CalculationManager::Execute(Calculation *calculation)
+bool CalculationManager::Execute(Calculation *calculation, QByteArray params)
 {
     bool ok = false;
     // -- on ajoute le calcul à la liste des calculs
@@ -13,7 +13,9 @@ bool CalculationManager::Execute(Calculation *calculation)
     // -- si le plugin existe
     if(PluginManager::getInstance().PluginExists(calculation->GetBin()))
     {
-        emit sig_newCalculation(calculation->GetId());
+
+        QJsonDocument doc = QJsonDocument::fromJson(params);
+        emit sig_newCalculation(calculation->GetId(), doc);
         connect (calculation, SIGNAL(sig_progressUpdated(QUuid, int)),
                  this, SIGNAL(sig_calculationProgressUpdated(QUuid, int)));
         connect (calculation, SIGNAL(sig_stateUpdated(QUuid, Calculation::State)),

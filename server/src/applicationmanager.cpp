@@ -103,7 +103,7 @@ void ApplicationManager::Slot_exec(QByteArray json)
         emit sig_response(CMD_EXEC, false, error);
     }
     else
-    {   if(CalculationManager::getInstance().Execute(calculation))
+    {   if(CalculationManager::getInstance().Execute(calculation, json))
         {   LOG_DEBUG("sig_response(CMD_EXEC,true) emitted.");
             emit sig_response(CMD_EXEC, true, QString("Calculation accepted id=%1.").arg(
                                   calculation->GetId().toString()));

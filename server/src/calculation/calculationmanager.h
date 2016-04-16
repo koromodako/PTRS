@@ -18,9 +18,11 @@ public:
      * @brief Réalise la fragmentation du calcul et programme son execution
      * @param calculation
      *      Calcul à fragmenter et executer
+     * @param params
+     *      Représentation json des paramètres de calculs (requis pour l'IHM)
      * @return false si le binaire de fragmentation correspondant au calcul n'existe pas
      */
-    bool Execute(Calculation * calculation);
+    bool Execute(Calculation * calculation, QByteArray params);
 
     /**
      * @brief Démarre le processus d'annulation d'un calcul
@@ -78,8 +80,9 @@ signals:
     /**
      * @brief Emis quand un nouveau calcul doit être effectué
      * @param idCalculation l'id du nouveau calcul
+     * @param params représente les paramètres du calcul (requis par l'IHM)
      */
-    void sig_newCalculation(QUuid idCalculation);
+    void sig_newCalculation(QUuid idCalculation, QJsonDocument params);
 
 
 protected:

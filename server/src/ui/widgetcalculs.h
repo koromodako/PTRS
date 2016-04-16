@@ -27,7 +27,7 @@ public slots:
     /**
      * @brief Slot déclenché lorsqu'un nouveau calcul est crée
      */
-    void Slot_NewCalculation(QUuid id);
+    void Slot_NewCalculation(QUuid id, QJsonDocument params);
 
     /**
      * @brief Slot déclenché lors de la mise à jour de l'état d'un calcul
@@ -50,9 +50,14 @@ public slots:
     void Slot_CalculationDone(QUuid, QJsonObject);
 
     /**
-     * @brief Slot déclenché lors d'un appui sur un bouton résultat
+     * @brief Slot déclenché lors d'un clic sur un bouton résultat
      */
     void Slot_ShowResults();
+
+    /**
+     * @brief Slot déclenché lors d'un clic sur un bouton target
+     */
+    void Slot_ShowTarget();
 
 private:
     AddCalculationWindow *addCalcWindow;
@@ -64,12 +69,14 @@ private:
     QHash<QPushButton *, QUuid> memCancelToId;
     QHash<QPushButton *, bool> memCancelClicked;
     QHash<QPushButton *, QUuid> memResultButtonToId;
+    QHash<QPushButton *, QUuid> memTargetToId;
     /** --------------------------- **/
     QHash<QUuid, QJsonObject> memResults;
+    QHash<QUuid, QJsonDocument> memParams;
 
-    enum Colonnes {C_ID, C_NOM, C_STATUT, C_PROGRES, C_CLIENTS, C_RESULTAT, C_ANNULER};
+    enum Colonnes {C_ID, C_NOM, C_STATUT, C_PROGRES, C_PARAMS, C_RESULTAT, C_ANNULER};
 
-    void ChangeCancelToDelete(int row);
+    void changeCancelToDelete(int row);
 
 };
 
