@@ -43,6 +43,7 @@ void NetworkManager::slot_addAvailableClient(ClientSession *client)
         emit sig_workingClientCountUpdated(_fragmentsPlace.count());
     }
 
+    emit sig_newClient(client->GetId());
     emit sig_availableClientCountUpdated(_availableClients.count());
 
     LOG_DEBUG("Adding available client");

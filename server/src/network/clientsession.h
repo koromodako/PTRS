@@ -108,6 +108,13 @@ signals:
      */
     void sig_working(ClientSession *client);
 
+    /**
+     * @brief Emis lorsqu'un client doit travailler sur un calcul.
+     * @param calculationId Id du calcul
+     * @param clientId Id du client
+     */
+    void sig_clientWorkingOnCalculation(QUuid calculationId, QUuid clientId);
+
 private:
     /**
      * @brief Initialise l'automate et les états

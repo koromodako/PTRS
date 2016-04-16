@@ -36,6 +36,15 @@ void ApplicationManager::Init(UserInterface *interface)
     connect(this, SIGNAL(sig_terminateModule()),
             &(PluginManager::getInstance()), SLOT(Slot_terminate()));
 
+    //network_manager --> userinterface
+    connect(&(NetworkManager::getInstance()), SIGNAL(sig_newClient(QUuid)), interface, SLOT(Slot_newClient(QUuid)));
+
+    //calc_manager --> userinterface
+    connect(&(CalculationManager::getInstance()), SIGNAL(sig_newCalculation(QUuid,QJsonDocument)),
+                interface, SLOT(Slot_newCalculation(QUuid,QJsonDocument)));
+    connect(&(CalculationManager::getInstance()), SIGNAL(sig_calculationStateUpdated(QUuid,Calculation::State)),
+                interface, SLOT(Slot_stateUpdated(QUuid,Calculation::State)));
+
     LOG_INFO("Initialisation des composants...");
     // -- initialisation des composants
     PluginManager::getInstance().Init();

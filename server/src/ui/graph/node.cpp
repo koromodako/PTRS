@@ -47,8 +47,17 @@
 #include <QPainter>
 #include <QStyleOption>
 
-Node::Node(GraphWidget *graphWidget)
-    : graph(graphWidget)
+Node::Node(GraphWidget *graphWidget, QColor colorExt, QColor colorInt, QUuid id)
+    : graph(graphWidget), extColor(colorExt), intColor(colorInt), objectId(id), _isServer(false)
+{
+    setFlag(ItemIsMovable);
+    setFlag(ItemSendsGeometryChanges);
+    setCacheMode(DeviceCoordinateCache);
+    setZValue(-1);
+}
+
+Node::Node(GraphWidget *graphWidget, QColor colorExt, QColor colorInt, bool server)
+    : graph(graphWidget), extColor(colorExt), intColor(colorInt), objectId(QUuid()), _isServer(server)
 {
     setFlag(ItemIsMovable);
     setFlag(ItemSendsGeometryChanges);
@@ -145,11 +154,11 @@ void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
     if (option->state & QStyle::State_Sunken) {
         gradient.setCenter(3, 3);
         gradient.setFocalPoint(3, 3);
-        gradient.setColorAt(1, QColor(Qt::yellow).light(120));
-        gradient.setColorAt(0, QColor(Qt::darkYellow).light(120));
+        gradient.setColorAt(1, intColor.light(120));
+        gradient.setColorAt(0, extColor.light(120));
     } else {
-        gradient.setColorAt(0, Qt::yellow);
-        gradient.setColorAt(1, Qt::darkYellow);
+        gradient.setColorAt(0, intColor.light(120));
+        gradient.setColorAt(1, extColor.light(120));
     }
     painter->setBrush(gradient);
 
@@ -182,4 +191,24 @@ void Node::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     update();
     QGraphicsItem::mouseReleaseEvent(event);
+}
+
+QUuid Node::getObjectId()
+{
+    return objectId;
+}
+
+bool Node::isServer()
+{
+    return _isServer;
+}
+
+void Node::removeEdges()
+{
+    edgeList.clear();
+}
+
+void Node::removeEdge(Edge *edge)
+{
+    edgeList.removeOne(edge);
 }

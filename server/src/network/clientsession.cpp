@@ -5,6 +5,7 @@
 #include "src/network/etat/workingabouttostartstate.h"
 #include "src/network/etat/workingstate.h"
 #include "src/utils/logger.h"
+#include "src/ui/mainwindowcontroller.h"
 
 #include <QJsonObject>
 #include <QDataStream>
@@ -20,6 +21,13 @@ ClientSession::ClientSession(QTcpSocket *associatedSocket, QObject *parent) :
 {
     connect(_socket, &QTcpSocket::readyRead, this, &ClientSession::slot_processReadyRead);
     connect(_socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(slot_disconnect()));
+
+    if(MainWindowController::GetInstance() != NULL)
+    {
+        connect(this, SIGNAL(sig_clientWorkingOnCalculation(QUuid,QUuid)),
+                MainWindowController::GetInstance(), SLOT(Slot_clientWorkingOnCalculation(QUuid,QUuid)));
+    }
+
     initializeStateMachine();
 }
 
@@ -190,6 +198,9 @@ bool ClientSession::StartCalcul(const Fragment *fragment)
     _fragment = fragment;
     emit sig_calculStarted();
     _currentState->ProcessDo(fragment->ToJson().toUtf8());
+
+    emit sig_clientWorkingOnCalculation(fragment->GetCalculation()->GetId(), GetId());
+
     return true;
 }
 

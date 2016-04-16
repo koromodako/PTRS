@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include "../userinterface.h"
+#include "graph/graphwidget.h"
 
 namespace Ui {
 class MainWindow;
@@ -21,12 +22,16 @@ public:
 
     ~MainWindow();
 
+    GraphWidget *getGraphWidget();
+
 protected:
     void closeEvent(QCloseEvent *event);
 
 private:
     Ui::MainWindow *ui;
     Q_DISABLE_COPY(MainWindow)
+
+    GraphWidget * _graphWidget;
 };
 
 #endif // MAINWINDOW_H

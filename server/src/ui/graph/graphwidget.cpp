@@ -41,13 +41,15 @@
 #include "graphwidget.h"
 #include "edge.h"
 #include "node.h"
+#include "../../utils/logger.h"
 
 #include <math.h>
 
 #include <QKeyEvent>
+#include <QUuid>
 
 GraphWidget::GraphWidget(QWidget *parent)
-    : QGraphicsView(parent), timerId(0)
+    : QGraphicsView(parent), timerId(0), newNodePos(0)
 {
     QGraphicsScene *scene = new QGraphicsScene(this);
     scene->setItemIndexMethod(QGraphicsScene::NoIndex);
@@ -61,52 +63,16 @@ GraphWidget::GraphWidget(QWidget *parent)
     setMinimumSize(400, 400);
     setWindowTitle(tr("Elastic Nodes"));
 
-    Node *node1 = new Node(this);
-    Node *node2 = new Node(this);
-    Node *node3 = new Node(this);
-    Node *node4 = new Node(this);
-    centerNode = new Node(this);
-    Node *node6 = new Node(this);
-    Node *node7 = new Node(this);
-    Node *node8 = new Node(this);
-    Node *node9 = new Node(this);
-    scene->addItem(node1);
-    scene->addItem(node2);
-    scene->addItem(node3);
-    scene->addItem(node4);
+    centerNode = new Node(this, QColor(Qt::darkBlue), QColor(Qt::blue), true);
     scene->addItem(centerNode);
-    scene->addItem(node6);
-    scene->addItem(node7);
-    scene->addItem(node8);
-    scene->addItem(node9);
-    scene->addItem(new Edge(node1, node2));
-    scene->addItem(new Edge(node2, node3));
-    scene->addItem(new Edge(node2, centerNode));
-    scene->addItem(new Edge(node3, node6));
-    scene->addItem(new Edge(node4, node1));
-    scene->addItem(new Edge(node4, centerNode));
-    scene->addItem(new Edge(centerNode, node6));
-    scene->addItem(new Edge(centerNode, node8));
-    scene->addItem(new Edge(node6, node9));
-    scene->addItem(new Edge(node7, node4));
-    scene->addItem(new Edge(node8, node7));
-    scene->addItem(new Edge(node9, node8));
-
-    node1->setPos(-50, -50);
-    node2->setPos(0, -50);
-    node3->setPos(50, -50);
-    node4->setPos(-50, 0);
     centerNode->setPos(0, 0);
-    node6->setPos(50, 0);
-    node7->setPos(-50, 50);
-    node8->setPos(0, 50);
-    node9->setPos(50, 50);
+    centerNode->setToolTip("Server");
 }
 
 void GraphWidget::itemMoved()
 {
     if (!timerId)
-        timerId = startTimer(1000 / 25);
+        timerId = startTimer(1000 / 50);
 }
 
 void GraphWidget::keyPressEvent(QKeyEvent *event)
@@ -174,38 +140,7 @@ void GraphWidget::wheelEvent(QWheelEvent *event)
 void GraphWidget::drawBackground(QPainter *painter, const QRectF &rect)
 {
     Q_UNUSED(rect);
-
-    // Shadow
-    QRectF sceneRect = this->sceneRect();
-    QRectF rightShadow(sceneRect.right(), sceneRect.top() + 5, 5, sceneRect.height());
-    QRectF bottomShadow(sceneRect.left() + 5, sceneRect.bottom(), sceneRect.width(), 5);
-    if (rightShadow.intersects(rect) || rightShadow.contains(rect))
-        painter->fillRect(rightShadow, Qt::darkGray);
-    if (bottomShadow.intersects(rect) || bottomShadow.contains(rect))
-        painter->fillRect(bottomShadow, Qt::darkGray);
-
-    // Fill
-    QLinearGradient gradient(sceneRect.topLeft(), sceneRect.bottomRight());
-    gradient.setColorAt(0, Qt::white);
-    gradient.setColorAt(1, Qt::lightGray);
-    painter->fillRect(rect.intersected(sceneRect), gradient);
-    painter->setBrush(Qt::NoBrush);
-    painter->drawRect(sceneRect);
-
-    // Text
-    QRectF textRect(sceneRect.left() + 4, sceneRect.top() + 4,
-                    sceneRect.width() - 4, sceneRect.height() - 4);
-    QString message(tr("Click and drag the nodes around, and zoom with the mouse "
-                       "wheel or the '+' and '-' keys"));
-
-    QFont font = painter->font();
-    font.setBold(true);
-    font.setPointSize(14);
-    painter->setFont(font);
-    painter->setPen(Qt::lightGray);
-    painter->drawText(textRect.translated(2, 2), message);
-    painter->setPen(Qt::black);
-    painter->drawText(textRect, message);
+    Q_UNUSED(painter);
 }
 
 void GraphWidget::scaleView(qreal scaleFactor)
@@ -233,4 +168,142 @@ void GraphWidget::zoomIn()
 void GraphWidget::zoomOut()
 {
     scaleView(1 / qreal(1.2));
+}
+
+void GraphWidget::newClient(QUuid newClientId)
+{
+    Node *client = seekItem(newClientId);
+
+    if(client == NULL)
+    {
+        LOG_DEBUG("Now adding client "+newClientId.toString()+" to graph!");
+
+        Node *newNode = new Node(this, Qt::darkRed, Qt::red, newClientId);
+        scene()->addItem(newNode);
+        scene()->addItem(new Edge(newNode, centerNode));
+        newNode->setPos(newNodePos++, 10);
+        newNode->setToolTip("Client, id "+newClientId.toString());
+    }
+    else
+    {
+        clientNotWorkingAnymore(newClientId);
+    }
+}
+
+void GraphWidget::newCalculation(QUuid calculationId, QString name)
+{
+    LOG_DEBUG("Now adding calc "+calculationId.toString()+" to graph!");
+
+    Node *newNode = new Node(this, Qt::darkGreen, Qt::green, calculationId);
+    scene()->addItem(newNode);
+    newNode->setPos(newNodePos++, 10);
+    newNode->setToolTip("Calculation "+name+", id "+calculationId.toString());
+}
+
+void GraphWidget::clientWorkingOnCalculation(QUuid calculationId, QUuid clientId)
+{
+    LOG_DEBUG("Now linking calculation "+calculationId.toString()+" to client "+clientId.toString()+"!");
+
+    Node *calculation = seekItem(calculationId);
+    Node *client = seekItem(clientId);
+
+    if(calculation == NULL || client == NULL)
+    {
+        LOG_ERROR("Error: Calculation or client does not exist on graph!");
+    }
+    else
+    {
+        scene()->addItem(new Edge(client, calculation));
+    }
+}
+
+void GraphWidget::clientNotWorkingAnymore(QUuid clientId)
+{
+    LOG_DEBUG("Now removing links from "+clientId.toString()+"!");
+
+    Node *client = seekItem(clientId);
+
+    if(client == NULL)
+    {
+        LOG_ERROR("Error: Client does not exist on graph!");
+    }
+    else
+    {
+        for(Edge *e : client->edges())
+        {
+            if(!e->destNode()->isServer())
+            {
+                //it is a calculation (not the server)
+                e->destNode()->removeEdge(e);
+                client->removeEdge(e);
+
+                if(e->scene() == scene()) scene()->removeItem(e);
+            }
+        }
+    }
+}
+
+
+void GraphWidget::deleteClient(QUuid clientId)
+{
+    LOG_DEBUG("Now removing client "+clientId.toString()+"!");
+
+    Node *client = seekItem(clientId);
+
+    if(client == NULL)
+    {
+        LOG_ERROR("Error: Client does not exist on graph!");
+    }
+    else
+    {
+        for(Edge *e : client->edges())
+        {
+            if(e->scene() == scene()) scene()->removeItem(e);
+        }
+        client->removeEdges();
+
+        if(client->scene() == scene()) scene()->removeItem(client);
+    }
+}
+
+void GraphWidget::deleteCalculation(QUuid calculationId)
+{
+    LOG_DEBUG("Now removing calculation "+calculationId.toString()+"!");
+
+    Node *calculation = seekItem(calculationId);
+
+    if(calculation == NULL)
+    {
+        LOG_ERROR("Error: Calculation does not exist on graph!");
+    }
+    else
+    {
+        for(Edge *e : calculation->edges())
+        {
+            if(e->scene() == scene()) scene()->removeItem(e);
+        }
+        calculation->removeEdges();
+
+        if(calculation->scene() == scene()) scene()->removeItem(calculation);
+    }
+}
+
+Node * GraphWidget::seekItem(QUuid itemId)
+{
+    Node *foundNode = NULL;
+
+    for(QGraphicsItem *item : items())
+    {
+        if (Node * node = dynamic_cast<Node *>(item))
+        {
+            if(node->getObjectId() == itemId)
+            {
+                foundNode = node;
+                break;
+            }
+        }
+
+    }
+
+    return foundNode;
 }

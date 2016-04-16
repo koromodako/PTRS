@@ -18,7 +18,7 @@ MainWindow::MainWindow(QWidget *parent) :
     centralWidget->setLayout(centralLayout);
 
     // ---- Onglet clients
-    GraphWidget * clients = new GraphWidget();
+    _graphWidget = new GraphWidget();
 
     // ---- Onglet résultats
     WidgetCalculs * calculs = new WidgetCalculs();
@@ -26,7 +26,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // ---- Configuration tabview
     QTabWidget * onglets = new QTabWidget(this);
     onglets->addTab(calculs, "Calculations");
-    onglets->addTab(clients, "Clients");
+    onglets->addTab(_graphWidget, "Clients");
     centralLayout->addWidget(onglets);
 
     // ---- Configuration MainWindow
@@ -43,4 +43,9 @@ MainWindow::~MainWindow()
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     MainWindowController::GetInstance()->windowClosed();
+}
+
+GraphWidget *MainWindow::getGraphWidget()
+{
+    return _graphWidget;
 }

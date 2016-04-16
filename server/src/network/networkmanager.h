@@ -85,6 +85,12 @@ signals:
      */
     void sig_workingClientCountUpdated(int nb);
 
+    /**
+     * @brief Emis lorsqu'un nouveau client se connecte.
+     * @param client Identifiant du client
+     */
+    void sig_newClient(QUuid client);
+
 private:
     /**
      * @brief Constructeur de la classe

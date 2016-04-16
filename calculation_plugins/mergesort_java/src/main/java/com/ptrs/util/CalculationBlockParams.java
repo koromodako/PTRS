@@ -4,7 +4,7 @@ public class CalculationBlockParams {
 	
 	public static final String PARAM_VALUES = "values";
 	public static final String PARAM_TYPE_VALUES = "array";
-	public static final String PARAM_REGEX_VALUES = "\\[([1-9]\\d*,)*[1-9]\\d*\\]";
+	public static final String PARAM_REGEX_VALUES = "\\[((-?[1-9]\\d*|0),)*(-?[1-9]\\d*|0)\\]";
 	public static final String PARAM_TOOLTIP_VALUES = "List of numbers between brackets, example: [1,3,8,2]";
 	public static final String PARAM_PARTITIONS = "partitions";
 	public static final String PARAM_TYPE_PARTITIONS = "int";

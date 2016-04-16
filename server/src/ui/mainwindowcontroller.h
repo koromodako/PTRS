@@ -40,6 +40,11 @@ public slots:
      */
     void Slot_response(Command command, bool ok, QString message);
 
+    void Slot_newClient(QUuid clientId);
+    void Slot_newCalculation(QUuid calculationId, QJsonDocument params);
+    void Slot_stateUpdated(QUuid id, Calculation::State state);
+    void Slot_clientWorkingOnCalculation(QUuid calculationId, QUuid clientId);
+
 private:
     MainWindow window;
 

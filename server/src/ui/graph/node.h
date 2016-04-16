@@ -43,6 +43,7 @@
 
 #include <QGraphicsItem>
 #include <QList>
+#include <QUuid>
 
 class Edge;
 class GraphWidget;
@@ -51,7 +52,8 @@ class QGraphicsSceneMouseEvent;
 class Node : public QGraphicsItem
 {
 public:
-    Node(GraphWidget *graphWidget);
+    Node(GraphWidget *graphWidget, QColor colorExt, QColor colorInt, QUuid id);
+    Node(GraphWidget *graphWidget, QColor colorExt, QColor colorInt, bool server);
 
     void addEdge(Edge *edge);
     QList<Edge *> edges() const;
@@ -66,6 +68,13 @@ public:
     QPainterPath shape() const Q_DECL_OVERRIDE;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) Q_DECL_OVERRIDE;
 
+    QUuid getObjectId();
+
+    void removeEdges();
+    void removeEdge(Edge *edge);
+
+    bool isServer();
+
 protected:
     QVariant itemChange(GraphicsItemChange change, const QVariant &value) Q_DECL_OVERRIDE;
 
@@ -76,6 +85,14 @@ private:
     QList<Edge *> edgeList;
     QPointF newPos;
     GraphWidget *graph;
+
+    QColor extColor;
+    QColor intColor;
+
+    QUuid objectId;
+
+    bool _isServer;
+
 };
 
 #endif // NODE_H

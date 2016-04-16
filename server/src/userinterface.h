@@ -6,8 +6,10 @@
 #include <QByteArray>
 #include <QUuid>
 #include <QString>
+#include <QJsonDocument>
 
 #include "const.h"
+#include "calculation/calculation.h"
 
 class UserInterface : public QObject
 {
@@ -32,6 +34,11 @@ public slots:
      *      Message de réponse construit par l'émetteur de cette dernière
      */
     virtual void Slot_response(Command command, bool ok, QString message) = 0;
+
+    virtual void Slot_newClient(QUuid clientId);
+    virtual void Slot_newCalculation(QUuid calculationId, QJsonDocument params);
+    virtual void Slot_stateUpdated(QUuid id, Calculation::State state);
+
 
 signals:
     /**

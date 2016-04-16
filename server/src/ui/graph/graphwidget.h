@@ -54,6 +54,13 @@ public:
 
     void itemMoved();
 
+    void newClient(QUuid newClientId);
+    void newCalculation(QUuid calculationId, QString name);
+    void clientWorkingOnCalculation(QUuid calculationId, QUuid clientId);
+    void clientNotWorkingAnymore(QUuid clientId);
+    void deleteCalculation(QUuid calculationId);
+    void deleteClient(QUuid clientId);
+
 public slots:
     void shuffle();
     void zoomIn();
@@ -70,8 +77,12 @@ protected:
     void scaleView(qreal scaleFactor);
 
 private:
+    Node *seekItem(QUuid itemId);
+
     int timerId;
     Node *centerNode;
+
+    int newNodePos;
 };
 
 #endif // GRAPHWIDGET_H

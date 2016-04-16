@@ -1,5 +1,7 @@
 #include "mainwindowcontroller.h"
 #include "../utils/logger.h"
+#include "../calculation/specs.h"
+#include "../calculation/calculation.h"
 
 MainWindowController *MainWindowController::_instance = NULL;
 
@@ -30,4 +32,28 @@ void MainWindowController::Slot_response(Command command, bool ok, QString messa
     } else {
         LOG_ERROR("Slot_response is not implemented.");
     }
+}
+
+void MainWindowController::Slot_newClient(QUuid clientId)
+{
+    window.getGraphWidget()->newClient(clientId);
+}
+
+void MainWindowController::Slot_newCalculation(QUuid calculationId, QJsonDocument params)
+{
+    window.getGraphWidget()->newCalculation(calculationId, params.object()[CS_JSON_KEY_CALC_BIN].toString());
+}
+
+void MainWindowController::Slot_stateUpdated(QUuid id, Calculation::State state)
+{
+    if(state == Calculation::COMPLETED || state == Calculation::CANCELED
+            || state == Calculation::CRASHED)
+    {
+        window.getGraphWidget()->deleteCalculation(id);
+    }
+}
+
+void MainWindowController::Slot_clientWorkingOnCalculation(QUuid calculationId, QUuid clientId)
+{
+    window.getGraphWidget()->clientWorkingOnCalculation(calculationId, clientId);
 }
