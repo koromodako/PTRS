@@ -83,7 +83,7 @@ public class MergeSortTest {
 	private static void splitTest() {
 		Gson gson = new Gson();
 		int[] arrayToSplit = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-		CalculationBlock cb = new CalculationBlock(1, arrayToSplit, 11);
+		CalculationBlock cb = new CalculationBlock("1", arrayToSplit, 11);
 		
 		String json = gson.toJson(cb);
 		System.out.println(json);
@@ -95,7 +95,7 @@ public class MergeSortTest {
 	private static void mergeSortFromJsonTest() {
 		Gson gson = new Gson();
 		int[] arr = {6,3,2,4,5, 6, 7, 8, 9, 10};
-		CalculationBlock cb = new CalculationBlock(1, arr, 11);
+		CalculationBlock cb = new CalculationBlock("1", arr, 11);
 		
 		String json = gson.toJson(cb);
 		System.out.println(json);
@@ -107,7 +107,7 @@ public class MergeSortTest {
 	private static void mergerDuplicatesTest() {
 		Gson gson = new Gson();
 		int[] arr = {6,3,2,4,5, 6, 7, 8, 9, 10};
-		CalculationBlock cb = new CalculationBlock(1, arr, 11);
+		CalculationBlock cb = new CalculationBlock("1", arr, 11);
 		
 		String json = gson.toJson(cb);
 		System.out.println(json);
@@ -127,8 +127,8 @@ public class MergeSortTest {
 		int[] arr1 = {1, 2, 3, 4, 5, 6, 28};
 		int[] arr2 = {0, 7, 8, 9, 10, 11, 12};
 		
-		CalculationResultBlock crb = new CalculationResultBlock(1, arr1);
-		CalculationResultBlock crb2 = new CalculationResultBlock(2, arr2);
+		CalculationResultBlock crb = new CalculationResultBlock("1", arr1);
+		CalculationResultBlock crb2 = new CalculationResultBlock("2", arr2);
 		
 		String json = "[" + gson.toJson(crb) + ", " + gson.toJson(crb2) + "]";
 		System.out.println(json);

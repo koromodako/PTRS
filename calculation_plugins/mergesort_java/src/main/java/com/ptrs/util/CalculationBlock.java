@@ -2,22 +2,22 @@ package com.ptrs.util;
 
 public class CalculationBlock {
 	
-	private static final String BINARY_NAME = "mergesort.jar";
+	private static final String BINARY_NAME = "ptrs-mergesort.jar";
 	
 	private String bin;
-	private int fragmentId;
+	private String fragmentId;
 	
 	private CalculationBlockParams params;
 	
-	public CalculationBlock(int fragmentId, int[] values, int nbPartitions) {
+	public CalculationBlock(String fragmentId, int[] values, int nbPartitions) {
 		this(BINARY_NAME, fragmentId, new CalculationBlockParams(values, nbPartitions));
 	}
 	
-	public CalculationBlock(int fragmentId, CalculationBlockParams params) {
+	public CalculationBlock(String fragmentId, CalculationBlockParams params) {
 		this(BINARY_NAME, fragmentId, params);
 	}
 
-	private CalculationBlock(String bin, int fragmentId, CalculationBlockParams params) {
+	private CalculationBlock(String bin, String fragmentId, CalculationBlockParams params) {
 		super();
 		this.bin = bin;
 		this.fragmentId = fragmentId;
@@ -32,11 +32,11 @@ public class CalculationBlock {
 		this.bin = bin;
 	}
 
-	public int getFragmentId() {
+	public String getFragmentId() {
 		return fragmentId;
 	}
 
-	public void setFragmentId(int fragmentId) {
+	public void setFragmentId(String fragmentId) {
 		this.fragmentId = fragmentId;
 	}
 
