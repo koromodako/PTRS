@@ -13,7 +13,7 @@ public class CalculationBlockParams {
 	public CalculationBlockParams(int[] values) {
 		super();
 		this.values = values;
-		this.partitions = -1;
+		this.partitions = 1;
 	}
 	
 	public CalculationBlockParams(int[] values, int partitions) {
