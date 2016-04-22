@@ -15,7 +15,7 @@ public:
     /**
      * @brief Cette énumération décrit les différents états que peut prendre un calcul
      */
-    enum State {
+    enum Status {
         BEING_SPLITTED,
         SCHEDULED,
         BEING_COMPUTED,
@@ -24,6 +24,7 @@ public:
         CANCELED,
         CRASHED
     };
+    static QString StatusToString(Status state);
 
     ~Calculation(){}
 
@@ -37,7 +38,7 @@ public:
      * @brief Etat du calcul
      * @return
      */
-    inline State GetStatus() const { return _state; }
+    inline Status GetStatus() const { return _status; }
 
     /**
      * @brief Binaire utilisé pour les operations split, calc et join
@@ -123,7 +124,7 @@ signals:
      * @param idCalculation l'id de ce calcul
      * @param state le nouvel état du calcul
      */
-    void sig_stateUpdated(QUuid idCalculation, Calculation::State state);
+    void sig_stateUpdated(QUuid idCalculation, Calculation::Status status);
 
     /**
      * @brief Ce signal est émis quand l'avancement du calcul est mis à jour
@@ -134,7 +135,7 @@ private:
     /**
      * @brief Modifie l'état actuel
      */
-    void setCurrentState(Calculation::State state);
+    void setCurrentStatus(Calculation::Status status);
 
     /**
      * @brief Cette méthode met à jour l'avancement d'un calcul
@@ -155,7 +156,7 @@ private slots:
 private:
 
     // attributs
-    State _state;
+    Status _status;
     QString _bin;
     QVariantMap _params;
     QHash<QUuid,Fragment*> _fragments;
