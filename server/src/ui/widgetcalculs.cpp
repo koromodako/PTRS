@@ -53,8 +53,8 @@ WidgetCalculs::WidgetCalculs(QWidget *parent) : QWidget(parent), addCalcWindow(N
     connect(newCalc, SIGNAL(clicked()), this, SLOT(Slot_AddNewCalculation()));
     connect(&CalculationManager::getInstance(), SIGNAL(sig_newCalculation(QUuid, QJsonDocument)), this,
             SLOT(Slot_NewCalculation(QUuid, QJsonDocument)));
-    connect(&CalculationManager::getInstance(), SIGNAL(sig_calculationStateUpdated(QUuid, Calculation::State)),
-            this, SLOT(Slot_StateUpdated(QUuid, Calculation::State)));
+    connect(&CalculationManager::getInstance(), SIGNAL(sig_calculationStateUpdated(QUuid, Calculation::Status)),
+            this, SLOT(Slot_StateUpdated(QUuid, Calculation::Status)));
     connect(&CalculationManager::getInstance(), SIGNAL(sig_calculationProgressUpdated(QUuid,int)), this,
                                                        SLOT(Slot_ProgressUpdated(QUuid,int)));
     connect(&CalculationManager::getInstance(), SIGNAL(sig_calculationDone(QUuid, QJsonObject)), this,
@@ -116,7 +116,7 @@ void WidgetCalculs::Slot_NewCalculation(QUuid id, QJsonDocument params)
     tableWidget->setItem(ligneInsertion, C_NOM, binaireItem);
 }
 
-void WidgetCalculs::Slot_StateUpdated(QUuid id, Calculation::State state)
+void WidgetCalculs::Slot_StateUpdated(QUuid id, Calculation::Status state)
 {
     const QMetaObject &mo = Calculation::staticMetaObject;
     int index = mo.indexOfEnumerator("State");

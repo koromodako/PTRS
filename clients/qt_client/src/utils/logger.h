@@ -57,7 +57,6 @@ private: // singleton
     Logger();
     Q_DISABLE_COPY(Logger)
     static Logger _instance;
-    QMutex *_consoleMutex;
 
 private:
     LoggerConfiguration _config;

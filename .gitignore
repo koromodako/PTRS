@@ -2,3 +2,4 @@ bin*
 html*
 build*
 *.user
+*.json

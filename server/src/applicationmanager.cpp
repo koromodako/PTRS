@@ -42,8 +42,8 @@ void ApplicationManager::Init(UserInterface *interface)
     //calc_manager --> userinterface
     connect(&(CalculationManager::getInstance()), SIGNAL(sig_newCalculation(QUuid,QJsonDocument)),
                 interface, SLOT(Slot_newCalculation(QUuid,QJsonDocument)));
-    connect(&(CalculationManager::getInstance()), SIGNAL(sig_calculationStateUpdated(QUuid,Calculation::State)),
-                interface, SLOT(Slot_stateUpdated(QUuid,Calculation::State)));
+    connect(&(CalculationManager::getInstance()), SIGNAL(sig_calculationStateUpdated(QUuid,Calculation::Status)),
+                interface, SLOT(Slot_stateUpdated(QUuid,Calculation::Status)));
 
     LOG_INFO("Initialisation des composants...");
     // -- initialisation des composants

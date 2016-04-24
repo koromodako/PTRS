@@ -38,6 +38,8 @@ public class Merger {
 		Queue<Entry> queue = new PriorityQueue<>();
 		
 		int finalSize = 0;
+		boolean first = true;
+		String fragmentId = "0";
 		for(int i = 0; i < resultsArray.size(); i++) {
 			JsonElement resultJson = resultsArray.get(i);
 			
@@ -45,6 +47,11 @@ public class Merger {
 			if(calculationResultBlock == null || calculationResultBlock.getResult() == null) {
 				System.err.println("Unexpected structure for the calculcation result block, skipping fragment");
 				continue;
+			}
+			
+			if(first) {
+				fragmentId = calculationResultBlock.getFragmentId();
+				first = false;
 			}
 			
 			int[] sortedArray = calculationResultBlock.getResult();
@@ -69,7 +76,7 @@ public class Merger {
 			}
 		}
 		
-		return gson.toJson(new CalculationResultBlock("0", finalSortedArray));
+		return gson.toJson(new CalculationResultBlock(fragmentId, finalSortedArray));
 	}
 	
 	/**

@@ -32,7 +32,7 @@ public slots:
     /**
      * @brief Slot déclenché lors de la mise à jour de l'état d'un calcul
      */
-    void Slot_StateUpdated(QUuid id, Calculation::State state);
+    void Slot_StateUpdated(QUuid id, Calculation::Status state);
 
     /**
      * @brief Slot déclenché lors du progrès d'un calcul

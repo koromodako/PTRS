@@ -18,8 +18,8 @@ bool CalculationManager::Execute(Calculation *calculation, QByteArray params)
         emit sig_newCalculation(calculation->GetId(), doc);
         connect (calculation, SIGNAL(sig_progressUpdated(QUuid, int)),
                  this, SIGNAL(sig_calculationProgressUpdated(QUuid, int)));
-        connect (calculation, SIGNAL(sig_stateUpdated(QUuid, Calculation::State)),
-                 this, SIGNAL(sig_calculationStateUpdated(QUuid, Calculation::State)));
+        connect (calculation, SIGNAL(sig_stateUpdated(QUuid, Calculation::Status)),
+                 this, SIGNAL(sig_calculationStateUpdated(QUuid, Calculation::Status)));
         connect (calculation, SIGNAL(sig_calculationDone(QUuid, const QJsonObject &)),
                  this, SIGNAL(sig_calculationDone(QUuid, const QJsonObject &)));
 
@@ -50,22 +50,44 @@ bool CalculationManager::Cancel(QUuid id)
     return ok;
 }
 
-QString CalculationManager::Result(QUuid id, QString filename) const
+QString CalculationManager::Result(QUuid id, const QString & filename) const
 {
+    QString out("Error : no calculation match the given id.");
     CalculationHash::const_iterator it = _calculations.find(id);
     if(it != _calculations.end())
-    {
-
-        return QJsonDocument(it.value()->GetResult()).toJson();
+    {   QByteArray data = QJsonDocument(it.value()->GetResult()).toJson();
+        if(!filename.isEmpty())
+        {   QFile f(filename);
+            if(f.open(QIODevice::WriteOnly))
+            {
+                f.write(data);  // write data to file
+                f.close();      // close file
+                out = "Info : data successfully written to output file.";
+            }
+            else
+            {   LOG_ERROR("Error writing result file.");
+                out = "Error : can't open output file to write data. Data : \n" + data;
+            }
+        }
+        else
+        {
+            out = data;
+        }
     }
-    return "";
+    return out.prepend('\n');
 }
 
 QString CalculationManager::Status() const
 {
-    /// TODO implement CalculationManager::Status()
-    ///     Construire la table des status des calculs en cours
-    return QString("We are working on this functionality.");
+    QString result("Calculations statuses :\n");
+    for(CalculationHash::const_iterator c = _calculations.begin(); c != _calculations.end(); ++c)
+    {
+        result += QString("calculation(id=%1,state=%2)\n").arg(c.value()->GetId().toString(), Calculation::StatusToString(c.value()->GetStatus()));
+    }
+    if(_calculations.size() == 0)
+    {   result = "No calculation result to display.";
+    }
+    return result.prepend('\n');
 }
 
 int CalculationManager::ScheduledCount() const
@@ -88,13 +110,13 @@ int CalculationManager::CrashedCount() const
     return countWithState(Calculation::CRASHED);
 }
 
-int CalculationManager::countWithState(Calculation::State state) const
+int CalculationManager::countWithState(Calculation::Status status) const
 {
     int count(0);
     CalculationHash::const_iterator c;
     for(c = _calculations.constBegin() ; c != _calculations.constEnd() ; ++c)
     {
-        if(c.value()->GetStatus() == state)
+        if(c.value()->GetStatus() == status)
             count++;
     }
     return count;

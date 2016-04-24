@@ -44,7 +44,7 @@ void MainWindowController::Slot_newCalculation(QUuid calculationId, QJsonDocumen
     window.getGraphWidget()->newCalculation(calculationId, params.object()[CS_JSON_KEY_CALC_BIN].toString());
 }
 
-void MainWindowController::Slot_stateUpdated(QUuid id, Calculation::State state)
+void MainWindowController::Slot_stateUpdated(QUuid id, Calculation::Status state)
 {
     if(state == Calculation::COMPLETED || state == Calculation::CANCELED
             || state == Calculation::CRASHED)

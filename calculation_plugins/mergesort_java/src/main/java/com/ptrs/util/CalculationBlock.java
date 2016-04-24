@@ -2,7 +2,7 @@ package com.ptrs.util;
 
 public class CalculationBlock {
 	
-	private static final String BINARY_NAME = "mergesort.jar";
+	private static final String BINARY_NAME = "ptrs-mergesort.jar";
 	
 	private String bin;
 	private String fragmentId;

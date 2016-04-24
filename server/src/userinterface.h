@@ -37,7 +37,7 @@ public slots:
 
     virtual void Slot_newClient(QUuid clientId);
     virtual void Slot_newCalculation(QUuid calculationId, QJsonDocument params);
-    virtual void Slot_stateUpdated(QUuid id, Calculation::State state);
+    virtual void Slot_stateUpdated(QUuid id, Calculation::Status state);
 
 
 signals:

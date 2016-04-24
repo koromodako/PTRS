@@ -36,7 +36,7 @@ public:
      * @brief Result
      * @return
      */
-    QString Result(QUuid id, QString filename) const;
+    QString Result(QUuid id, const QString &filename) const;
 
     /**
      * @brief Status
@@ -75,7 +75,7 @@ signals:
      * @param idCalculation l'id du calcul dont l'avancement a progressé
      * @param state le nouvel état du calcul
      */
-    void sig_calculationStateUpdated(QUuid idCalculation, Calculation::State state);
+    void sig_calculationStateUpdated(QUuid idCalculation, Calculation::Status status);
 
     /**
      * @brief Emis quand un nouveau calcul doit être effectué
@@ -103,7 +103,7 @@ private: // singleton
     /**
      * @brief Retourne le nombre de calcul dans l'état donné
      */
-    int countWithState(Calculation::State state) const;
+    int countWithState(Calculation::Status status) const;
 
     Q_DISABLE_COPY(CalculationManager)   // interdiction de réaliser une copie de l'instance
 
