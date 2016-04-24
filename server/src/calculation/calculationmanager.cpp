@@ -18,8 +18,8 @@ bool CalculationManager::Execute(Calculation *calculation, QByteArray params)
         emit sig_newCalculation(calculation->GetId(), doc);
         connect (calculation, SIGNAL(sig_progressUpdated(QUuid, int)),
                  this, SIGNAL(sig_calculationProgressUpdated(QUuid, int)));
-        connect (calculation, SIGNAL(sig_stateUpdated(QUuid, Calculation::Status)),
-                 this, SIGNAL(sig_calculationStateUpdated(QUuid, Calculation::Status)));
+        connect (calculation, SIGNAL(sig_statusUpdated(QUuid, Calculation::Status)),
+                 this, SIGNAL(sig_calculationStatusUpdated(QUuid, Calculation::Status)));
         connect (calculation, SIGNAL(sig_calculationDone(QUuid, const QJsonObject &)),
                  this, SIGNAL(sig_calculationDone(QUuid, const QJsonObject &)));
 

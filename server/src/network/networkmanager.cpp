@@ -100,6 +100,7 @@ void NetworkManager::slot_deleteClient(ClientSession *client)
 
     emit sig_clientCountUpdated(ClientCount());
     emit sig_availableClientCountUpdated(_availableClients.count());
+    emit sig_deleteClient(client->GetId());
 }
 
 void NetworkManager::Slot_init()

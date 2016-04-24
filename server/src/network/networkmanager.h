@@ -91,6 +91,12 @@ signals:
      */
     void sig_newClient(QUuid client);
 
+    /**
+     * @brief Emis lorsqu'un client est déconnecté.
+     * @param client Identifiant du client
+     */
+    void sig_deleteClient(QUuid client);
+
 private:
     /**
      * @brief Constructeur de la classe

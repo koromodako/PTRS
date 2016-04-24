@@ -75,7 +75,7 @@ signals:
      * @param idCalculation l'id du calcul dont l'avancement a progressé
      * @param state le nouvel état du calcul
      */
-    void sig_calculationStateUpdated(QUuid idCalculation, Calculation::Status status);
+    void sig_calculationStatusUpdated(QUuid idCalculation, Calculation::Status status);
 
     /**
      * @brief Emis quand un nouveau calcul doit être effectué

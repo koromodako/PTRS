@@ -53,8 +53,8 @@ WidgetCalculs::WidgetCalculs(QWidget *parent) : QWidget(parent), addCalcWindow(N
     connect(newCalc, SIGNAL(clicked()), this, SLOT(Slot_AddNewCalculation()));
     connect(&CalculationManager::getInstance(), SIGNAL(sig_newCalculation(QUuid, QJsonDocument)), this,
             SLOT(Slot_NewCalculation(QUuid, QJsonDocument)));
-    connect(&CalculationManager::getInstance(), SIGNAL(sig_calculationStateUpdated(QUuid, Calculation::Status)),
-            this, SLOT(Slot_StateUpdated(QUuid, Calculation::Status)));
+    connect(&CalculationManager::getInstance(), SIGNAL(sig_calculationStatusUpdated(QUuid, Calculation::Status)),
+            this, SLOT(Slot_StatusUpdated(QUuid, Calculation::Status)));
     connect(&CalculationManager::getInstance(), SIGNAL(sig_calculationProgressUpdated(QUuid,int)), this,
                                                        SLOT(Slot_ProgressUpdated(QUuid,int)));
     connect(&CalculationManager::getInstance(), SIGNAL(sig_calculationDone(QUuid, QJsonObject)), this,
@@ -116,20 +116,25 @@ void WidgetCalculs::Slot_NewCalculation(QUuid id, QJsonDocument params)
     tableWidget->setItem(ligneInsertion, C_NOM, binaireItem);
 }
 
-void WidgetCalculs::Slot_StateUpdated(QUuid id, Calculation::Status state)
+void WidgetCalculs::Slot_StatusUpdated(QUuid id, Calculation::Status status)
 {
     const QMetaObject &mo = Calculation::staticMetaObject;
-    int index = mo.indexOfEnumerator("State");
-    QMetaEnum stateEnum = mo.enumerator(index);
-    QString stateString = QString(stateEnum.valueToKey(state));
+    int index = mo.indexOfEnumerator("Status");
+    QMetaEnum statusEnum = mo.enumerator(index);
+    QString statusString = QString(statusEnum.valueToKey(status));
 
-    LOG_DEBUG("Updating calculation state (id : " + id.toString() + ", row : "
-              + QString::number(memIdToRow.value(id)) + ", state : " + stateString);
+    LOG_DEBUG("Updating calculation status (id : " + id.toString() + ", row : "
+              + QString::number(memIdToRow.value(id)) + ", status : " + statusString);
 
-    QTableWidgetItem * stateTab = new QTableWidgetItem();
-    stateTab->setText(stateString);
-    stateTab->setTextAlignment(Qt::AlignCenter);
-    tableWidget->setItem(memIdToRow.value(id), C_STATUT, stateTab);
+    QTableWidgetItem * statusTab = new QTableWidgetItem();
+    statusTab->setText(statusString);
+    statusTab->setTextAlignment(Qt::AlignCenter);
+    tableWidget->setItem(memIdToRow.value(id), C_STATUT, statusTab);
+
+    if(status == Calculation::CRASHED)
+    {
+        changeCancelToDelete(memIdToRow.value(id));
+    }
 }
 
 void WidgetCalculs::Slot_ProgressUpdated(QUuid id, int value)

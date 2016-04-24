@@ -169,7 +169,7 @@ void Calculation::Slot_started()
 void Calculation::setCurrentStatus(Calculation::Status status)
 {
     _status = status;
-    emit sig_stateUpdated(GetId(), _status);
+    emit sig_statusUpdated(GetId(), _status);
 }
 
 Calculation::Calculation(const QString & bin, const QVariantMap &params, QObject * parent) :

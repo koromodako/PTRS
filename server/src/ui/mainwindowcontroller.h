@@ -42,8 +42,9 @@ public slots:
 
     void Slot_newClient(QUuid clientId);
     void Slot_newCalculation(QUuid calculationId, QJsonDocument params);
-    void Slot_stateUpdated(QUuid id, Calculation::Status state);
+    void Slot_statusUpdated(QUuid id, Calculation::Status state);
     void Slot_clientWorkingOnCalculation(QUuid calculationId, QUuid clientId);
+    void Slot_clientDisconnected(QUuid clientId);
 
 private:
     MainWindow window;

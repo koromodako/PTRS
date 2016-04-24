@@ -11,7 +11,8 @@
 class Calculation : public AbstractIdentifiable
 {
     Q_OBJECT
-    Q_ENUMS(State)
+    Q_ENUMS(Status)
+
 public:
     /**
      * @brief Cette énumération décrit les différents états que peut prendre un calcul
@@ -125,7 +126,7 @@ signals:
      * @param idCalculation l'id de ce calcul
      * @param state le nouvel état du calcul
      */
-    void sig_stateUpdated(QUuid idCalculation, Calculation::Status status);
+    void sig_statusUpdated(QUuid idCalculation, Calculation::Status status);
 
     /**
      * @brief Ce signal est émis quand l'avancement du calcul est mis à jour

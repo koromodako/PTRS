@@ -41,7 +41,6 @@ SOURCES += \
     src/ui/addcalculationwindow.cpp \
     src/ui/mainwindow.cpp \
     src/ui/widgetcalculs.cpp \
-    src/ui/widgetclients.cpp \
     src/userinterface.cpp \
     src/ui/mainwindowcontroller.cpp \
 	src/ui/graph/edge.cpp \
