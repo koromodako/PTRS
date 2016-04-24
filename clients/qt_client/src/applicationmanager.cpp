@@ -55,20 +55,24 @@ void ApplicationManager::Slot_state()
     else
     {   report += "  - no plugin available, this client is useless.\n";
     }
-    ClientSession* cs = NetworkManager::getInstance().GetClientSession();
-    if( cs != NULL)
+    if( _clientSession != NULL)
     {
-        report += "\n"
-                "STATE: CONNECTED \n"
-                "ID: %1\n";
-        report.arg(cs->Id());
-        if(cs->FragmentId() != -1)
+        report += QString("\n"
+                "State : CONNECTED \n"
+                "ID : %1\n").arg(_clientSession->Id());
+        if(_clientSession->GetCurrentCalculation() != NULL)
         {
             report += "\n"
-                    "CURRENT CALCULATION TYPE: %1\n"
-                    "CURRENT CALCULATION ID: %2\n"
-                    "CURRENT FRAGMENT ID: %3\n";
-            report.arg(cs->GetCurrentCalculation()->GetBin(), cs->GetCurrentCalculation()->GetId().toString(), QString(cs->FragmentId()));
+                    "Calculation Type : %1\n"
+                    "Calculation ID : %2\n"
+                    "Fragment ID : %3\n";
+            report.arg(_clientSession->GetCurrentCalculation()->GetBin(),
+                       _clientSession->GetCurrentCalculation()->GetId().toString(),
+                       QString(_clientSession->FragmentId()));
+        }
+        else
+        {
+            report += "No calculation.";
         }
     }
     else
@@ -123,8 +127,6 @@ void ApplicationManager::Slot_connect()
 ApplicationManager::ApplicationManager() :
     _terminated_ctr(0)
 {
-    Logger::GetInstance().SetConsoleMutex(&_consoleMutex);
-    ConsoleHandler::getInstance().SetConsoleMutex(&_consoleMutex);
 }
 
 ApplicationManager::~ApplicationManager()

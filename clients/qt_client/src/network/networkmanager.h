@@ -28,8 +28,6 @@ public slots:
      */
     void Slot_init();
 
-
-
 private:
     /**
      * @brief Constructeur de la classe

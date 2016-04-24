@@ -10,7 +10,7 @@
 #define C_STATE       "STATE"
 #define C_HELP        "HELP"
 #define C_SHUTDOWN    "SHUTDOWN"
-#define C_CONNECT "CONNECT"
+#define C_CONNECT     "CONNECT"
 
 // -- define some convenient macros shrink code
 #define HANDLE_ERR(msg) else { error(msg); }
@@ -52,7 +52,6 @@ void ConsoleHandler::welcome()
 
 bool ConsoleHandler::prompt(QString * input)
 {
-    QMutexLocker locker(_consoleMutex);
      _out << "client <: " << flush;
     *input = _in.readLine();
     if (input->isNull())
@@ -79,7 +78,6 @@ void ConsoleHandler::error(QString errorStr, QString cmd)
 
 void ConsoleHandler::print(const QString & string, bool eol)
 {
-    QMutexLocker locker(_consoleMutex);
     _out << string;
     if(eol) { _out << endl; }
     _out << flush;
@@ -96,6 +94,8 @@ void ConsoleHandler::help(const QString &cmd)
                 "\n"
                 "\t\t+ " C_STATE " : print client state.\n"
                 "\n"
+                "\t\t+ " C_CONNECT " : connect to the server.\n"
+                "\n"
                 "\t\t+ " C_SHUTDOWN " : shutdown client.\n"
                 "\n");
     }
@@ -105,6 +105,9 @@ void ConsoleHandler::help(const QString &cmd)
         }
         else if(cmd == C_STATE)
         {   respond(C_STATE" : print client state.");
+        }
+        else if(cmd == C_CONNECT)
+        {   respond(C_CONNECT" : connect to the server.");
         }
         else if(cmd == C_SHUTDOWN)
         {   respond(C_SHUTDOWN" : shutdown client.");
@@ -148,14 +151,7 @@ bool ConsoleHandler::interpret(QString &input)
     return wait;
 }
 
-void ConsoleHandler::SetConsoleMutex(QMutex *mutex)
-{
-    _consoleMutex = mutex;
-}
-
-
 ConsoleHandler::ConsoleHandler() :
-    _out(stdout), _in(stdin),
-    _consoleMutex(NULL)
+    _out(stdout), _in(stdin)
 {
 }

@@ -64,7 +64,7 @@ public:
      * @brief Retourne le calcul en cours
      * @return
      */
-    inline Calculation* GetCurrentCalculation() {return _currentCalculation;}
+    inline Calculation* GetCurrentCalculation() { return _currentCalculation; }
 
 public slots:
     /**
