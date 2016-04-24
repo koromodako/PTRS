@@ -83,10 +83,16 @@ void NetworkManager::slot_addUnavailableClient(ClientSession *client)
 
 void NetworkManager::slot_deleteClient(ClientSession *client)
 {
+    LOG_INFO("Client "+client->GetId().toString()+" has disconnected!");
+
     _availableClients.remove(client);
     if (_unavailableClients.remove(client) && client->GetFragment() != NULL)
     {
         _fragmentsPlace.remove(client->GetFragment()->GetId());
+
+        LOG_DEBUG("Fragment is getting reaffected.");
+        Slot_startCalcul(client->GetFragment());
+
         emit sig_workingClientCountUpdated(_fragmentsPlace.count());
     }
     client->deleteLater();
