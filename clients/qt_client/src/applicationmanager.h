@@ -78,7 +78,6 @@ private:
     ApplicationManager();
     Q_DISABLE_COPY(ApplicationManager)
 
-    QMutex _consoleMutex;
     QThread _consoleThread;
     ClientSession* _clientSession;
     static ApplicationManager _instance;
