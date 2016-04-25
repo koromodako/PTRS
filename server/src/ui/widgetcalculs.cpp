@@ -139,7 +139,7 @@ void WidgetCalculs::Slot_StatusUpdated(QUuid id, Calculation::Status status)
 
 void WidgetCalculs::Slot_ProgressUpdated(QUuid id, int value)
 {
-    LOG_DEBUG("Updating progress (QUid : " + id.toString() + ", progress : " + value  + ")");
+    LOG_DEBUG("Updating progress (QUid : " + id.toString() + ", progress : " + QString::number(value) + ")");
 
     QProgressBar * progres = new QProgressBar(this);
     progres->setValue(value);

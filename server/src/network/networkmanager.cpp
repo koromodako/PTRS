@@ -48,6 +48,22 @@ void NetworkManager::slot_addAvailableClient(ClientSession *client)
 
     LOG_DEBUG("Adding available client");
     _availableClients.insert(client);
+
+    //ignore every waiting fragment that belongs to a canceled or crashed calculation
+    while(_waitingFragments.size() > 0) {
+        Calculation::Status st = _waitingFragments.head()->GetCalculation()->GetStatus();
+        if(st == Calculation::CANCELED || st == Calculation::CRASHED)
+        {
+            _waitingFragments.dequeue();
+            LOG_DEBUG("Destroyed a canceled or crashed fragment");
+        }
+        else
+        {
+            break;
+        }
+    }
+
+    //now, run the next calculation
     if (_waitingFragments.size() > 0)
     {
         Slot_startCalcul(_waitingFragments.dequeue());
@@ -57,6 +73,8 @@ void NetworkManager::slot_addAvailableClient(ClientSession *client)
 
 void NetworkManager::slot_addUnavailableClient(ClientSession *client)
 {
+    LOG_DEBUG("Client is not available anymore");
+
     if (client == NULL)
         return;
 
@@ -119,7 +137,10 @@ void NetworkManager::Slot_startCalcul(const Fragment *fragment)
     QSet<ClientSession *>::iterator it = _availableClients.begin();
     bool add = false;
     if (it == _availableClients.end())
+    {
+        LOG_INFO("No available client!");
         add = true;
+    }
     else
     {
         _availableClients.remove(*it);

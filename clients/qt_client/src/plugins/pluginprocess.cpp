@@ -10,7 +10,8 @@ PluginProcess::PluginProcess(QString absExecDir, Calculation *calc, Operation op
     _calculation(calc),
     _op(op),
     _out(""),
-    _err("")
+    _err(""),
+    deliberatelyKilled(false)
 {
     // -- connexion du calcul aux évènements du processus
     connect(this, SIGNAL(error(QProcess::ProcessError)),      SLOT(SLOT_ERROR(QProcess::ProcessError)));
@@ -49,7 +50,10 @@ bool PluginProcess::Start()
 }
 
 void PluginProcess::SLOT_ERROR(QProcess::ProcessError error)
-{   LOG_DEBUG(QString("SLOT_ERROR(%1) called.").arg(error));
+{
+    if(deliberatelyKilled) return;
+
+    LOG_DEBUG(QString("SLOT_ERROR(%1) called.").arg(error));
     QString msg("");
     switch (error) {
     case QProcess::FailedToStart:
@@ -89,6 +93,8 @@ void PluginProcess::SLOT_FINISHED(int exitCode, QProcess::ExitStatus exitStatus)
         }
         break;
     case QProcess::CrashExit:
+        if(deliberatelyKilled) return;
+
         LOG_ERROR(QString("Process crashed (exit_code=%1).").arg(exitCode));
         // crash calculation
         _calculation->Slot_crashed(readAllStandardError());
@@ -123,4 +129,12 @@ QString PluginProcess::selectInterpreter()
     {   index = SCRIPT_EXT().indexOf(parts.last());
     }
     return (index >= 0 ? SCRIPT_INTERPRETER()[index] : QString());
+}
+
+void PluginProcess::Stop()
+{
+    LOG_DEBUG("Process stopped.");
+
+    deliberatelyKilled = true;
+    kill();
 }

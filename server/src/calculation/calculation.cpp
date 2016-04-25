@@ -80,7 +80,7 @@ void Calculation::Cancel()
     setCurrentStatus(CANCELED);
     updateProgress(100);
 
-    LOG_DEBUG("sig_canceled() emitted for all children.");
+    LOG_DEBUG("sig_canceled() emitted for all children. "+QString::number(_fragments.size()));
     QHash<QUuid,Fragment*>::const_iterator fragment;
     for(fragment = _fragments.constBegin() ; fragment != _fragments.constEnd() ; fragment++)
         emit fragment.value()->sig_canceled();

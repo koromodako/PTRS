@@ -33,6 +33,8 @@ public:
      */
     bool Start();
 
+    void Stop();
+
 private slots:
     /**
      * @brief Ce slot reçoit les notifications d'erreurs depuis le processus asynchrone
@@ -73,6 +75,12 @@ private:
     Operation _op;
     QString _out;
     QString _err;
+
+    /**
+     * @brief Switched to TRUE if we wanted to kill the process, so that no error is sent
+     * for the process crashing.
+     */
+    bool deliberatelyKilled;
 };
 
 typedef QList<PluginProcess*> PluginProcessList;

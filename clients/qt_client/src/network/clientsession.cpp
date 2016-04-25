@@ -202,7 +202,7 @@ void ClientSession::Send(ReqType reqType, const QString &content)
 
 void ClientSession::Slot_startCalculation(Calculation *calculation)
 {
-    if (_currentCalculation != NULL)
+    if (_currentCalculation != NULL && _currentCalculation->GetStatus() == Calculation::BEING_COMPUTED)
     {
         LOG_DEBUG("Un calcul est déjà en cours");
         return;

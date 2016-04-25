@@ -208,6 +208,9 @@ void ClientSession::Slot_stopCalcul()
 {
     if (_fragment == NULL)
         return;
-    _currentState->ProcessStop();
+
+    LOG_DEBUG("Now resetting fragment");
     resetCurrentFragment();
+
+    _currentState->ProcessStop();
 }

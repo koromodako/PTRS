@@ -123,14 +123,18 @@ void PluginManager::startProcess(Calculation * calc, PluginProcess::Operation op
         LOG_CRITICAL("Processus started without arguments : unhandled operation is the cause !");
         break;
     }
-    cp->waitForFinished();
+
+    //cp->waitForFinished();
 }
 
 void PluginManager::Slot_stop()
 {
     LOG_DEBUG("Slot_stop() called.");
     if (_processes.size() > 0 && _processes.first()->state() == QProcess::Running)
-        _processes.first()->kill();
+    {
+        _processes.first()->Stop();
+        _processes.removeFirst();
+    }
 }
 
 
