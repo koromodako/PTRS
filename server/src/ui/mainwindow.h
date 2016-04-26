@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include "../userinterface.h"
 #include "graph/graphwidget.h"
+#include "widgetcalculs.h"
 
 namespace Ui {
 class MainWindow;
@@ -24,6 +25,8 @@ public:
 
     GraphWidget *getGraphWidget();
 
+    void closeAddCalculationWindow();
+
 protected:
     void closeEvent(QCloseEvent *event);
 
@@ -32,6 +35,7 @@ private:
     Q_DISABLE_COPY(MainWindow)
 
     GraphWidget * _graphWidget;
+    WidgetCalculs * _calculWidget;
 };
 
 #endif // MAINWINDOW_H

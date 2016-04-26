@@ -2,7 +2,9 @@
 #define WIDGETCALCULS_H
 
 #include <QWidget>
-#include <QtWidgets>
+#include <QPushButton>
+#include <QTableWidget>
+
 #include "addcalculationwindow.h"
 #include "../calculation/calculation.h"
 
@@ -14,6 +16,7 @@ class WidgetCalculs : public QWidget
     Q_OBJECT
 public:
     explicit WidgetCalculs(QWidget *parent = 0);
+    void closeAddCalculationWindow();
 
 signals:
 

@@ -92,3 +92,4 @@ DEFINES += QHOST_VERSION_STRING=\\\"$$QMAKE_HOST.version_string\\\"
 DEFINES += QGIT_LAST_COMMIT=\\\"$$system(git rev-list HEAD | head -n 1)\\\"
 DEFINES += QGIT_DIRTY=$$system(git status --porcelain | wc -l)
 DEFINES += QGIT_BRANCH=\\\"$$system(git rev-parse --abbrev-ref HEAD)\\\"
+DEFINES += DUMP_RESULTS

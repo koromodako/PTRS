@@ -3,6 +3,8 @@
 #include "../calculation/specs.h"
 #include "../calculation/calculation.h"
 
+#include <QMessageBox>
+
 MainWindowController *MainWindowController::_instance = NULL;
 
 MainWindowController::MainWindowController(QObject *parent)
@@ -25,12 +27,23 @@ void MainWindowController::Slot_init()
 
 void MainWindowController::Slot_response(Command command, bool ok, QString message)
 {
-    if(command == CMD_SHUTDOWN) {
+    if(command == CMD_SHUTDOWN)
+    {
         window.hide();
         // notify termination
         emit sig_terminated();
-    } else {
-        LOG_ERROR("Slot_response is not implemented.");
+    }
+    else if(command == CMD_EXEC) {
+        if(ok)
+        {
+            window.closeAddCalculationWindow();
+        }
+        else
+        {
+            QMessageBox *box = new QMessageBox(&window);
+            box->setText("An error occured while running calculation.\n" + message);
+            box->show();
+        }
     }
 }
 

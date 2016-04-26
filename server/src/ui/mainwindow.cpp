@@ -1,6 +1,5 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "widgetcalculs.h"
 #include "graph/graphwidget.h"
 #include "mainwindowcontroller.h"
 
@@ -21,11 +20,11 @@ MainWindow::MainWindow(QWidget *parent) :
     _graphWidget = new GraphWidget();
 
     // ---- Onglet résultats
-    WidgetCalculs * calculs = new WidgetCalculs();
+    _calculWidget = new WidgetCalculs();
 
     // ---- Configuration tabview
     QTabWidget * onglets = new QTabWidget(this);
-    onglets->addTab(calculs, "Calculations");
+    onglets->addTab(_calculWidget, "Calculations");
     onglets->addTab(_graphWidget, "Clients");
     centralLayout->addWidget(onglets);
 
@@ -48,4 +47,9 @@ void MainWindow::closeEvent(QCloseEvent *event)
 GraphWidget *MainWindow::getGraphWidget()
 {
     return _graphWidget;
+}
+
+void MainWindow::closeAddCalculationWindow()
+{
+    _calculWidget->closeAddCalculationWindow();
 }

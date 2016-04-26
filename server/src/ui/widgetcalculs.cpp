@@ -5,6 +5,8 @@
 #include "../utils/logger.h"
 #include "../ui/mainwindowcontroller.h"
 
+#include <QtWidgets>
+
 
 WidgetCalculs::WidgetCalculs(QWidget *parent) : QWidget(parent), addCalcWindow(NULL)
 {
@@ -198,8 +200,8 @@ void WidgetCalculs::Slot_ShowResults()
 
     QJsonDocument jsonDocument(jsonObject);
     QMessageBox * resultsMessage = new QMessageBox(this);
-    resultsMessage->setText("Results for calculation " + id.toString());
-    resultsMessage->setInformativeText(jsonDocument.toJson(QJsonDocument::Indented));
+    resultsMessage->setText("Results for calculation " + id.toString()+": see details.");
+    resultsMessage->setDetailedText(jsonDocument.toJson(QJsonDocument::Indented));
     resultsMessage->show();
 }
 
@@ -214,7 +216,17 @@ void WidgetCalculs::Slot_ShowTarget()
 {
     QUuid id = memTargetToId.value((QPushButton *) sender());
     QMessageBox * targetMessage = new QMessageBox(this);
-    targetMessage->setText("Target for calculation " + id.toString());
-    targetMessage->setText(memParams.value(id).toJson(QJsonDocument::Indented));
+    targetMessage->setText("Target for calculation " + id.toString()+": see details.");
+    targetMessage->setDetailedText(memParams.value(id).toJson(QJsonDocument::Indented));
     targetMessage->show();
+}
+
+void WidgetCalculs::closeAddCalculationWindow()
+{
+    if(addCalcWindow != NULL)
+    {
+        addCalcWindow->close();
+        addCalcWindow->deleteLater();
+        addCalcWindow = NULL;
+    }
 }

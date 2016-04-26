@@ -2,6 +2,7 @@
 #define CONST_H
 
 #define PLUGINS_DIR "plugins"
+#define RESULTS_DIR "results"
 
 #include <QString>
 #include <QObject>

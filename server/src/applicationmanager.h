@@ -70,6 +70,13 @@ public slots:
      */
     void Slot_terminated();
 
+    /**
+     * @brief Ce slot reçoit les résultats des calculs.
+     * @param calcId Id du calcul terminé
+     * @param result Résultat du calcul
+     */
+    void Slot_calculationDone(QUuid calcId, QJsonObject result);
+
 signals:
     /**
      * @brief Ce signal est émis en réponse aux demandes reçues par les slots.

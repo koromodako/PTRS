@@ -9,7 +9,7 @@
 #include <QDoubleSpinBox>
 #include <QString>
 
-#include "mainwindowcontroller.h"
+class MainWindowController;
 
 /**
  * @brief Fenêtre permettant d'ajouter un calcul
@@ -50,6 +50,8 @@ signals:
 public slots:
     void Slot_pickedAnotherPlugin(QString name);
     void Slot_runCalculation();
+    void Slot_importCalculation();
+    void Slot_fileSelected(QString fileName);
 
 private:
     void fetchPluginParameters(QString name);

@@ -18,8 +18,12 @@
 #include <QJsonParseError>
 #include <QJsonValue>
 
+#include <QApplication>
+#include <QFileDialog>
+
 #include "../calculation/specs.h"
 #include "widgetcalculs.h"
+#include "mainwindowcontroller.h"
 
 AddCalculationWindow::AddCalculationWindow(QWidget *parent) : QMainWindow(parent)
 {
@@ -210,8 +214,11 @@ void AddCalculationWindow::updateOptions(QString selectedPlugin, QStringList ite
 
         QPushButton *calculate = new QPushButton("Calculate", listParameters);
         listLayout->addWidget(calculate, 2 + itemNames.size(), 0, 1, -1);
-
         connect(calculate, SIGNAL(clicked()), this, SLOT(Slot_runCalculation()));
+
+        QPushButton *import = new QPushButton("Import and Run Calculation", listParameters);
+        listLayout->addWidget(import, 3 + itemNames.size(), 0, 1, -1);
+        connect(import, SIGNAL(clicked()), this, SLOT(Slot_importCalculation()));
     }
 
     this->setCentralWidget(listParameters);
@@ -382,6 +389,23 @@ void AddCalculationWindow::Slot_runCalculation()
     document.setObject(mainObj);
 
     MainWindowController::GetInstance()->sig_exec(document.toJson(QJsonDocument::Compact));
+}
 
-    this->hide();
+void AddCalculationWindow::Slot_importCalculation()
+{
+    QFileDialog *dialog = new QFileDialog(this, "Select calculation to run", qApp->applicationDirPath());
+    dialog->open();
+
+    connect(dialog, SIGNAL(fileSelected(QString)), this, SLOT(Slot_fileSelected(QString)));
+}
+
+void AddCalculationWindow::Slot_fileSelected(QString fileName)
+{
+    QFile file(fileName);
+    file.open(QIODevice::ReadOnly);
+
+    QByteArray content = file.readAll();
+    file.close();
+
+    MainWindowController::GetInstance()->sig_exec(content);
 }

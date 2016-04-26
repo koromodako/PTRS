@@ -25,6 +25,8 @@ void ReadyState::OnExit()
 
 void ReadyState::ProcessDo(const QByteArray &content)
 {
+    LOG_DEBUG("Sent DO request");
+
     _client->send(DO, content);
     _client->setCurrentStateAfterSuccess();
 }

@@ -5,6 +5,7 @@
 #include "applicationmanager.h"
 #include "src/network/networkmanager.h"
 #include "src/const.h"
+#include "src/userinterface.h"
 
 #include "ui/mainwindowcontroller.h"
 

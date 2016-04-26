@@ -4,6 +4,7 @@
 #include <QObject>
 
 #include "../userinterface.h"
+
 #include "mainwindow.h"
 
 class MainWindowController : public UserInterface

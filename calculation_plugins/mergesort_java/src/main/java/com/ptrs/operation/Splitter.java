@@ -66,7 +66,7 @@ public class Splitter {
 			int nbValues = nbValuesPerPartition;
 			
 			// Add last values to last partition
-			if(partitionPosition == nbPartitions - 1) {
+			if(i == nbPartitions - 1) {
 				nbValues += extraValues;
 			}
 			

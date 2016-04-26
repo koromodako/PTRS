@@ -1,9 +1,13 @@
 #include "applicationmanager.h"
 
+#include <QApplication>
+
 #include "utils/logger.h"
 #include "console/consolehandler.h"
 #include "plugins/pluginmanager.h"
 #include "ui/mainwindow.h"
+
+#include "const.h"
 
 ApplicationManager ApplicationManager::_instance;
 
@@ -47,6 +51,10 @@ void ApplicationManager::Init(UserInterface *interface)
                 interface, SLOT(Slot_newCalculation(QUuid,QJsonDocument)));
     connect(&(CalculationManager::getInstance()), SIGNAL(sig_calculationStatusUpdated(QUuid,Calculation::Status)),
                 interface, SLOT(Slot_statusUpdated(QUuid,Calculation::Status)));
+
+    //calc_manager --> application_manager
+    connect(&(CalculationManager::getInstance()), SIGNAL(sig_calculationDone(QUuid,QJsonObject)),
+                this, SLOT(Slot_calculationDone(QUuid,QJsonObject)));
 
     LOG_INFO("Initialisation des composants...");
     // -- initialisation des composants
@@ -189,4 +197,33 @@ ApplicationManager::ApplicationManager() :
 ApplicationManager::~ApplicationManager()
 {
 
+}
+
+void ApplicationManager::Slot_calculationDone(QUuid calcId, QJsonObject result)
+{
+#ifdef DUMP_RESULTS
+    bool ok = true;
+
+    QDir dumpDir (qApp->applicationDirPath());
+    if(!dumpDir.cd(RESULTS_DIR))
+    {   if(!dumpDir.mkdir(RESULTS_DIR))
+        {   LOG_ERROR("Can't make results directory !");
+            ok = false;
+        }
+        if(!dumpDir.cd(RESULTS_DIR))
+        {   LOG_ERROR(QString("Directory '%1' doesn't exist !").arg(dumpDir.absolutePath()));
+            ok = false;
+        }
+    }
+
+    if(ok)
+    {
+        QFile dumpFile (dumpDir.absoluteFilePath(calcId.toString()+".txt"));
+        dumpFile.open(QIODevice::WriteOnly);
+
+        QByteArray resultRaw = QJsonDocument(result).toJson(QJsonDocument::Compact);
+        dumpFile.write(resultRaw.toStdString().c_str());
+        dumpFile.close();
+    }
+#endif
 }
