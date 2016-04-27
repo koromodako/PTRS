@@ -30,7 +30,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // ---- Configuration MainWindow
     this->setCentralWidget(centralWidget);
-    this->setWindowTitle("PTRS - Server");
+    this->setWindowTitle("PICARD - Server Control");
     this->setMinimumSize(900, 500);
 }
 

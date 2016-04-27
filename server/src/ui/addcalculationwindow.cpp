@@ -35,7 +35,7 @@ AddCalculationWindow::AddCalculationWindow(QWidget *parent) : QMainWindow(parent
         this->updateOptions(listPlugins[0]);
         this->fetchPluginParameters(listPlugins[0]);
 
-        this->setWindowTitle("PTRS - New calculation");
+        this->setWindowTitle("PICARD - New calculation");
     }
     else
     {
